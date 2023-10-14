@@ -1,0 +1,239 @@
+export interface AppliedCandidateListConfig {
+  name?: string
+  state?: string
+}
+
+export interface RecInterviewerListConfig {
+  page?: number | string
+  size?: number | string
+  name?: string
+  skill?: string
+}
+
+export interface RecInterviewerInterface {
+  email: string
+  phone: string
+  fullName: string
+  avatar: string
+  address: string
+  about: string
+  skills: {
+    skillId: number
+    name: string
+  }[]
+  projects: {
+    projectId: string
+    projectName: string
+    positionInProject: string
+    description: string
+  }[]
+  awards: {
+    awardId: string
+    awardName: string
+    awardOrganization: string
+    awardWinningTime: string
+  }[]
+  experiences: {
+    experienceId: string
+    companyName: string
+    position: string
+    time: string
+  }[]
+  courses: {
+    courseId: string
+    courseName: string
+    trainningOrganizations: string
+    completionTime: string
+  }[]
+  certificates: {
+    certificateId: string
+    certificateName: string
+    certificateBody: string
+    certificationTime: string
+  }[]
+  educations: {
+    educationId: string
+    schoolName: string
+    specialized: string
+    certificate: string
+  }[]
+  dateOfBirth: string
+  interviewerId: string
+}
+
+export interface RecCandidateList {
+  index?: number | string
+  size?: number | string
+  name?: string
+  skill?: string
+}
+export interface RecCandidateInterface {
+  email: string
+  phone: number | string
+  fullName: any
+  avatar: string
+  address: string
+  about: string
+  skills: {
+    skillId: number
+    name: string
+  }[]
+  projects: {
+    projectId: string
+    projectName: string
+    positionInProject: string
+    description: string
+  }[]
+  awards: {
+    awardId: string
+    awardName: string
+    awardOrganization: string
+    awardWinningTime: string
+  }[]
+  experiences: {
+    experienceId: string
+    companyName: string
+    position: string
+    time: string
+  }[]
+  courses: {
+    courseId: string
+    courseName: string
+    trainningOrganizations: string
+    completionTime: string
+  }[]
+  certificates: {
+    certificateId: string
+    certificateName: string
+    certificateBody: string
+    certificationTime: string
+  }[]
+  educations: {
+    educationId: string
+    schoolName: string
+    specialized: string
+    certificate: string
+  }[]
+  dateOfBirth: string
+  interviewerId: string
+}
+
+export interface JobReccerListConfig {
+  page?: number | string
+  size?: number | string
+  name?: string
+  type?: string
+  location?: string
+  posName?: string
+}
+
+export interface AdminJobListConfig {
+  page?: number | string
+  size?: number | string
+}
+export interface AdminJobInterface {
+  idJob: string
+  name: string
+  date: string
+  quantity: number
+  member: string
+}
+
+export interface AdminJobPassInterface {
+  name: string
+  date: string
+  phone: number
+  score: string
+  state: string
+  interview: string
+}
+
+export interface AdminDelete {
+  fullName: string
+  createdAt: string
+  clastLoginAt: string
+  email: string
+  phone: number
+  gender: string
+  userId: string
+  state: string
+}
+export interface AdminDeleteAcountConfig {
+  index: string
+  size: string
+  fullName: string
+}
+export interface AdminJobPassListConfig {
+  page?: number | string
+  size?: number | string
+  id?: number | string
+}
+export interface AcountFrofileInterface {
+  userId: string
+  name: string
+  avatar: string
+  phone: number
+  address: string
+}
+export interface AcountFrofileUsersInterface {
+  userId: string
+  name: string
+  avatar: string
+  createdAt: string
+  phone: number
+  address: string
+  blackDate: string
+  blackReason: string
+  email: string
+  role: string
+}
+
+export interface QuestionListConfig {
+  page?: number | string
+  size?: number | string
+  skill?: string
+  type?: string
+  note?: number | string
+  content?: string
+}
+
+export interface QuestionListInterface {
+  skill: string
+  type: string
+  questionId?: number | string
+  note: number | string
+  content: string
+}
+
+export interface TypeListInterface {
+  type: string
+}
+
+export interface SkillListInterface {
+  skillId: number
+  skill: string
+}
+
+export interface DataSearchInterface {
+  skill?: string
+  type?: string
+}
+
+export interface Pagable {
+  page?: number | string
+  limit?: number | string
+}
+
+export interface GetUsersInterviewsParams extends Pagable {}
+
+export interface ResumeResponse {
+  resumeId: string
+  socialActivity: null
+  upload: true
+  resumeUpload: 'https://res.cloudinary.com/dc6weg8vp/image/upload/v1690873255/Recruiment%20Assets/CV/internship_resume.pdf.pdf'
+  createAt: string
+  updateAt: string
+  name: string
+}
+
+export type LoadingStatus = 'pending' | 'idle' | 'failed' | 'fulfill'
