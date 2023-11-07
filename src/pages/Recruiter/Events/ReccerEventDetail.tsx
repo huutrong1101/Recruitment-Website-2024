@@ -82,6 +82,7 @@ export default function ReccerEventDetail() {
   const [time, setTime] = useState('')
   const [location, setlocation] = useState('')
   const [title, settitle] = useState<string | null>(null)
+  const [name, setName] = useState('')
   const [description, setdescription] = useState('')
   const [openSave, setOpenSave] = React.useState(false)
 
@@ -104,11 +105,13 @@ export default function ReccerEventDetail() {
     const getEventDetail = async () => {
       try {
         const response = await axiosInstance(`/events/${eventId}`)
+
         // Set state with the response data
-        setAvatar(response.data.result.img)
+        setAvatar(response.data.result.image.url)
         setDayend(moment(response.data.result.deadline).format('YYYY-MM-DD'))
-        setDaystar(moment(response.data.result.startAt).format('YYYY-MM-DD'))
+        setDaystar(moment(response.data.result.createdAt).format('YYYY-MM-DD'))
         setTime(response.data.result.time)
+        setName(response.data.result.name)
         setlocation(response.data.result.location)
         settitle(response.data.result.title)
         setdescription(response.data.result.description)
@@ -123,6 +126,8 @@ export default function ReccerEventDetail() {
 
   const handleSubmit = (event: any) => {
     event.preventDefault()
+
+    console.log('check')
 
     if (title === null || title === undefined) {
       throw new Error(`Title is null or not found.`)
@@ -156,13 +161,22 @@ export default function ReccerEventDetail() {
     const formData = new FormData()
     const formattedValueStart = moment(daystar).format('YYYY-MM-DD')
     const formattedValueDeadline = moment(dayend).format('YYYY-MM-DD')
+    // formData.append('title', title)
+    // formData.append('description', description)
+    // formData.append('file', avatar1 !== null ? avatar1 : new File([], ''))
+    // formData.append('startAt', formattedValueStart)
+    // formData.append('deadline', formattedValueDeadline)
+    // formData.append('location', location)
+    // formData.append('time', time)
+
     formData.append('title', title)
     formData.append('description', description)
-    formData.append('file', avatar1 !== null ? avatar1 : new File([], ''))
-    formData.append('startAt', formattedValueStart)
-    formData.append('deadline', formattedValueDeadline)
+    formData.append('image', avatar1 !== null ? avatar1 : new File([], ''))
+    formData.append('startAt', daystar)
+    formData.append('deadline', dayend)
     formData.append('location', location)
-    formData.append('time', time)
+    formData.append('time', time + ':00')
+    formData.append('name', 'Giáng sinh an lành test')
 
     if (isSubmitting) return
 
@@ -176,7 +190,9 @@ export default function ReccerEventDetail() {
       .then(() => {
         navigate('/recruiter/events/')
       })
-      .catch((error) => toast.error(error.response.data.message))
+      .catch((error) => {
+        toast.error(error.response?.data?.message || 'An error occurred.')
+      })
       .finally(() => {
         setIsSubmitting(false)
       })
@@ -203,7 +219,6 @@ export default function ReccerEventDetail() {
   const handleDelete = (event: any) => {
     event && event.preventDefault()
 
-    navigate(`/recruiter/events`)
     setDialogData({ ...dialogData, loading: true })
     toast
       .promise(axiosInstance.delete(`recruiter/events/${eventId}`), {
@@ -211,6 +226,7 @@ export default function ReccerEventDetail() {
       })
       .then(() => {
         toast.success(`Deleted the selected event`)
+        navigate(`/recruiter/events`)
       })
       .catch((err) => toast.error(err.response.data.message))
       .finally(() => {
@@ -280,6 +296,21 @@ export default function ReccerEventDetail() {
                   />
                 </div>
 
+                <div className={classnames(' items-left rounded-xl flex-1')}>
+                  <label className='mx-4 text-sm font-normal leading-7 text-gray-600' htmlFor='name'>
+                    Name
+                  </label>
+                  <input
+                    id='name'
+                    name='name'
+                    value={name}
+                    className='resize-none p-2.5 text-xs w-full text-justify bg-white border rounded-xl outline-none focus:ring-1 ring-emerald-700'
+                    placeholder='The name of the event'
+                    onChange={(event) => setName(event.target.value)}
+                    required
+                  />
+                </div>
+
                 {/* Description */}
                 <div className={classNames(`text-justify`)}>
                   <label className='mx-4 text-sm font-normal leading-7 text-gray-600' htmlFor='description'>
@@ -312,14 +343,8 @@ export default function ReccerEventDetail() {
                       })
                       toggleVisibleDialog()
                     }}
-                    // isLoading={isPending}
-                    // disabled={isPending}
                   />
-                  <PrimaryButton
-                    text='Save changes'
-                    // isLoading={isPending}
-                    // disabled={isPending}
-                  />
+                  <PrimaryButton text='Save changes' onClick={handleSubmit} />
                 </div>
               </div>
             </div>

@@ -233,18 +233,6 @@ export default function ReccerEventManagement() {
 
             <PrimaryButton text='Reset' className='bg-red-600 hover:bg-red-700' />
           </div>
-
-          {/* Add Event */}
-          {/* <div className='flex flex-row-reverse items-center flex-1'>
-            <div>
-              <PrimaryButton
-                text={`Add event`}
-                onClick={() => {
-                  navigate(`/recruiter/events-add`)
-                }}
-              />
-            </div>
-          </div> */}
         </div>
 
         {/* Content */}
@@ -270,6 +258,21 @@ export default function ReccerEventManagement() {
         <div className='flex flex-col mt-6'>
           {/* Pagination  */}
           <Pagination queryConfig={queryConfig} pageSize={pageSize} url='/recruiter/events' />
+        </div>
+      </div>
+      {/* Add Event */}
+      <div className='absolute right-0 p-4 text-white bottom-4'>
+        <div className='sm:w-[100px] h-[50px] relative'>
+          <Link to='../addevent'>
+            <button className='relative w-[50%] h-full text-3xl font-w bg-[#05966A] hover:bg-emerald-700 text-white rounded-full transition-all duration-300 hover:w-[100%] group'>
+              <span className='absolute text-sm transition-opacity duration-300 transform -translate-x-1/2 -translate-y-1/2 opacity-0 left-1/2 top-1/2 group-hover:opacity-100'>
+                Add Event
+              </span>
+              <span className='absolute transition-opacity duration-300 transform -translate-x-1/2 -translate-y-1/2 opacity-100 left-1/2 top-1/2 group-hover:opacity-0'>
+                +
+              </span>
+            </button>{' '}
+          </Link>
         </div>
       </div>
     </>

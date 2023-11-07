@@ -39,8 +39,13 @@ export default function ConfirmPassword() {
   }, [])
 
   const handleSend = (data: any) => {
+    const newData = new FormData()
+    newData.append('token', token)
+    newData.append('confirmPassword', data.confirmPassword)
+    newData.append('newPassword', data.newPassword)
+
     toast
-      .promise(AuthService.createNewPassword(token, data), {
+      .promise(AuthService.createNewPassword(token, newData), {
         pending: `Creating your new password`,
         success: `Your new password was created. Let's login `
       })

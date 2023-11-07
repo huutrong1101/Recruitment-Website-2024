@@ -29,11 +29,11 @@ const RecJobListSlice = createSlice({
 export default RecJobListSlice.reducer
 export const { setRecjobsList, setRecjobsListStatus, setTotalJobs, setRecjobType } = RecJobListSlice.actions
 
-export const fetchRecJobList = () => {
+export const fetchRecJobList = (query: string) => {
   return async function fetchRecJobListThunk(dispatch: Dispatch) {
     dispatch(setRecjobsListStatus(STATUS.LOADING))
     try {
-      const response = await axiosInstance.get(`recruiter/jobs`)
+      const response = await axiosInstance.get(`/jobs?${query}`)
       const data = await response.data
       dispatch(setRecjobsList(data.result.content))
       dispatch(setRecjobsListStatus(STATUS.IDLE))

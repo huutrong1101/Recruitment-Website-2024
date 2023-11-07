@@ -188,23 +188,6 @@ export interface AcountFrofileUsersInterface {
   role: string
 }
 
-export interface QuestionListConfig {
-  page?: number | string
-  size?: number | string
-  skill?: string
-  type?: string
-  note?: number | string
-  content?: string
-}
-
-export interface QuestionListInterface {
-  skill: string
-  type: string
-  questionId?: number | string
-  note: number | string
-  content: string
-}
-
 export interface TypeListInterface {
   type: string
 }
@@ -225,15 +208,5 @@ export interface Pagable {
 }
 
 export interface GetUsersInterviewsParams extends Pagable {}
-
-export interface ResumeResponse {
-  resumeId: string
-  socialActivity: null
-  upload: true
-  resumeUpload: 'https://res.cloudinary.com/dc6weg8vp/image/upload/v1690873255/Recruiment%20Assets/CV/internship_resume.pdf.pdf'
-  createAt: string
-  updateAt: string
-  name: string
-}
 
 export type LoadingStatus = 'pending' | 'idle' | 'failed' | 'fulfill'

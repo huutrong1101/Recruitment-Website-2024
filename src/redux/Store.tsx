@@ -7,6 +7,10 @@ import JobSlice from './reducer/JobSlice'
 import JobDetailSlice from './reducer/JobDetailSlice'
 import RecJobSlice from './reducer/RecJobSlice'
 import RecJobDetailSlice from './reducer/RecJobDetailSlice'
+import RecInterviewerSilce from './reducer/RecInterviewerSilce'
+import CandidateListSlice from './reducer/CandidateListSlice'
+import QuestionListSlice from './reducer/QuestionListSlice'
+import INTCandidatesSlice from './reducer/INTCandidatesSlice'
 
 export const ApplicationStore = configureStore({
   reducer: {
@@ -19,7 +23,13 @@ export const ApplicationStore = configureStore({
     OneTimePassword: OneTimePasswordSlice,
 
     RecJobList: RecJobSlice,
-    RecJobDetail: RecJobDetailSlice
+    RecJobDetail: RecJobDetailSlice,
+
+    RecInterviewerList: RecInterviewerSilce,
+    CandidateList: CandidateListSlice,
+
+    QuestionList: QuestionListSlice,
+    INTCandidates: INTCandidatesSlice
   }
 })
 

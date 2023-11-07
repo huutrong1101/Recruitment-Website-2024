@@ -11,6 +11,8 @@ export default function JobInformationCard({ cardData, jobId }: any) {
   const [visibleApplyDialog, setVisibleApplyDialog] = useState<boolean>(false)
   const { isLoggedIn, user } = useAppSelector((app) => app.Auth)
   const { isApplied } = useAppSelector((state) => state.JobDetail.response)
+
+  console.log(isApplied)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -62,17 +64,16 @@ export default function JobInformationCard({ cardData, jobId }: any) {
                 See your applicant
               </button>
             )}
+            <JobInformationApplyModal
+              visible={visibleApplyDialog}
+              onClose={toggleVisibleApplyModal}
+              onApplySucceeded={handleOnApplySucceeded}
+            />
           </>
         ) : (
           <></>
         )}
       </div>
-
-      <JobInformationApplyModal
-        visible={visibleApplyDialog}
-        onClose={toggleVisibleApplyModal}
-        onApplySucceeded={handleOnApplySucceeded}
-      />
     </div>
   )
 }

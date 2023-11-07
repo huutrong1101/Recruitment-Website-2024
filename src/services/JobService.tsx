@@ -73,9 +73,7 @@ async function getRecJobFromID(jobId: string) {
   if (!jobId) {
     throw new Error(`The value jobId cannot be undefined`)
   }
-  return axiosInstance.get(`/jobs/${jobId}`, {
-    headers: { Authorization: `` }
-  })
+  return axiosInstance.get(`jobs/${jobId}`)
 }
 
 const createJob = async (data: any) => {
@@ -83,7 +81,7 @@ const createJob = async (data: any) => {
 }
 
 const deleteJob = async (data: string) => {
-  return await axiosInstance.delete(`/recruiter/job/${data}`)
+  return await axiosInstance.delete(`/recruiter/jobs/${data}`)
 }
 
 const editJob = async (data: any, jobId: any) => {

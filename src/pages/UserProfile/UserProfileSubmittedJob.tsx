@@ -4,11 +4,13 @@ import { Fragment, useEffect, useState } from 'react'
 import { HiListBullet } from 'react-icons/hi2'
 import Button from '../../components/Button/Button'
 import Table from '../../components/Table/Table'
+
 import moment from 'moment'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import JobStatusBadge from '../../components/Badge/JobStatusBadge'
 import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
+import { getCandidateSubmittedJobs } from '../../services/CandidateService'
 
 export default function UserProfileSubmittedJob() {
   const [filterType, setFilterType] = useState<number>(0)
@@ -24,6 +26,33 @@ export default function UserProfileSubmittedJob() {
     totalElements: 10,
     totalPages: 1
   })
+
+  useEffect(() => {
+    const index = searchParams.get('index') || 1
+    const size = searchParams.get('size') || 5
+    setPagination({ ...pagination, loading: true })
+
+    getCandidateSubmittedJobs({ index, size })
+      .then((response) => {
+        const { result } = response.data
+        const { pageNumber, pageSize, totalElements, totalPages } = result
+
+        // Normalize the result onto a fitted table data
+        // Set onto a data list for rendering
+        setApplicants(normalizeResponseResult(result))
+        setPagination({
+          ...pagination,
+          pageNumber,
+          pageSize,
+          totalElements,
+          totalPages,
+          loading: false
+        })
+      })
+      .catch(() => {
+        // toast.error(``)
+      })
+  }, [searchParams])
 
   const normalizeResponseResult = (result: any) => {
     return (
@@ -124,31 +153,6 @@ export default function UserProfileSubmittedJob() {
                   leaveTo='opacity-0'
                 >
                   <Listbox.Options className='absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
-                    {/* {APPLICANT_STATUS.map((status, personIdx) => (
-                      <Listbox.Option
-                        key={status}
-                        className={({ active }) =>
-                          `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                            active
-                              ? "bg-emerald-100 text-emerald-900"
-                              : "text-zinc-600"
-                          }`
-                        }
-                        value={personIdx}
-                      >
-                        {({ selected }: any) => (
-                          <>
-                            <span
-                              className={`block truncate ${
-                                selected ? "font-medium" : "font-normal"
-                              }`}
-                            >
-                              {status}
-                            </span>
-                          </>
-                        )}
-                      </Listbox.Option>
-                    ))} */}
                     {[...new Array(10)].map((_, idx) => {
                       const _value = (idx + 1) * 5
                       return (

@@ -26,7 +26,7 @@ export default function EventCard({ event }: EventCardProps) {
       <div className='bg-white border rounded-lg shadow-lg hover:border-emerald-700'>
         <div className={classNames('w-full shadow')}>
           <img
-            src={event.img || blog_image}
+            src={event.image.url || blog_image}
             alt='blog_image'
             className={classNames('w-full h-[150px] object-cover aspect-video rounded-t-md')}
           />

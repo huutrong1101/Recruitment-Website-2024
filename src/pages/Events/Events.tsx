@@ -11,6 +11,7 @@ import useQueryParams from '../../hooks/useQueryParams'
 import axiosInstance from '../../utils/AxiosInstance'
 import { EventInterface, EventListConfig } from '../../types/event.type'
 import EventCard from '../../components/EventCard/EventCard'
+import { AiOutlineBlock } from 'react-icons/ai'
 
 export type QueryConfig = {
   [key in keyof EventListConfig]: string
@@ -97,8 +98,11 @@ export default function Events() {
                   </div>
                 ))
               ) : (
-                <div className='flex justify-center w-full mb-10'>
-                  <span>Không tìm thấy kết quả</span>
+                <div className='flex flex-col justify-center w-full mb-10 min-h-[70vh] items-center text-3xl gap-4'>
+                  <span>
+                    <AiOutlineBlock />
+                  </span>
+                  <span>There is no event available.</span>
                 </div>
               )}
             </div>
@@ -128,7 +132,7 @@ export default function Events() {
                 )}
               >
                 <div className={classNames('')}>
-                  <img src={event.img || blog_image} alt='' className={classNames('object-cover aspect-video')} />
+                  <img src={event.image.url || blog_image} alt='' className={classNames('object-cover aspect-video')} />
                 </div>
                 <div className={classNames('px-4 py-2')}>
                   <h3 className='text-xs font-medium text-black capitalize line-clamp-3'>{event.title}</h3>

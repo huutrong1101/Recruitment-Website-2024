@@ -3,7 +3,10 @@ export interface EventInterface {
   title: string
   name: string
   description: string
-  img: string | null
+  image: {
+    publicId: string
+    url: string
+  }
   author: string
   linkContacts: {
     Instagram: string

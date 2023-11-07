@@ -38,7 +38,7 @@ export default function AdminNavbar({ showNav, setShowNav }: AdminNavbarProps) {
           <div>
             <Menu.Button className='inline-flex items-center justify-center w-full gap-2'>
               {user?.avatar === null ? (
-                <DummyAvatar iconClassName='text-xl' />
+                <DummyAvatar iconClassName='text-6xl flex items-center justify-center' wrapperClassName='h-32 w-32' />
               ) : (
                 <img
                   src={user?.avatar}
@@ -46,7 +46,7 @@ export default function AdminNavbar({ showNav, setShowNav }: AdminNavbarProps) {
                   alt={`${user?.fullName}'s avatar`}
                 />
               )}
-              <span className='hidden font-medium text-gray-700 md:block'>{user?.fullName}</span>
+              <span className='hidden font-medium text-gray-700 md:block'> {user?.fullName}</span>
               <ChevronDownIcon className='w-4 h-4 ml-2 text-gray-700' />
             </Menu.Button>
           </div>

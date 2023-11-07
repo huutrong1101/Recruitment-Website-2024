@@ -8,7 +8,8 @@ import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
 import Dialog from '../../components/Modal/Dialog'
 import { useAppSelector } from '../../hooks/hooks'
 import { getCandidateResume, sendApplyRequestToJob } from '../../services/CandidateService'
-import { LoadingStatus, ResumeResponse } from '../../types/services'
+import { LoadingStatus } from '../../types/services'
+import { ResumeResponse } from '../../types/resume.type'
 
 export interface JobInformationApplyModal {
   visible: boolean
@@ -29,7 +30,7 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
     getCandidateResume()
       .then((response) => {
         const { result } = response.data
-        setResumeList(result)
+        setResumeList(result.content)
       })
       .finally(() => setResumeListLoadingState(false))
   }, [])
@@ -39,7 +40,6 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
     if (resumeListLoadingState) {
       return toast.warn(`The resume list is loading, please wait`)
     }
-
     setSubmitLoadingState('pending')
     const { resumeId } = resumeList[resumeSelectedIndex]
     if (!jobId) {
@@ -68,10 +68,10 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
       onClose={onClose}
       title=''
       titleClass='text-lg font-semibold leading-6text-gray-900'
-      // cancelTitle="Cancel"
-      // successClass="text-emerald-700 bg-emerald-100 hover:bg-emerald-200 focus-visible:ring-emerald-500"
-      // successTitle="Apply"
-      size='max-w-full md:max-w-lg xl:max-w-sm'
+      // cancelTitle='Cancel'
+      // successClass='text-emerald-700 bg-emerald-100 hover:bg-emerald-200 focus-visible:ring-emerald-500'
+      // successTitle='Apply'
+      size='max-w-full md:max-w-lg xl:max-w-lg'
       // handleSucces={handleApply}
       buttons={[
         <button onClick={onClose} className={`bg-red-200 px-4 py-2 rounded-xl text-red-900`}>
@@ -167,6 +167,7 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
                           `text-gray-950`
                         )}
                         onClick={() => handleSelectResume(_index)}
+                        key={_index}
                       >
                         {/* <AiOutlineCheckCircle /> */}
                         <span className={classNames(`flex-1 text-left`)}>{resumeItem.name}</span>

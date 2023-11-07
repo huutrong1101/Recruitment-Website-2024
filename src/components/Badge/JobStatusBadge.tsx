@@ -5,7 +5,7 @@ import Badge from './Badge'
 
 interface JobStatusBadge extends React.HTMLProps<HTMLDivElement> {
   className?: string
-  status: 'NOT_RECEIVED' | 'RECEIVED' | 'PASSED' | 'FAILED'
+  status: 'NOT_RECEIVED' | 'RECEIVED' | 'PASSED' | 'FAILED' | 'PENDING'
 }
 
 export default function JobStatusBadge({ className, status }: JobStatusBadge) {
@@ -16,6 +16,7 @@ export default function JobStatusBadge({ className, status }: JobStatusBadge) {
         {
           'bg-emerald-600': status === 'PASSED',
           'bg-yellow-600': status === 'NOT_RECEIVED',
+          'bg-yellow-500': status === 'PENDING',
           'bg-orange-600': status === 'RECEIVED' || status === 'FAILED'
           // "bg-red-600": ,
         },
@@ -32,12 +33,17 @@ export default function JobStatusBadge({ className, status }: JobStatusBadge) {
         })}
       ></span>
       <span
-        className={classnames({
-          'text-emerald-300': status === 'PASSED',
-          'text-yellow-300': status === 'NOT_RECEIVED',
-          'text-orange-300': status === 'RECEIVED' || status === 'FAILED'
-          // "text-red-300": status === "FAILED",
-        })}
+        className={classnames(
+          {
+            'text-emerald-300': status === 'PASSED',
+            'text-yellow-300': status === 'NOT_RECEIVED',
+            'text-yellow-100': status === 'PENDING',
+            'text-orange-300': status === 'RECEIVED' || status === 'FAILED'
+
+            // "text-red-300": status === "FAILED",
+          },
+          'text-center'
+        )}
       >
         {APPLICANTS_STATUS[status]}
       </span>

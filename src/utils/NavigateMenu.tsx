@@ -22,7 +22,8 @@ import {
   UserGroupIcon,
   UsersIcon,
   FolderIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  QuestionMarkCircleIcon
 } from '@heroicons/react/24/solid'
 MdOutlineEventAvailable
 
@@ -91,6 +92,11 @@ export const linksAll = [
         url: '/admin'
       },
       {
+        name: 'Profile',
+        icon: <UserIcon />,
+        url: '/admin/profile'
+      },
+      {
         name: 'Manager Account',
         icon: <UserIcon />,
         url: '/admin/account'
@@ -151,19 +157,34 @@ export const linksAll = [
     title: 'INTERVIEWER',
     links: [
       {
+        name: 'Overview',
+        icon: <ChartPieIcon />,
+        url: '/interviewer'
+      },
+      {
+        name: 'Profile',
+        icon: <UserIcon />,
+        url: '/interviewer/profile'
+      },
+      {
+        name: 'Information',
+        icon: <UserIcon />,
+        url: '/interviewer/information'
+      },
+      {
         name: 'Interview Recent',
-        icon: <HiOutlineClipboardDocumentList />,
-        url: 'interviewer/interview-recent'
+        icon: <UserGroupIcon />,
+        url: '/interviewer/interview-recent'
       },
       {
         name: 'Candidate Recent',
-        icon: <HiOutlineCalendarDays />,
-        url: 'interviewer/candidate-recent'
+        icon: <UsersIcon />,
+        url: '/interviewer/candidate-recent'
       },
       {
-        name: 'Interview Question',
-        icon: <HiOutlineClipboardDocument />,
-        url: 'interviewer/question'
+        name: 'Questions',
+        icon: <QuestionMarkCircleIcon />,
+        url: '/interviewer/question'
       }
     ]
   }

@@ -11,7 +11,7 @@ import Pagination from '../../../components/Pagination/Pagination'
 import { useAppSelector } from '../../../hooks/hooks'
 import axiosInstance from '../../../utils/AxiosInstance'
 import { JOB_POSITION } from '../../../utils/Localization'
-import { JobInterface, JobListConfig } from '../../../types/product.type'
+import { JobInterface, JobListConfig } from '../../../types/job.type'
 import useQueryParams from '../../../hooks/useQueryParams'
 import RecruiterJobCard from '../../../components/JobCard/RecruiterJobCard'
 
@@ -137,9 +137,7 @@ const ReccerJobManagement = () => {
   }
 
   const fetchJobWithQuery = async (query: string) => {
-    return await axiosInstance(`/jobs?${query}`, {
-      headers: { Authorization: null }
-    })
+    return await axiosInstance(`recruiter/jobs?${query}`)
   }
 
   const handleonClick = (data: any) => {
@@ -200,7 +198,7 @@ const ReccerJobManagement = () => {
                 leaveFrom='transform opacity-100 scale-100'
                 leaveTo='transform opacity-0 scale-95'
               >
-                <Menu.Items className='absolute md:left-[-18px] w-full z-10 md:w-55 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                <Menu.Items className='absolute left-0 z-10 w-full mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
                   <div className='py-1'>
                     {listType.map((type, index) => (
                       <Menu.Item key={index}>

@@ -17,30 +17,7 @@ export default function Navbar() {
   const { isLoggedIn, loading, user } = useAppSelector((app) => app.Auth)
   const [updatedLeftMenu, setUpdatedLeftMenu] = useState([...items])
 
-  useEffect(() => {
-    if (user !== null && user !== undefined) {
-      if (user.role === 'RECRUITER') {
-        if (updatedLeftMenu.length < 4) {
-          setUpdatedLeftMenu([...updatedLeftMenu, { name: 'Dashboard', url: '/recruiter/dashboard' }])
-        }
-      } else if (user.role === 'INTERVIEWER') {
-        const updatedMenuWithoutDashboard = updatedLeftMenu.filter((item) => item.name !== 'Dashboard')
-        setUpdatedLeftMenu([
-          ...updatedMenuWithoutDashboard,
-          { name: 'Dashboard', url: '/interviewer/interview-recent' }
-        ])
-      } else if (user.role === 'ADMIN') {
-        const updatedMenuWithoutDashboard = updatedLeftMenu.filter((item) => item.name !== 'Dashboard')
-        setUpdatedLeftMenu([...updatedMenuWithoutDashboard, { name: 'Dashboard', url: '/admin' }])
-      } else {
-        const updatedMenuWithoutDashboard = updatedLeftMenu.filter((item) => item.name !== 'Dashboard')
-        setUpdatedLeftMenu([...updatedMenuWithoutDashboard])
-      }
-    } else {
-      const updatedMenuWithoutDashboard = updatedLeftMenu.filter((item) => item.name !== 'Dashboard')
-      setUpdatedLeftMenu([...updatedMenuWithoutDashboard])
-    }
-  }, [user])
+  const navigate = useNavigate()
 
   const { pathname: currentPathname } = useLocation()
 

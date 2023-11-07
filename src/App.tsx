@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import UserAppLayout from './layouts/UserAppLayout'
 import Home from './pages/Home/Home'
 import Authenticate from './pages/Authenticate/Authenticate'
@@ -48,6 +48,29 @@ import ReccerJobDetail from './pages/Recruiter/Jobs/ReccerJobDetail'
 import ReccerCandidateManagement from './pages/Recruiter/Candidate/ReccerCandidateManagement'
 import ReccerEventDetail from './pages/Recruiter/Events/ReccerEventDetail'
 import ReccerProfile from './pages/Recruiter/ReccerProfile'
+import EditJob from './pages/Recruiter/Jobs/EditJob'
+import AddJob from './pages/Recruiter/Jobs/AddJob'
+import FilterInterviewer from './components/Routers/FilterInterviewer'
+import InterviewerDashboard from './pages/Interviewer/InterviewerDashboard'
+import ManageQuestion from './pages/Interviewer/Question/ManageQuestion'
+import InterviewRecent from './pages/Interviewer/Interview/InterviewRecent'
+import CandidateRecent from './pages/Interviewer/Candidate/CandidateRecent'
+import AddEvent from './pages/Recruiter/Events/AddEvent/AddEvent'
+import CandidateDetail from './pages/Recruiter/Candidate/CandidateDetail'
+import ReccerInterviewerDetail from './pages/Recruiter/Interview/ReccerInterviewerDetail'
+import InterviewInformation from './pages/Interviewer/InterviewInformation'
+import InterviewProfile from './pages/Interviewer/InterviewProfile'
+import INTCandidateDetail from './pages/Interviewer/Candidate/Detail/INTCandidateDetail'
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
+}
 
 function App() {
   const dispatch = useAppDispatch()
@@ -62,6 +85,9 @@ function App() {
 
   return (
     <BrowserRouter>
+      <>
+        <ScrollToTop />
+      </>
       <Routes>
         <Route path='/' element={<UserAppLayout />}>
           <Route index element={<Home />} />
@@ -78,17 +104,6 @@ function App() {
             <Route element={<AuthenticateLogin />} />
           </Route>
 
-          {/* This route is only accepted when user is logged in and/or token is not broken  */}
-          <Route element={<FilterCandidate />}>
-            <Route path='/profile' element={<UserProfileLayout />}>
-              <Route index element={<UserProfileMyProfile />} />
-              <Route path='information' element={<UserProfileMyInformation />} />
-              <Route path='resume' element={<UserProfileMyResume />} />
-              <Route path='submitted-jobs' element={<UserProfileSubmittedJob />} />
-            </Route>
-            <Route path='/print-resume' element={<PrintResume />} />
-          </Route>
-
           {/* This route is accepted when user is not logged in */}
           <Route element={<FilterNonLogin />}>
             <Route path='/email' element={<EmailConfirmationLayout />}>
@@ -101,12 +116,24 @@ function App() {
               <Route path='confirm-password' element={<ConfirmPassword />} />
             </Route>
           </Route>
+
+          {/* This route is only accepted when user is logged in and/or token is not broken  */}
+          <Route element={<FilterCandidate />}>
+            <Route path='/profile' element={<UserProfileLayout />}>
+              <Route index element={<UserProfileMyProfile />} />
+              <Route path='information' element={<UserProfileMyInformation />} />
+              <Route path='resume' element={<UserProfileMyResume />} />
+              <Route path='submitted-jobs' element={<UserProfileSubmittedJob />} />
+            </Route>
+            <Route path='/print-resume' element={<PrintResume />} />
+          </Route>
         </Route>
 
         {/* ADMIN  */}
         <Route element={<FilterAdmin />}>
           <Route path='/admin' element={<ManagementAppLayOut />}>
             <Route index element={<AdminDashboard />} />
+            <Route path='profile' element={<ReccerProfile />} />
             <Route path='account' element={<AdminManagerAccount />} />
             <Route path='create_account' element={<CreateAccount />} />
             <Route path='jobs' element={<AdminJobs />} />
@@ -122,12 +149,31 @@ function App() {
             {/* Define recruiter routes here */}
             <Route index element={<ReccerDashboard />} />
             <Route path='profile' element={<ReccerProfile />} />
+
             <Route path='jobs' element={<ReccerJobManagement />} />
             <Route path='jobdetail/:jobId' element={<ReccerJobDetail />} />
+            <Route path='addjob' element={<AddJob />} />
+            <Route path='jobdetail/:jobId/edit' element={<EditJob />} />
             <Route path='candidates' element={<ReccerCandidateManagement />} />
+            <Route path='candidates/:userId' element={<CandidateDetail />} />
             <Route path='interviewers' element={<ReccerInterviewerManagement />} />
+            <Route path='interviewers/:interviewerId' element={<ReccerInterviewerDetail />} />
             <Route path='events' element={<ReccerEventManagement />} />
             <Route path='events/:eventId' element={<ReccerEventDetail />} />
+            <Route path='addevent' element={<AddEvent />} />
+          </Route>
+        </Route>
+
+        {/* INTERVIEW  */}
+        <Route element={<FilterInterviewer />}>
+          <Route path='/interviewer' element={<ManagementAppLayOut />}>
+            <Route index element={<InterviewerDashboard />} />
+            <Route path='profile' element={<InterviewProfile />} />
+            <Route path='information' element={<InterviewInformation />} />
+            <Route path='interview-recent' element={<InterviewRecent />} />
+            <Route path='candidate-recent' element={<CandidateRecent />} />
+            <Route path='candidate-recent/:id' element={<INTCandidateDetail />} />
+            <Route path='question' element={<ManageQuestion />} />
           </Route>
         </Route>
       </Routes>

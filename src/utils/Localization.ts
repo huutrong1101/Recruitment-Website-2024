@@ -11,7 +11,8 @@ export const JOB_POSITION: LocalizationDeclarationType = {
   FTOWN2: 'F-Town 2',
   FTOWN3: 'F-Town 3',
   FRONTEND: 'Front-End',
-  BACKEND: 'Back-End'
+  BACKEND: 'Back-End',
+  REMOTE: 'Remote'
 }
 
 export const TYPE_alter: LocalizationDeclarationType = {
@@ -48,7 +49,8 @@ export const APPLICANTS_STATUS: LocalizationDeclarationType = {
   PASS: 'Passed',
   FAIL: 'Failed',
   PASSED: 'Passed',
-  FAILED: 'Received'
+  FAILED: 'Received',
+  PENDING: 'Pending'
 }
 
 export const ADMIN_APPLICANTS_STATUS: LocalizationDeclarationType = {

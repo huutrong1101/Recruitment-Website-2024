@@ -25,3 +25,7 @@ export interface JobListConfig {
   position?: string
   active?: boolean
 }
+
+export interface JobDataInterface {
+  listJobInfoSearch: { [index: string]: object[] }
+}

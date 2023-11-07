@@ -13,8 +13,6 @@ const SideBar = forwardRef<HTMLDivElement, SideBarProps>(({ showNav }, ref: Ref<
 
   const { user } = useAppSelector((state: any) => state.Auth)
 
-  console.log(user.role)
-
   let links = linksAll
   if (user?.role == 'INTERVIEWER') {
     links = [linksAll[2]]

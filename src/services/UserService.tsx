@@ -1,15 +1,15 @@
 import qs from 'query-string'
 import axiosInstance from '../utils/AxiosInstance'
-import { hasLocalToken } from '../utils/localToken'
+import { getLocalToken, hasLocalToken } from '../utils/localToken'
 
 const getUserFromToken = async () => {
   if (!hasLocalToken()) {
     throw new Error(`Unable to load the token`)
   }
   return await axiosInstance.get(`/user/profile`, {
-    // headers: {
-    //   Authorization: `Bearer ${getLocalToken()}`,
-    // },
+    headers: {
+      Authorization: `Bearer ${getLocalToken()}`
+    }
   })
 }
 
@@ -50,12 +50,12 @@ const getUserInterviews = async ({ index, size }: any) => {
 }
 
 const getUserInformation = async () => {
-  return await axiosInstance.get(`/candidate/information`)
+  // return await axiosInstance.get(`/candidate/information`)
 }
 
 const updateUserInformation = async (values: any) => {
   const _values = JSON.stringify(values)
-  return await axiosInstance.put(`/candidate/information`, { values: _values })
+  // return await axiosInstance.put(`/candidate/information`, { values: _values })
 }
 
 export const UserService = {

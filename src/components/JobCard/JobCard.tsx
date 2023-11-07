@@ -3,7 +3,7 @@ import moment from 'moment'
 import { HiComputerDesktop, HiMapPin, HiMiniUser, HiUser } from 'react-icons/hi2'
 import { Link } from 'react-router-dom'
 import logo_FPT from '../../../images/logo_FPT.png'
-import { JobInterface } from '../../types/product.type'
+import { JobInterface } from '../../types/job.type'
 import { JOB_POSITION } from '../../utils/Localization'
 
 interface JobCardProps {

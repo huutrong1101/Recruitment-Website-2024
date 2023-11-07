@@ -35,6 +35,8 @@ export default function AuthenticateLogin() {
         navigate('/admin')
       } else if (userData.payload.role === 'RECRUITER') {
         navigate('/recruiter')
+      } else if (userData.payload.role === 'INTERVIEWER') {
+        navigate('/interviewer')
       } else {
         navigate('/')
       }

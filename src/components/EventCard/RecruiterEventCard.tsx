@@ -7,15 +7,12 @@ import { Link } from 'react-router-dom'
 import blog_image from '../../../images/blog_image.png'
 
 export default function RecruiterEventCard({ event }: any) {
-  useEffect(() => {
-    console.log(event)
-  }, [event])
   return (
     <Link to={`/recruiter/events/${event.eventId}`}>
       <div className='flex flex-col bg-white border rounded-lg shadow-lg cursor-pointer rounded-t-xl hover:border-emerald-700'>
         {/* Header thumbnail */}
         <div className='flex justify-center w-full'>
-          <img src={event.img || blog_image} className='object-center shadow-sm aspect-video rounded-t-xl' />
+          <img src={event.image.url || blog_image} className='object-center shadow-sm aspect-video rounded-t-xl' />
         </div>
 
         <div className='flex flex-col gap-3 px-6 py-4'>

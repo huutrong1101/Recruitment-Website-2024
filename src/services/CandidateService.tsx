@@ -19,5 +19,5 @@ export async function getCandidateSubmittedJobs({ index, size }: any) {
 }
 
 export async function getSkills() {
-  return axiosInstance.get(`/candidate/skills`)
+  return axiosInstance.get(`/skills`)
 }

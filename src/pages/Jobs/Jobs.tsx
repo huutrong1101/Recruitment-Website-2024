@@ -10,7 +10,7 @@ import Pagination from '../../components/Pagination/Pagination'
 import { useAppSelector } from '../../hooks/hooks'
 import useQueryParams from '../../hooks/useQueryParams'
 import axiosInstance from '../../utils/AxiosInstance'
-import { JobInterface, JobListConfig } from '../../types/product.type'
+import { JobInterface, JobListConfig } from '../../types/job.type'
 import FilterJobs from './FilterJobs'
 
 export type QueryConfig = {

@@ -26,6 +26,8 @@ export default function EventDetail() {
     getEventDetail()
   }, [eventId])
 
+  console.log(event)
+
   const formattedDate = moment(event?.startAt).format('Do MMMM, YYYY')
 
   const handleForward = (url: string) => {
@@ -40,7 +42,7 @@ export default function EventDetail() {
             <div className={classnames('bg-white rounded-lg shadow-lg w-[70%] border')}>
               <div>
                 <img
-                  src={event?.img || blog_image}
+                  src={event?.image?.url || blog_image}
                   alt='blog_image'
                   className={classnames('w-full object-cover rounded-t-md')}
                 />

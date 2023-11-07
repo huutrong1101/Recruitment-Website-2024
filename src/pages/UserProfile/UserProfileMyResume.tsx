@@ -49,7 +49,7 @@ export default function UserProfileMyResume() {
     getCandidateResume()
       .then((response) => {
         const { result } = response.data
-        setResumeList([...result].sort((a: any, b: any) => b.createdAt - a.createdAt))
+        setResumeList([...result.content].sort((a: any, b: any) => b.createdAt - a.createdAt))
       })
       .catch(() => toast.error(`There was an error when fetching resume`))
       .finally(() => {

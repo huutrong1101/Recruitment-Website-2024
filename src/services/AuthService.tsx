@@ -39,7 +39,7 @@ const forgetPassword = async (data: FormData) => {
 }
 
 const createNewPassword = async (token: string, data: FormData) => {
-  return await axiosInstance.put(`/user/reset-password?token=${token}`, data)
+  return await axiosInstance.post(`/user/reset-password?token=${token}`, data)
 }
 
 export const AuthService = {

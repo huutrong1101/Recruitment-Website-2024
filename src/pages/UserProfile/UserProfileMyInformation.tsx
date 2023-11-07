@@ -48,21 +48,21 @@ export default function UserProfileMyInformation() {
     return () => {}
   }, [])
 
-  // useEffect(() => {
-  //   getSkills()
-  //     .then((response) => {
-  //       const { result } = response.data
-  //       setSkillOptions(
-  //         result.map(({ skillId, name }: any) => {
-  //           return {
-  //             label: name,
-  //             value: skillId
-  //           }
-  //         })
-  //       )
-  //     })
-  //     .catch(() => toast.error(`Cannot fetch candidate skills`))
-  // }, [])
+  useEffect(() => {
+    getSkills()
+      .then((response) => {
+        const { result } = response.data
+        setSkillOptions(
+          result.map(({ skillId, name }: any) => {
+            return {
+              label: name,
+              value: skillId
+            }
+          })
+        )
+      })
+      .catch(() => toast.error(`Cannot fetch candidate skills`))
+  }, [])
 
   // const [selectedOptions, setSelectedOptions] = useState([]);
 
@@ -77,11 +77,12 @@ export default function UserProfileMyInformation() {
 
   const handleSubmit = (e: any, updatedItem: any) => {
     e !== null && e.preventDefault()
-    toast.promise(UserService.updateUserInformation(updatedItem), {
-      pending: `Updating your information`,
-      success: `Successfully update the information`,
-      error: `There was an error when updated the information`
-    })
+    console.log(updatedItem)
+    // toast.promise(UserService.updateUserInformation(updatedItem), {
+    //   pending: `Updating your information`,
+    //   success: `Successfully update the information`,
+    //   error: `There was an error when updated the information`
+    // })
   }
 
   const handleValuesUpdate = (ofId: string, values: any[]) => {

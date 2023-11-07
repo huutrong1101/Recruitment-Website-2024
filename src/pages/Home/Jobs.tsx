@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import { Link } from 'react-router-dom'
 import { data } from '../../data/fetchData'
 import JobCard from '../../components/JobCard/JobCard'
-import { JobInterface } from '../../types/product.type'
+import { JobInterface } from '../../types/job.type'
 import { useAppSelector } from '../../hooks/hooks'
 
 export default function Jobs() {

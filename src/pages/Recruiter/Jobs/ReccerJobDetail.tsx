@@ -22,6 +22,8 @@ import { fetchRecJobDetail } from '../../../redux/reducer/RecJobDetailSlice'
 import JobDescriptionWidget from '../../JobDetail/JobDescriptionWidget'
 import NotFound from '../../../components/NotFound/NotFound'
 import RecJobInformationCard from './ReccerJobInformationCard'
+import Modal from '../../../components/Modal/Modal'
+import { JobService } from '../../../services/JobService'
 
 export default function ReccerJobDetail() {
   const [jobInformation, setJobInformation] = useState([
@@ -115,14 +117,29 @@ export default function ReccerJobDetail() {
     let path = `./edit`
     navigate(path)
   }
-  const [open, setOpen] = React.useState(false)
+
+  let [isOpen, setIsOpen] = useState(false)
 
   const handleClickOpen = () => {
-    setOpen(true)
+    setIsOpen(true)
   }
 
   const handleClose = () => {
-    setOpen(false)
+    setIsOpen(false)
+  }
+
+  const handleDelete = () => {
+    if (job) {
+      toast
+        .promise(JobService.deleteJob(job?.jobId), {
+          pending: `Delete Job`,
+          success: `The Job was deleted`
+        })
+        .catch((error) => toast.error(error.response.data.result))
+      navigate({
+        pathname: '/recruiter/jobs'
+      })
+    }
   }
 
   return (
@@ -196,50 +213,29 @@ export default function ReccerJobDetail() {
                       >
                         Delete Job
                       </button>
-                      <Dialog
-                        open={open}
+                      <Modal
+                        isOpen={isOpen}
                         onClose={handleClose}
-                        aria-labelledby='alert-dialog-title'
-                        aria-describedby='alert-dialog-description'
+                        title='Delete Job'
+                        titleClass='text-xl font-bold leading-7 text-center text-red-600'
+                        cancelTitle='No'
+                        successClass='text-green-900 bg-green-100 hover:bg-green-200 focus-visible:ring-green-500'
+                        successTitle='Yes'
+                        size='max-w-xl'
+                        handleSucces={handleDelete}
                       >
-                        <DialogTitle id='alert-dialog-title' className='text-center'>
-                          <p className='pt-3 font-extrabold'>Delete Job</p>
-                        </DialogTitle>
-                        <DialogContent className='text-center'>
-                          <div className='px-6 text-center'>
-                            <DialogContent className='mb-2 text-lg font-semibold'>
-                              Are you sure you want to delete "{job.name}"?
-                            </DialogContent>
-                            <DialogContentText
-                              id='alert-dialog-description'
-                              className='px-3 py-2 bg-orange-100 border '
-                            >
-                              <div className='flex'>
-                                <ExclamationTriangleIcon className='w-6 h-6 text-red-800' />
-                                <p className='flex px-2 font-semibold text-red-800'>WARNING</p>
-                              </div>
-                              <div className='font-semibold text-left'>
-                                This action cannot be undone, the deleted item cannot be restored.
-                              </div>
-                            </DialogContentText>
+                        <div className='flex items-center justify-center gap-5 mt-2'>
+                          <div className='w-full'>
+                            <h1 className='mb-2 text-lg font-semibold text-center'>
+                              Are you sure you want to delete{' '}
+                              <span className={classNames('text-red-500')}>{job.name}</span>?
+                            </h1>
+                            <div className='text-center'>
+                              This action cannot be undone, the deleted item cannot be restored.
+                            </div>
                           </div>
-                        </DialogContent>
-                        <DialogActions>
-                          <button
-                            className='rounded-lg bg-[#059669] hover:bg-green-900 px-4 py-2 mx-1 my-1 text-white'
-                            onClick={handleClose}
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            className='px-4 py-2 mx-1 my-1 text-white bg-red-700 rounded-lg hover:bg-red-900'
-                            // onClick={deleteJob}
-                            autoFocus
-                          >
-                            Delete
-                          </button>
-                        </DialogActions>
-                      </Dialog>
+                        </div>
+                      </Modal>
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { LoadingStatus } from '../../types/services'
-import { JobInterface } from '../../types/product.type'
+import { JobInterface } from '../../types/job.type'
 import { JobService } from '../../services/JobService'
 
 export interface JobDetailState {

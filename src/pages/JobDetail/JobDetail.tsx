@@ -20,8 +20,8 @@ import { JOB_POSITION } from '../../utils/Localization'
 import Logo from './../../../images/logo_FPT.png'
 import JobDescriptionWidget from './JobDescriptionWidget'
 import JobInformationCard from './JobInformationCard'
+import { JobInterface } from '../../types/job.type'
 import { fetchJobDetail } from '../../redux/reducer/JobDetailSlice'
-import { JobInterface } from '../../types/product.type'
 
 export default function JobDetail() {
   const { jobId } = useParams()
@@ -30,6 +30,10 @@ export default function JobDetail() {
   const jobs: JobInterface[] = useAppSelector((state) => state.Home.jobs)
   const { status } = useAppSelector((state) => state.JobDetail)
   const { job } = useAppSelector((state) => state.JobDetail.response)
+  const { isApplied } = useAppSelector((state) => state.JobDetail.response)
+
+  console.log(isApplied)
+
   const [jobInformation, setJobInformation] = useState([
     { icon: <UserIcon />, name: 'Employee Type', value: '' },
     { icon: <MapPinIcon />, name: 'Location', value: '' },
@@ -189,7 +193,7 @@ export default function JobDetail() {
                 <div className={classNames(`flex flex-col md:flex-row gap-6`)}>
                   {/* TODO: add job fetch data */}
                   {suggestedJobs.map((data) => {
-                    return <JobCard job={data} key={data.jobId} />
+                    return <JobCard job={data} />
                   })}
                 </div>
               </div>
