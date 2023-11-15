@@ -15,6 +15,7 @@ import {
   ProjectSchema
 } from '../UserProfile/UserProfileMyInformationSchema'
 import './styles/PrintResume.css'
+import moment from 'moment'
 
 function ResumeRenderSection<T>({
   keyId,
@@ -38,16 +39,25 @@ function ResumeRenderSection<T>({
     throw new Error(`Unable to parse schema from id ${keyId}`)
   }
 
+  function formatDate(dateString: string) {
+    const formattedDate = moment(dateString).format('DD-MM-YYYY')
+    return formattedDate
+  }
+
   return (
     <div className={classNames(`mb-4`)}>
       {parseSchemaFromId(keyId).map(({ id, display }) => {
+        const dateFields = ['graduatedYear', 'dateFrom', 'dateTo', 'receivedDate']
+        const isDateField = dateFields.includes(id)
+        const formattedValue = isDateField ? formatDate(value[id]) : value[id]
+
         return (
           <p
             className={classNames({
               'font-bold text-black': primaryLabelKey === id
             })}
           >
-            {value[id]}
+            {formattedValue}
           </p>
         )
       })}
@@ -60,19 +70,34 @@ export default function PrintResume() {
   const [loading, setLoading] = useState(false)
   const { user } = useAppSelector((app) => app.Auth)
 
+  const convertSkillsFormat = (inputSkills: any[]) => {
+    return inputSkills.map((skill) => {
+      return {
+        value: skill.skillId || '',
+        label: skill.name || ''
+      }
+    })
+  }
+
   useEffect(() => {
     setLoading(true)
     UserService.getUserInformation()
-      .then((res) => {
-        const { result } = res.data
-        const parsedData = JSON.parse(result.information)
-        // console.log(`parsedData`, parsedData, Object.keys(parsedData));
-        setData(parsedData)
+      .then(async (response) => {
+        const fetchContainerItem = await response.data.result
+        const skillsFormat = convertSkillsFormat(fetchContainerItem.skills)
+        const dataFormatSkills = { ...fetchContainerItem, skills: skillsFormat }
+
+        if (dataFormatSkills !== null) {
+          // setContainerItem({ ...JSON.parse(fetchContainerItem) })
+          setData(dataFormatSkills)
+        }
       })
       .catch(() => toast.error(`There was an error when fetching user information`))
       .finally(() => {
         setLoading(false)
       })
+
+    return () => {}
   }, [])
 
   const selectPrimaryLabelKey = (keyId: string) => {
@@ -145,7 +170,7 @@ export default function PrintResume() {
                   }
 
                   return (
-                    <div className={classNames(`text-zinc-500  mb-12`)} key={keyId}>
+                    <div className={classNames(`text-zinc-500  mb-12`)} key={_idx}>
                       <h1 className={classNames(`font-semibold text-emerald-800 text-2xl capitalize`)}>{keyId}</h1>
 
                       <div className={classNames(`inline-block mx-6`)}>
@@ -162,7 +187,9 @@ export default function PrintResume() {
                           <>
                             {/* @ts-ignore */}
                             {data[keyId].map(({ label, _value }, _index) => (
-                              <span className={classNames(`text-emerald-600 px-4 py-4 inline-block`)}>{label}</span>
+                              <span className={classNames(`text-emerald-600 px-4 py-4 inline-block`)} key={_index}>
+                                {label}
+                              </span>
                             ))}
                           </>
                         )}

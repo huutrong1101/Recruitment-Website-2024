@@ -39,9 +39,11 @@ export default function FieldContainer<T>({
 
   const handleDeleteItem = (indexToRemove: number) => {
     if (values.length > 1) {
-      const newValues = structuredClone(values)
-      newValues.splice(indexToRemove, 1)
-      setValues(newValues)
+      setValues((prevValues) => {
+        const newValues = prevValues.filter((_, index) => index !== indexToRemove)
+        onFieldUpdate(newValues) // Update the parent state as well
+        return newValues
+      })
     }
   }
 
@@ -72,7 +74,6 @@ export default function FieldContainer<T>({
     let clonedObject = structuredClone(values)
     clonedObject[index] = data
     setValues(clonedObject)
-
     onFieldUpdate(clonedObject)
   }
 

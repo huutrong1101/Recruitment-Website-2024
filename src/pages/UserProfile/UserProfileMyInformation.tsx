@@ -33,13 +33,26 @@ export default function UserProfileMyInformation() {
   const [skillOptions, setSkillOptions] = useState<any[]>([])
   const navigate = useNavigate()
 
+  const convertSkillsFormat = (inputSkills: any[]) => {
+    return inputSkills.map((skill) => {
+      return {
+        value: skill.skillId || '',
+        label: skill.name || ''
+      }
+    })
+  }
+
   useEffect(() => {
     setLoadingState('pending')
     UserService.getUserInformation()
       .then(async (response) => {
-        const fetchContainerItem = await response.data.result.information
-        if (fetchContainerItem !== null) {
-          setContainerItem({ ...JSON.parse(fetchContainerItem) })
+        const fetchContainerItem = await response.data.result
+        const skillsFormat = convertSkillsFormat(fetchContainerItem.skills)
+        const dataFormatSkills = { ...fetchContainerItem, skills: skillsFormat }
+
+        if (dataFormatSkills !== null) {
+          // setContainerItem({ ...JSON.parse(fetchContainerItem) })
+          setContainerItem(dataFormatSkills)
         }
       })
       .then(() => setLoadingState('fulfill'))
@@ -77,12 +90,12 @@ export default function UserProfileMyInformation() {
 
   const handleSubmit = (e: any, updatedItem: any) => {
     e !== null && e.preventDefault()
-    console.log(updatedItem)
-    // toast.promise(UserService.updateUserInformation(updatedItem), {
-    //   pending: `Updating your information`,
-    //   success: `Successfully update the information`,
-    //   error: `There was an error when updated the information`
-    // })
+
+    toast.promise(UserService.updateUserInformation(updatedItem), {
+      pending: `Updating your information`,
+      success: `Successfully update the information`,
+      error: `There was an error when updated the information`
+    })
   }
 
   const handleValuesUpdate = (ofId: string, values: any[]) => {

@@ -17,15 +17,13 @@ export default function ReccerInterviewerDetail() {
   const { interviewerId } = useParams()
   const [interviewer, setInterviewer] = useState<any | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
   useEffect(() => {
     const getInterviewerDetail = async () => {
       setIsLoading(true)
       try {
-        // const response = await axiosInstance.get(`recruiter/interviewers/${interviewerId}`)
-        // setInterviewer(response.data.result)
-
-        const user = data.candidate.find((data) => data.userId === interviewerId) || null
-        setInterviewer(user)
+        const response = await axiosInstance.get(`recruiter/interviewers/${interviewerId}`)
+        setInterviewer(response.data.result)
       } catch (error) {
         console.log(error)
       } finally {
@@ -34,6 +32,8 @@ export default function ReccerInterviewerDetail() {
     }
     getInterviewerDetail()
   }, [interviewerId])
+
+  console.log(interviewer)
   // console.log(interviewer?.skills[0].name)
   const [InterviewerInformation, setInterviewerInformation] = useState([
     { icon: <MdOutlineEmail />, name: '', value: '' },
@@ -124,14 +124,14 @@ export default function ReccerInterviewerDetail() {
                       <h1 className='text-2xl font-semibold'>Skill</h1>
                       <p>
                         <div>
-                          {JSON.parse(interviewer.information)?.skills?.map((skill: any, index: any) => (
+                          {/* {JSON.parse(interviewer.information)?.skills?.map((skill: any, index: any) => (
                             <p
                               key={index}
                               className='inline-flex gap-2 px-4 py-2 ml-2 text-white rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600'
                             >
                               {skill.label}
                             </p>
-                          ))}
+                          ))} */}
                         </div>
                       </p>
                     </div>
@@ -139,7 +139,7 @@ export default function ReccerInterviewerDetail() {
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Education</div>
                     <div className='flex flex-wrap gap-4'>
-                      {JSON.parse(interviewer.information)?.education?.map((edu: any, index: any) => (
+                      {/* {JSON.parse(interviewer.information)?.education?.map((edu: any, index: any) => (
                         <>
                           <div
                             key={index}
@@ -150,13 +150,13 @@ export default function ReccerInterviewerDetail() {
                             <p>Graduated Year: {edu.graduatedYear}</p>
                           </div>
                         </>
-                      ))}
+                      ))} */}
                     </div>
                   </div>
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Project</div>
                     <div className='flex flex-wrap gap-4'>
-                      {JSON.parse(interviewer.information)?.project?.map((edu: any, index: any) => (
+                      {/* {JSON.parse(interviewer.information)?.project?.map((edu: any, index: any) => (
                         <div>
                           <div
                             key={index}
@@ -164,7 +164,6 @@ export default function ReccerInterviewerDetail() {
                           >
                             <p>Project: {edu.name}</p>
                             <p>Description: {edu.description}</p>
-                            {/* <p>Link: {edu.url}</p> */}
                           </div>
                           <button
                             className='w-full p-1 text-center text-white border rounded-b-lg shadow bg-emerald-500 hover:bg-emerald-700 border-emerald-600'
@@ -173,13 +172,13 @@ export default function ReccerInterviewerDetail() {
                             View Project
                           </button>
                         </div>
-                      ))}
+                      ))} */}
                     </div>
                   </div>
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Experience</div>
                     <div className='flex flex-wrap gap-4'>
-                      {JSON.parse(interviewer.information)?.experience?.map((edu: any, index: any) => (
+                      {/* {JSON.parse(interviewer.information)?.experience?.map((edu: any, index: any) => (
                         <>
                           <div
                             key={index}
@@ -190,13 +189,13 @@ export default function ReccerInterviewerDetail() {
                             <p>From: {edu.dateFrom + ' to ' + edu.dateTo}</p>
                           </div>
                         </>
-                      ))}
+                      ))} */}
                     </div>
                   </div>
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Certificate</div>
                     <div className='flex flex-wrap gap-4'>
-                      {JSON.parse(interviewer.information)?.certificate?.map((edu: any, index: any) => (
+                      {/* {JSON.parse(interviewer.information)?.certificate?.map((edu: any, index: any) => (
                         <div>
                           <div
                             key={index}
@@ -205,7 +204,6 @@ export default function ReccerInterviewerDetail() {
                             <p>Title: {edu.name}</p>
                             <p>Id: {edu.id}</p>
                             <p>Received Date: {edu.receivedDate}</p>
-                            {/* <p>Link: {edu.url}</p> */}
                           </div>
                           <button
                             className='w-full p-1 text-center text-white border rounded-b-lg shadow bg-emerald-500 hover:bg-emerald-700 border-emerald-600'
@@ -214,7 +212,7 @@ export default function ReccerInterviewerDetail() {
                             View Project
                           </button>
                         </div>
-                      ))}
+                      ))} */}
                     </div>
                   </div>
                 </div>

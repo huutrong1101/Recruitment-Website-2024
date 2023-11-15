@@ -53,8 +53,6 @@ export default function Table<T>({ rows, data, isModal }: TableProps<T>) {
     }
   }, [])
 
-  console.log(data)
-
   return (
     <div className='w-full list-view-table-wrapper'>
       {/* Table simulation */}

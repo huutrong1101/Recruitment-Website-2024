@@ -11,6 +11,8 @@ import RecInterviewerSilce from './reducer/RecInterviewerSilce'
 import CandidateListSlice from './reducer/CandidateListSlice'
 import QuestionListSlice from './reducer/QuestionListSlice'
 import INTCandidatesSlice from './reducer/INTCandidatesSlice'
+import INTInterviewsSlice from './reducer/INTInterviewsSlice'
+import INTQuestionsSlice from './reducer/INTQuestionsSlice'
 
 export const ApplicationStore = configureStore({
   reducer: {
@@ -29,7 +31,9 @@ export const ApplicationStore = configureStore({
     CandidateList: CandidateListSlice,
 
     QuestionList: QuestionListSlice,
-    INTCandidates: INTCandidatesSlice
+    INTCandidates: INTCandidatesSlice,
+    INTInterviews: INTInterviewsSlice,
+    INTQuestions: INTQuestionsSlice
   }
 })
 

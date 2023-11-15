@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 import { fetchRecInterviewerList, fetchRecInterviewerSkill } from '../../../redux/reducer/RecInterviewerSilce'
 import { RecInterviewerInterface, RecInterviewerListConfig } from '../../../types/services'
 import useQueryParams from '../../../hooks/useQueryParams'
-import { isEqual, isUndefined, omitBy } from 'lodash'
+import { isEqual, isUndefined, omitBy, isEmpty } from 'lodash'
 import qs from 'query-string'
 import axios from 'axios'
 import { createSearchParams, useNavigate } from 'react-router-dom'
@@ -12,7 +12,6 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import RecInterviewerManageCard from '../../../components/RecInterviewerManageCard/RecInterviewerManageCard'
 import axiosInstance from '../../../utils/AxiosInstance'
-import { data } from '../../../data/fetchData'
 
 export type QueryConfig = {
   [key in keyof RecInterviewerListConfig]: string
@@ -61,7 +60,7 @@ const ReccerInterviewerManagement = () => {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
           const response = await fetchIntervieWithQuery(query)
-          setshowinterviewers(response.data.result?.content)
+          setshowinterviewers(response.data.result)
           setPageSize(response.data.result.totalPages)
         }
         setDataSearch({
@@ -85,7 +84,7 @@ const ReccerInterviewerManagement = () => {
         try {
           const query = qs.stringify(queryConfig)
           const response = await fetchIntervieWithQuery(query)
-          setshowinterviewers(response.data.result.content)
+          setshowinterviewers(response.data.result)
           setPageSize(response.data.result.totalPages)
         } catch (error) {
           console.log(error)
@@ -106,15 +105,20 @@ const ReccerInterviewerManagement = () => {
     e.preventDefault()
     try {
       setIsLoading(true)
+
+      const searchParams = {
+        ...queryConfig,
+        //Dưới đây là cái parameter ở URL
+        name: dataSearch.key,
+        skill: dataSearch.skill,
+        page: '1'
+      }
+
+      const filteredSearchParams = omitBy(searchParams, isEmpty)
+
       navigate({
         pathname: '../interviewers',
-        search: createSearchParams({
-          ...queryConfig,
-          //Dưới đây là cái parameter ở URL
-          name: dataSearch.key,
-          skill: dataSearch.skill,
-          page: '1'
-        }).toString()
+        search: createSearchParams(filteredSearchParams).toString()
       })
     } catch (error) {
       console.error(error)
@@ -164,9 +168,9 @@ const ReccerInterviewerManagement = () => {
         ) : (
           <div className='flex flex-wrap justify-center items-center mt-[20px] '>
             {/* <!-- Card --> */}
-            {data.candidate && data.candidate.length > 0 ? (
-              data.candidate.map((interviewer: any) => (
-                <div key={interviewer.userId} className='px-3 mb-8 lg:w-1/4 md:w-1/3 sm:w-3/4'>
+            {showinterviewers && showinterviewers.length > 0 ? (
+              showinterviewers.map((interviewer: any) => (
+                <div key={interviewer.interviewerId} className='px-3 mb-8 lg:w-1/4 md:w-1/3 sm:w-3/4'>
                   <RecInterviewerManageCard interviewer={interviewer} />
                 </div>
               ))

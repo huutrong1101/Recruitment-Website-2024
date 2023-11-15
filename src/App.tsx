@@ -61,6 +61,7 @@ import ReccerInterviewerDetail from './pages/Recruiter/Interview/ReccerInterview
 import InterviewInformation from './pages/Interviewer/InterviewInformation'
 import InterviewProfile from './pages/Interviewer/InterviewProfile'
 import INTCandidateDetail from './pages/Interviewer/Candidate/Detail/INTCandidateDetail'
+import InterviewDetail from './pages/Interviewer/Interview/Detail/InterviewDetail'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -171,6 +172,7 @@ function App() {
             <Route path='profile' element={<InterviewProfile />} />
             <Route path='information' element={<InterviewInformation />} />
             <Route path='interview-recent' element={<InterviewRecent />} />
+            <Route path='interview-recent/:id' element={<InterviewDetail />} />
             <Route path='candidate-recent' element={<CandidateRecent />} />
             <Route path='candidate-recent/:id' element={<INTCandidateDetail />} />
             <Route path='question' element={<ManageQuestion />} />

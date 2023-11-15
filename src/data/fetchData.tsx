@@ -1080,5 +1080,122 @@ export const data = {
       email: 'thanh20080kg@gmail.com',
       cv: 'https://res.cloudinary.com/dc6weg8vp/image/upload/v1691462493/Recruiment%20Assets/CV/Nguyen-Duc-Thinh-TopCV.vn-261222.115649.pdf.pdf'
     }
+  ],
+  interview: [
+    {
+      interviewId: '8e01688c-0762-435e-aced-0b8ef5007a7c',
+      jobApplyState: 'RECEIVED',
+      jobName: 'Chuyên viên Content SEO',
+      time: '2023-08-25T22:07:19.000+07:00',
+      interviewerFullNames: [
+        'Nguyễn Huy Khiêm',
+        'Phạm Khánh Vân',
+        'Lê Vũ Trường Giang',
+        'Đặng Nam Hải Triều',
+        'Phan Minh Hiếu',
+        'Hồ Ngọc Hà'
+      ],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_MjAxYzgxMGEtZWYxOS00MDM5LWEzZGQtY2M0NDhhOTMzZmNm%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'BACKEND'
+    },
+    {
+      interviewId: 'd7b03efd-4727-4096-a9df-e6219b62b148',
+      jobApplyState: 'RECEIVED',
+      jobName: 'Automation Test',
+      time: '2023-08-17T07:40:22.000+07:00',
+      interviewerFullNames: ['Nguyễn Huy Khiêm'],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZjFkYTU4YjEtODVmYi00ZGM5LWJhZmItNjAxYzBiNjE5N2I0%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'FRONTEND'
+    },
+    {
+      interviewId: '51c30f69-29d4-4599-924b-f33116301310',
+      jobApplyState: 'FAILED',
+      jobName: 'Fullstack Developer Clouds',
+      time: '2023-08-15T06:26:36.000+07:00',
+      interviewerFullNames: [
+        'Nguyễn Thị Hương',
+        'Trần Văn Kiên',
+        'Nguyễn Huy Khiêm',
+        'Nguyễn Hải Anh',
+        'Lê Vũ Trường Giang',
+        'Nguyễn Văn Lương',
+        'Nguyễn Văn Bá'
+      ],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_NTc1N2UwNWItMjA3OS00NGFmLWFmZTItMDVkMjM1OTY2NmVj%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'FRONTEND'
+    },
+    {
+      interviewId: '79968b88-26e8-48d7-b1f2-de7132fd95e1',
+      jobApplyState: 'NOT_RECEIVED',
+      jobName: 'Junior Java Developer',
+      time: '2023-08-12T06:05:38.000+07:00',
+      interviewerFullNames: ['Nguyễn Huy Khiêm', 'Phạm Khánh Vân'],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_Nzk0MDFmNDYtMDIwNS00YzU1LTg0MTItNTFiOTBkNjFlMjQy%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'BACKEND'
+    },
+    {
+      interviewId: '3775b093-9447-4fc8-9234-7eb949c11a4f',
+      jobApplyState: 'NOT_RECEIVED',
+      jobName: 'Java Fullstack Developer',
+      time: '2023-08-09T18:00:13.000+07:00',
+      interviewerFullNames: ['Nguyễn Huy Khiêm', 'Phạm Khánh Vân'],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_M2JmYmE2OWMtNjY1MS00MDVkLTgzN2MtYjEyYTYxYzM0NmY3%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'FRONTEND'
+    },
+    {
+      interviewId: 'bc23254c-2c93-4735-a05a-906eb3da024c',
+      jobApplyState: 'FAILED',
+      jobName: 'Cloud Security Servive Engineer\r\n',
+      time: '2023-08-08T23:14:41.000+07:00',
+      interviewerFullNames: ['Nguyễn Huy Khiêm', 'Phạm Khánh Vân', 'Đặng Nam Hải Triều', 'Hồ Ngọc Hà'],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_YWNlNWJhNzUtMTNmNC00M2I2LWI1Y2QtZDJkYTlhYjViMjAw%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'FRONTEND'
+    },
+    {
+      interviewId: '57be3e8e-919f-41b8-988b-a9165440230e',
+      jobApplyState: 'RECEIVED',
+      jobName: 'Fresher ReactJS Developer ',
+      time: '2023-08-08T19:10:01.785+07:00',
+      interviewerFullNames: ['Nguyễn Huy Khiêm'],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_MjA4OWUyZTctYTk4Yi00ZjI3LWE1YTktYzJkNjk4NTZjNTFl%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'BACKEND'
+    },
+    {
+      interviewId: '59635486-4924-4440-a95e-f3bac708f7af',
+      jobApplyState: 'RECEIVED',
+      jobName: 'WEB SECURITY ',
+      time: '2023-08-08T10:44:17.000+07:00',
+      interviewerFullNames: ['Nguyễn Thị Hương', 'Trần Văn Kiên', 'Nguyễn Huy Khiêm'],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZDExZGI5NGItZWEwMS00Mjc2LWI5ZmUtNjBmZjU5NTc4ODg0%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'BACKEND'
+    },
+    {
+      interviewId: '71c98fd6-a11a-451f-ad6d-38894372cb14',
+      jobApplyState: 'PASSED',
+      jobName: 'Python Developer',
+      time: '2023-08-08T10:00:59.000+07:00',
+      interviewerFullNames: ['Trần Văn Kiên', 'Nguyễn Huy Khiêm', 'Lê Vũ Trường Giang'],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_NDM2ZWQ0YTEtYWVlZS00MWY1LTljMzUtZWU3N2NlMjkxNTcy%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'FRONTEND'
+    },
+    {
+      interviewId: 'dfe7253c-b84b-4e2a-81a9-aad73de6154d',
+      jobApplyState: 'RECEIVED',
+      jobName: 'Product & Service Trainer',
+      time: '2023-08-07T17:35:44.213+07:00',
+      interviewerFullNames: ['Nguyễn Huy Khiêm'],
+      interviewLink:
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_NWEzZDdlMTUtNWQyYy00YWZjLThlZDMtNjMyZmI3YTg1ZGE0%40thread.v2/0?context=%7b%22Tid%22%3a%2228a837bf-14c0-41ae-9387-fe0082be35b4%22%2c%22Oid%22%3a%226062f1a6-e95a-404b-bbd2-022412d96ff9%22%7d',
+      position: 'FRONTEND'
+    }
   ]
 }

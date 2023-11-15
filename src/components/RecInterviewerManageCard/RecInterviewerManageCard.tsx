@@ -7,7 +7,7 @@ const RecInterviewerManageCard = (props: any) => {
   const interviewer = props.interviewer
 
   return (
-    <Link to={`/recruiter/interviewers/${interviewer.userId}`}>
+    <Link to={`/recruiter/interviewers/${interviewer.interviewerId}`}>
       <div className='max-w-xs'>
         <div
           className={classNames(

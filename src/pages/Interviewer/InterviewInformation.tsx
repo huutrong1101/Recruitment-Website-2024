@@ -31,20 +31,33 @@ export default function InterviewInformation() {
   const [skillOptions, setSkillOptions] = useState<any[]>([])
   const navigate = useNavigate()
 
-  useEffect(() => {
-    setLoadingState('pending')
-    UserService.getUserInformation()
-      .then(async (response) => {
-        const fetchContainerItem = await response.data.result.information
-        if (fetchContainerItem !== null) {
-          setContainerItem({ ...JSON.parse(fetchContainerItem) })
-        }
-      })
-      .then(() => setLoadingState('fulfill'))
-      .catch(() => setLoadingState('failed'))
+  const convertSkillsFormat = (inputSkills: any[]) => {
+    return inputSkills.map((skill) => {
+      return {
+        value: skill.skillId || '',
+        label: skill.name || ''
+      }
+    })
+  }
 
-    return () => {}
-  }, [])
+  // useEffect(() => {
+  //   setLoadingState('pending')
+  //   UserService.getUserInformation()
+  //     .then(async (response) => {
+  //       const fetchContainerItem = await response.data.result
+  //       const skillsFormat = convertSkillsFormat(fetchContainerItem.skills)
+  //       const dataFormatSkills = { ...fetchContainerItem, skills: skillsFormat }
+
+  //       if (dataFormatSkills !== null) {
+  //         // setContainerItem({ ...JSON.parse(fetchContainerItem) })
+  //         setContainerItem(dataFormatSkills)
+  //       }
+  //     })
+  //     .then(() => setLoadingState('fulfill'))
+  //     .catch(() => setLoadingState('failed'))
+
+  //   return () => {}
+  // }, [])
 
   useEffect(() => {
     getSkills()
