@@ -14,12 +14,8 @@ export default function CandidateDetail() {
     const getCandidateDetail = async () => {
       setIsLoading(true)
       try {
-        // const response = await axiosInstance.get(`recruiter/applied-candidates/${userId}`)
-        // setCandidate(response.data.result)
-
-        const user = data.candidate.find((data) => data.userId === userId) || null
-
-        setCandidate(user)
+        const response = await axiosInstance.get(`recruiter/applied-candidates/${userId}`)
+        setCandidate(response.data.result)
       } catch (error) {
         console.log(error)
       } finally {

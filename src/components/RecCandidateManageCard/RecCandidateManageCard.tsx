@@ -8,7 +8,7 @@ const RecCandidateCard = (props: any) => {
   const candidate = props.candidate
 
   return (
-    <Link to={`/recruiter/candidates/${candidate.userId}`}>
+    <Link to={`/recruiter/candidates/${candidate.candidateId}`}>
       <div className='max-w-xs'>
         <div
           className={classNames(

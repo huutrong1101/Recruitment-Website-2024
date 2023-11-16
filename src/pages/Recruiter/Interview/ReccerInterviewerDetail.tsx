@@ -124,14 +124,14 @@ export default function ReccerInterviewerDetail() {
                       <h1 className='text-2xl font-semibold'>Skill</h1>
                       <p>
                         <div>
-                          {/* {JSON.parse(interviewer.information)?.skills?.map((skill: any, index: any) => (
+                          {interviewer.information?.skills?.map((skill: any, index: any) => (
                             <p
                               key={index}
                               className='inline-flex gap-2 px-4 py-2 ml-2 text-white rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600'
                             >
                               {skill.label}
                             </p>
-                          ))} */}
+                          ))}
                         </div>
                       </p>
                     </div>
@@ -139,7 +139,7 @@ export default function ReccerInterviewerDetail() {
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Education</div>
                     <div className='flex flex-wrap gap-4'>
-                      {/* {JSON.parse(interviewer.information)?.education?.map((edu: any, index: any) => (
+                      {interviewer.information?.education?.map((edu: any, index: any) => (
                         <>
                           <div
                             key={index}
@@ -150,13 +150,13 @@ export default function ReccerInterviewerDetail() {
                             <p>Graduated Year: {edu.graduatedYear}</p>
                           </div>
                         </>
-                      ))} */}
+                      ))}
                     </div>
                   </div>
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Project</div>
                     <div className='flex flex-wrap gap-4'>
-                      {/* {JSON.parse(interviewer.information)?.project?.map((edu: any, index: any) => (
+                      {interviewer.information?.project?.map((edu: any, index: any) => (
                         <div>
                           <div
                             key={index}
@@ -172,13 +172,13 @@ export default function ReccerInterviewerDetail() {
                             View Project
                           </button>
                         </div>
-                      ))} */}
+                      ))}
                     </div>
                   </div>
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Experience</div>
                     <div className='flex flex-wrap gap-4'>
-                      {/* {JSON.parse(interviewer.information)?.experience?.map((edu: any, index: any) => (
+                      {interviewer.information?.experience?.map((edu: any, index: any) => (
                         <>
                           <div
                             key={index}
@@ -189,13 +189,13 @@ export default function ReccerInterviewerDetail() {
                             <p>From: {edu.dateFrom + ' to ' + edu.dateTo}</p>
                           </div>
                         </>
-                      ))} */}
+                      ))}
                     </div>
                   </div>
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Certificate</div>
                     <div className='flex flex-wrap gap-4'>
-                      {/* {JSON.parse(interviewer.information)?.certificate?.map((edu: any, index: any) => (
+                      {interviewer.information?.certificate?.map((edu: any, index: any) => (
                         <div>
                           <div
                             key={index}
@@ -212,7 +212,7 @@ export default function ReccerInterviewerDetail() {
                             View Project
                           </button>
                         </div>
-                      ))} */}
+                      ))}
                     </div>
                   </div>
                 </div>

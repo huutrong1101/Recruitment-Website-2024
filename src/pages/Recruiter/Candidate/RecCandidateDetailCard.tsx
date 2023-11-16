@@ -62,6 +62,10 @@ export default function RecCandidateDetailCard(props: any) {
     url ? window.open(url) : toast.error('Not Available ')
   }
 
+  const handleDate = (inputDate: any) => {
+    return moment(inputDate).format('DD-MM-YYYY')
+  }
+
   return (
     <div>
       {candidate ? (
@@ -95,7 +99,7 @@ export default function RecCandidateDetailCard(props: any) {
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Skill</div>
                     <div>
-                      {JSON.parse(candidate.information)?.skills?.map((skill: any, index: any) => (
+                      {candidate.information?.skills?.map((skill: any, index: any) => (
                         <p
                           key={index}
                           className='inline-flex gap-2 px-4 py-2 mb-2 ml-2 text-white rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600'
@@ -108,7 +112,7 @@ export default function RecCandidateDetailCard(props: any) {
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Education</div>
                     <div className='flex flex-wrap gap-4'>
-                      {JSON.parse(candidate.information)?.education?.map((edu: any, index: any) => (
+                      {candidate.information?.education?.map((edu: any, index: any) => (
                         <>
                           <div
                             key={index}
@@ -116,7 +120,7 @@ export default function RecCandidateDetailCard(props: any) {
                           >
                             <p>School: {edu.school}</p>
                             <p>Major: {edu.major}</p>
-                            <p>Graduated Year: {edu.graduatedYear}</p>
+                            <p>Graduated Year: {handleDate(edu.graduatedYear)}</p>
                           </div>
                         </>
                       ))}
@@ -125,7 +129,7 @@ export default function RecCandidateDetailCard(props: any) {
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Project</div>
                     <div className='flex flex-wrap gap-4'>
-                      {JSON.parse(candidate.information)?.project?.map((edu: any, index: any) => (
+                      {candidate.information?.project?.map((edu: any, index: any) => (
                         <div>
                           <div
                             key={index}
@@ -148,7 +152,7 @@ export default function RecCandidateDetailCard(props: any) {
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Experience</div>
                     <div className='flex flex-wrap gap-4'>
-                      {JSON.parse(candidate.information)?.experience?.map((edu: any, index: any) => (
+                      {candidate.information?.experience?.map((edu: any, index: any) => (
                         <>
                           <div
                             key={index}
@@ -156,7 +160,7 @@ export default function RecCandidateDetailCard(props: any) {
                           >
                             <p>Company Name: {edu.companyName}</p>
                             <p>Position: {edu.position}</p>
-                            <p>From: {edu.dateFrom + ' to ' + edu.dateTo}</p>
+                            <p>From: {handleDate(edu.dateFrom) + ' to ' + handleDate(edu.dateTo)}</p>
                           </div>
                         </>
                       ))}
@@ -165,7 +169,7 @@ export default function RecCandidateDetailCard(props: any) {
                   <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
                     <div className='text-2xl font-semibold'>Certificate</div>
                     <div className='flex flex-wrap gap-4'>
-                      {JSON.parse(candidate.information)?.certificate?.map((edu: any, index: any) => (
+                      {candidate.information?.certificate?.map((edu: any, index: any) => (
                         <div>
                           <div
                             key={index}
@@ -173,7 +177,7 @@ export default function RecCandidateDetailCard(props: any) {
                           >
                             <p>Title: {edu.name}</p>
                             <p>Id: {edu.id}</p>
-                            <p>Received Date: {edu.receivedDate}</p>
+                            <p>Received Date: {handleDate(edu.receivedDate)}</p>
                             {/* <p>Link: {edu.url}</p> */}
                           </div>
                           <button

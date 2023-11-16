@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 import { RecCandidateInterface, RecCandidateList } from '../../../types/services'
 import { fetchCandidateList, fetchCandidateSkill } from '../../../redux/reducer/CandidateListSlice'
 import useQueryParams from '../../../hooks/useQueryParams'
-import { isEqual, isUndefined, omitBy } from 'lodash'
+import { isEqual, isUndefined, omitBy, isEmpty } from 'lodash'
 import axiosInstance from '../../../utils/AxiosInstance'
 import qs from 'query-string'
 import { createSearchParams, useNavigate } from 'react-router-dom'
@@ -68,8 +68,7 @@ const ReccerCandidateManagement = () => {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
           const response = await axiosInstance(`/recruiter/applied-candidates?${query}`)
-          // console.log(response.data.result.content);
-          setshowCandidates(response.data.result?.content)
+          setshowCandidates(response.data.result)
           setPageSize(response.data.result.totalPages)
         }
         setDataSearch({
@@ -93,8 +92,7 @@ const ReccerCandidateManagement = () => {
         try {
           const query = qs.stringify(queryConfig)
           const response = await axiosInstance(`/recruiter/applied-candidates?${query}`)
-
-          setshowCandidates(response.data.result?.content)
+          setshowCandidates(response.data.result)
           setPageSize(response.data.result.totalPages)
         } catch (error) {
           console.log(error)
@@ -111,14 +109,19 @@ const ReccerCandidateManagement = () => {
     e.preventDefault()
     try {
       setIsLoading(true)
+
+      const searchParams = {
+        ...queryConfig,
+        name: dataSearch.key,
+        skill: dataSearch.skill,
+        index: '1'
+      }
+
+      const filteredSearchParams = omitBy(searchParams, isEmpty)
+
       navigate({
         pathname: '',
-        search: createSearchParams({
-          ...queryConfig,
-          name: dataSearch.key,
-          skill: dataSearch.skill,
-          index: '1'
-        }).toString()
+        search: createSearchParams(filteredSearchParams).toString()
       })
     } catch (error) {
       console.error(error)
@@ -126,6 +129,8 @@ const ReccerCandidateManagement = () => {
       setIsLoading(false)
     }
   }
+
+  console.log(showCandidates)
 
   return (
     <>
@@ -168,9 +173,9 @@ const ReccerCandidateManagement = () => {
         ) : (
           <div className='flex flex-wrap justify-center items-center mt-[20px] '>
             {/* <!-- Card --> */}
-            {data.candidate && data.candidate.length > 0 ? (
-              data.candidate.map((candidate: any) => (
-                <div key={candidate.userId} className='px-3 mb-8 lg:w-1/4 md:w-1/3 sm:w-3/4'>
+            {showCandidates && showCandidates.length > 0 ? (
+              showCandidates.map((candidate: any) => (
+                <div key={candidate.candidateId} className='px-3 mb-8 lg:w-1/4 md:w-1/3 sm:w-3/4'>
                   <RecCandidateCard candidate={candidate} />
                 </div>
               ))
