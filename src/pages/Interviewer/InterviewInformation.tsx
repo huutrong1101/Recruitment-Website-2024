@@ -15,6 +15,7 @@ import {
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated'
 import classNames from 'classnames'
+import { InterviewService } from '../../services/InterviewService'
 
 const animatedComponents = makeAnimated()
 
@@ -40,24 +41,24 @@ export default function InterviewInformation() {
     })
   }
 
-  // useEffect(() => {
-  //   setLoadingState('pending')
-  //   UserService.getUserInformation()
-  //     .then(async (response) => {
-  //       const fetchContainerItem = await response.data.result
-  //       const skillsFormat = convertSkillsFormat(fetchContainerItem.skills)
-  //       const dataFormatSkills = { ...fetchContainerItem, skills: skillsFormat }
+  useEffect(() => {
+    setLoadingState('pending')
+    InterviewService.getInterviewerInfor()
+      .then(async (response) => {
+        const fetchContainerItem = await response.data.result
+        const skillsFormat = convertSkillsFormat(fetchContainerItem.skills)
+        const dataFormatSkills = { ...fetchContainerItem, skills: skillsFormat }
 
-  //       if (dataFormatSkills !== null) {
-  //         // setContainerItem({ ...JSON.parse(fetchContainerItem) })
-  //         setContainerItem(dataFormatSkills)
-  //       }
-  //     })
-  //     .then(() => setLoadingState('fulfill'))
-  //     .catch(() => setLoadingState('failed'))
+        if (dataFormatSkills !== null) {
+          // setContainerItem({ ...JSON.parse(fetchContainerItem) })
+          setContainerItem(dataFormatSkills)
+        }
+      })
+      .then(() => setLoadingState('fulfill'))
+      .catch(() => setLoadingState('failed'))
 
-  //   return () => {}
-  // }, [])
+    return () => {}
+  }, [])
 
   useEffect(() => {
     getSkills()
@@ -88,12 +89,11 @@ export default function InterviewInformation() {
 
   const handleSubmit = (e: any, updatedItem: any) => {
     e !== null && e.preventDefault()
-    console.log(updatedItem)
-    // toast.promise(UserService.updateUserInformation(updatedItem), {
-    //   pending: `Updating your information`,
-    //   success: `Successfully update the information`,
-    //   error: `There was an error when updated the information`
-    // })
+    toast.promise(InterviewService.updateInterviewerInformation(updatedItem), {
+      pending: `Updating your information`,
+      success: `Successfully update the information`,
+      error: `There was an error when updated the information`
+    })
   }
 
   const handleValuesUpdate = (ofId: string, values: any[]) => {

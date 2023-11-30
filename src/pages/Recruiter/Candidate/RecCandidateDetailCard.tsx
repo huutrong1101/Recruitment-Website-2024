@@ -24,7 +24,7 @@ export default function RecCandidateDetailCard(props: any) {
   useEffect(() => {
     if (candidate) {
       setCandidateInformation([
-        { icon: <MdOutlineEmail />, name: 'Email', value: candidate?.email },
+        { icon: <MdOutlineEmail />, name: 'Email', value: candidate?.candidateEmail },
         {
           icon: <MdOutlineCalendarMonth />,
           name: 'D.O.B',
@@ -66,6 +66,8 @@ export default function RecCandidateDetailCard(props: any) {
     return moment(inputDate).format('DD-MM-YYYY')
   }
 
+  console.log(candidate)
+
   return (
     <div>
       {candidate ? (
@@ -80,7 +82,7 @@ export default function RecCandidateDetailCard(props: any) {
                   <div className='relative flex items-end'>
                     <img src={candidate.avatar} className='rounded-full h-28 w-28 ring-4 ring-slate-50' />
                     <div className='ms-4 mb-7 mt-7'>
-                      <p className='text-2xl font-semibold'>{candidate?.fullName}</p>
+                      <p className='text-2xl font-semibold'>{candidate?.candidateFullName}</p>
                     </div>
                   </div>
                 </div>

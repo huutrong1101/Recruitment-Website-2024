@@ -12,6 +12,7 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import RecCandidateCard from '../../../components/RecCandidateManageCard/RecCandidateManageCard'
 import { data } from '../../../data/fetchData'
+import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton'
 
 export type QueryConfig = {
   [key in keyof RecCandidateList]: string
@@ -28,7 +29,7 @@ const ReccerCandidateManagement = () => {
   const queryParams: QueryConfig = useQueryParams()
   const queryConfig: QueryConfig = omitBy(
     {
-      index: queryParams.index || '1',
+      page: queryParams.page || '1',
       size: queryParams.size || 8,
       name: queryParams.name,
       skill: queryParams.skill
@@ -114,7 +115,7 @@ const ReccerCandidateManagement = () => {
         ...queryConfig,
         name: dataSearch.key,
         skill: dataSearch.skill,
-        index: '1'
+        page: '1'
       }
 
       const filteredSearchParams = omitBy(searchParams, isEmpty)
@@ -129,8 +130,6 @@ const ReccerCandidateManagement = () => {
       setIsLoading(false)
     }
   }
-
-  console.log(showCandidates)
 
   return (
     <>
@@ -155,14 +154,7 @@ const ReccerCandidateManagement = () => {
         </div>
         {/* Button */}
         <div className={classNames('gap-2 ml-10 items-center justify-center')}>
-          <button
-            className={classNames(
-              'bg-[#05966A] hover:bg-emerald-700 text-white p-3 rounded-md flex w-full text-center items-center justify-center'
-            )}
-            type='submit'
-          >
-            Search
-          </button>
+          <PrimaryButton type='submit' text='Search' className='bg-[#05966A] hover:bg-emerald-700' />
         </div>
       </form>
       <>

@@ -5,7 +5,7 @@ import { APPLICANTS_STATUS } from '../../../utils/Localization'
 
 interface CandidateStatusBadge extends React.HTMLProps<HTMLDivElement> {
   className?: string
-  status: 'NOT_RECEIVED' | 'RECEIVED' | 'PASSED' | 'FAILED' | 'PENDING'
+  status: 'PENDING' | 'REVIEWING' | 'PASS' | 'FAIL' | 'COMPLETED'
 }
 
 export default function CandidateStatusBadge({ className, status }: CandidateStatusBadge) {
@@ -14,10 +14,11 @@ export default function CandidateStatusBadge({ className, status }: CandidateSta
       className={classnames(
         `px-2 w-32`,
         {
-          'bg-emerald-600': status === 'PASSED',
-          'bg-yellow-600': status === 'NOT_RECEIVED',
+          'bg-emerald-700': status === 'COMPLETED',
+          'bg-emerald-600': status === 'PASS',
+          'bg-yellow-600': status === 'REVIEWING',
           'bg-yellow-500': status === 'PENDING',
-          'bg-orange-600': status === 'RECEIVED' || status === 'FAILED'
+          'bg-orange-600': status === 'FAIL'
           // "bg-red-600": ,
         },
 
@@ -26,9 +27,10 @@ export default function CandidateStatusBadge({ className, status }: CandidateSta
     >
       <span
         className={classnames('h-2 w-2 rounded-xl', {
-          'bg-emerald-800': status === 'PASSED',
-          'bg-yellow-800': status === 'NOT_RECEIVED',
-          'bg-orange-800': status === 'RECEIVED' || status === 'FAILED'
+          'bg-emerald-700': status === 'COMPLETED',
+          'bg-emerald-800': status === 'PASS',
+          'bg-yellow-800': status === 'REVIEWING',
+          'bg-orange-800': status === 'FAIL'
           // "bg-red-800": status === "FAILED",
         })}
       ></span>

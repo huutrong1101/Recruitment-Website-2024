@@ -2,23 +2,53 @@ import { Listbox, Transition } from '@headlessui/react'
 import classnames from 'classnames'
 import { Fragment, useEffect, useState } from 'react'
 import { HiListBullet } from 'react-icons/hi2'
-import Button from '../../components/Button/Button'
-import Table from '../../components/Table/Table'
 
-import moment from 'moment'
+import UserProfileInterviewListViewTable from '../../../components/Table/Table'
+
 import { useForm } from 'react-hook-form'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import JobStatusBadge from '../../components/Badge/JobStatusBadge'
-import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
-import { getCandidateSubmittedJobs } from '../../services/CandidateService'
+import { useSearchParams } from 'react-router-dom'
+import Button from '../../../components/Button/Button'
+import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
+import { getCandidateInterviews } from '../../../services/InterviewService'
 
-export default function UserProfileSubmittedJob() {
+const INTERVIEW_STATUS = ['Any', 'Pending', 'Finished']
+
+// export default function UserProfileInterviewListView() {
+//   const { register, handleSubmit } = useForm();
+export interface TableRow {
+  id: string
+  value: any
+}
+
+export interface TableProps<T> {
+  rows: TableRow[]
+  data: T[]
+}
+
+interface InterviewData {
+  interviewId: string
+  interviewLink: string
+  interviewerNames: string[]
+  jobId: string
+  jobName: string
+  time: string
+}
+
+export default function UserProfileInterviewListView<T>({ rows, data }: TableProps<T>) {
   const [filterType, setFilterType] = useState<number>(0)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm()
+
+  const onSubmit = () => {}
+
+  const [interviews, setInterviews] = useState<object[]>([])
+
   const [searchParams, setSearchParams] = useSearchParams()
-  const { handleSubmit, register } = useForm()
-  const onSubmit = (data: any) => {}
-  const [applicants, setApplicants] = useState<object[]>([])
-  const navigate = useNavigate()
+
   const [pagination, setPagination] = useState({
     loading: false,
     pageNumber: 1,
@@ -32,14 +62,13 @@ export default function UserProfileSubmittedJob() {
     const size = searchParams.get('size') || 5
     setPagination({ ...pagination, loading: true })
 
-    getCandidateSubmittedJobs({ index, size })
+    getCandidateInterviews({ index, size })
       .then((response) => {
         const { result } = response.data
         const { pageNumber, pageSize, totalElements, totalPages } = result
-
         // Normalize the result onto a fitted table data
         // Set onto a data list for rendering
-        setApplicants(normalizeResponseResult(result))
+        setInterviews(normalizeResponseResult(result))
         setPagination({
           ...pagination,
           pageNumber,
@@ -53,23 +82,6 @@ export default function UserProfileSubmittedJob() {
         // toast.error(``)
       })
   }, [searchParams])
-
-  const normalizeResponseResult = (result: any) => {
-    return (
-      result.content as {
-        jobApplyId: string
-        status: 'NOT_RECEIVED' | 'REVIEWING' | 'PASSED' | 'FAILED' | 'PENDING'
-        jobName: string
-        applicationDate: Date
-      }[]
-    ).map((applicant) => {
-      return {
-        jobTitle: applicant.jobName,
-        date: moment(applicant.applicationDate).format('DD/MM/yyyy'),
-        status: <JobStatusBadge status={applicant.status} />
-      }
-    })
-  }
 
   const handleNextPage = () => {
     setSearchParams((prev) => {
@@ -101,7 +113,6 @@ export default function UserProfileSubmittedJob() {
   const handleChangeLimit = (value: number) => {
     setSearchParams((prev) => {
       const index = prev.get('index') || '1'
-      // const size = prev.get("size") || "5";
 
       return {
         size: value.toString() || '5',
@@ -112,26 +123,32 @@ export default function UserProfileSubmittedJob() {
     setPagination({ ...pagination, loading: true })
   }
 
-  console.log(applicants)
+  const normalizeResponseResult = (result: any) => {
+    return (
+      result.content as {
+        interviewLink: string
+        interviewersName: string[]
+        jobName: string
+        time: string
+      }[]
+    ).map((interviews) => {
+      return {
+        jobName: interviews.jobName,
+        time: interviews.time,
+        interviewerNames: interviews.interviewersName,
+        interviewLink: interviews.interviewLink
+      }
+    })
+  }
 
   return (
-    <div className={`px-4 py-2 bg-zinc-100 mt-2 rounded-xl flex flex-col gap-2 flex-1`}>
+    <div className={`px-4 py-2 bg-zinc-100 mt-2 rounded-xl flex flex-col gap-2`}>
       {/* Header */}
       <div className={classnames(`flex flex-col gap-4`)}>
-        <h1 className={classnames(`font-semibold text-2xl pt-2`)}>Submitted Jobs</h1>
+        <h1 className={classnames(`font-semibold text-2xl pt-2`)}>Interview Recent</h1>
 
         {/* Filter groups */}
         <div className={classnames(`flex flex-row items-center gap-4`)}>
-          {/* <div className={classnames(`w-10/12`)}>
-            <InputIcon
-              icon={<HiMagnifyingGlass />}
-              className={`text-base px-3 py-2 w-full outline-none`}
-              placeholder="Search for the applicant"
-              type={`text`}
-              register={register}
-              label={`search`}
-            />
-          </div> */}
           <div className='w-40'>
             <Listbox value={searchParams.get('size') || 5} onChange={handleChangeLimit} disabled={pagination.loading}>
               <div className={classnames(`relative`)}>
@@ -155,6 +172,31 @@ export default function UserProfileSubmittedJob() {
                   leaveTo='opacity-0'
                 >
                   <Listbox.Options className='absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
+                    {/* {APPLICANT_STATUS.map((status, personIdx) => (
+                      <Listbox.Option
+                        key={status}
+                        className={({ active }) =>
+                          `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                            active
+                              ? "bg-emerald-100 text-emerald-900"
+                              : "text-zinc-600"
+                          }`
+                        }
+                        value={personIdx}
+                      >
+                        {({ selected }: any) => (
+                          <>
+                            <span
+                              className={`block truncate ${
+                                selected ? "font-medium" : "font-normal"
+                              }`}
+                            >
+                              {status}
+                            </span>
+                          </>
+                        )}
+                      </Listbox.Option>
+                    ))} */}
                     {[...new Array(10)].map((_, idx) => {
                       const _value = (idx + 1) * 5
                       return (
@@ -187,24 +229,7 @@ export default function UserProfileSubmittedJob() {
 
       {/* Body */}
       <div>
-        <Table
-          rows={[
-            {
-              id: 'jobTitle',
-              value: 'Job Title'
-            },
-            {
-              id: 'date',
-              value: 'Date'
-            },
-            {
-              id: 'status',
-              value: 'Status'
-            }
-          ]}
-          data={applicants}
-          isModal={false}
-        />
+        <UserProfileInterviewListViewTable rows={rows} data={interviews} isModal={true} />
       </div>
 
       {/* Footer */}

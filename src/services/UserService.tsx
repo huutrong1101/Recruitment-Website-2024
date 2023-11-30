@@ -54,8 +54,7 @@ const getUserInformation = async () => {
 }
 
 const updateUserInformation = async (values: any) => {
-  const _values = JSON.stringify(values)
-  return await axiosInstance.put(`/candidate/information`, { values: _values })
+  return await axiosInstance.put(`/candidate/information`, values)
 }
 
 export const UserService = {

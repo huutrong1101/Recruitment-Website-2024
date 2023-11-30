@@ -24,6 +24,8 @@ import NotFound from '../../../components/NotFound/NotFound'
 import RecJobInformationCard from './ReccerJobInformationCard'
 import Modal from '../../../components/Modal/Modal'
 import { JobService } from '../../../services/JobService'
+import Suggested from './SuggestedCandidate'
+import Applied from './AppliedCandidate'
 
 export default function ReccerJobDetail() {
   const [jobInformation, setJobInformation] = useState([
@@ -246,10 +248,10 @@ export default function ReccerJobDetail() {
               </div>
 
               {/* /Applied Candidate */}
-              {/* <Applied num={job?.quantity} /> */}
+              <Applied num={job?.quantity} />
 
               {/* Suggested Candidate*/}
-              {/* <Suggested /> */}
+              <Suggested />
             </>
           ) : (
             <NotFound />

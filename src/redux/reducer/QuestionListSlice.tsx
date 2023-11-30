@@ -37,7 +37,7 @@ export const fetchQuestionList = () => {
   return async function fetchQuestionThunk(dispatch: Dispatch) {
     dispatch(setQuestionStatus(STATUS.LOADING))
     try {
-      const reponse = await axiosInstance.get(`interviewer/question`)
+      const reponse = await axiosInstance.get(`interviewers/question`)
       const data = await reponse.data
       // console.log(data)
       dispatch(setQuestionList(data.result.content))

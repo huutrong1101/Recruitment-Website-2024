@@ -175,8 +175,8 @@ export default function ReccerEventDetail() {
     formData.append('startAt', daystar)
     formData.append('deadline', dayend)
     formData.append('location', location)
-    formData.append('time', time + ':00')
-    formData.append('name', 'Giáng sinh an lành test')
+    formData.append('time', '07:35')
+    formData.append('name', name)
 
     if (isSubmitting) return
 

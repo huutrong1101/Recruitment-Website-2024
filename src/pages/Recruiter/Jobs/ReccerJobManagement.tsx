@@ -14,6 +14,7 @@ import { JOB_POSITION } from '../../../utils/Localization'
 import { JobInterface, JobListConfig } from '../../../types/job.type'
 import useQueryParams from '../../../hooks/useQueryParams'
 import RecruiterJobCard from '../../../components/JobCard/RecruiterJobCard'
+import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton'
 
 export type QueryConfig = {
   [key in keyof JobListConfig]: string
@@ -111,7 +112,17 @@ const ReccerJobManagement = () => {
     }
   }, [queryConfig, prevQueryConfig])
   // console.log(showJobs[0].isActive)
-  const handleSearch = async () => {
+
+  const handleSearch = async (e: any) => {
+    e.preventDefault()
+    performSearch()
+  }
+
+  const fetchJobWithQuery = async (query: string) => {
+    return await axiosInstance(`recruiter/jobs?${query}`)
+  }
+
+  const performSearch = async () => {
     try {
       setIsLoading(true)
 
@@ -134,10 +145,6 @@ const ReccerJobManagement = () => {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const fetchJobWithQuery = async (query: string) => {
-    return await axiosInstance(`recruiter/jobs?${query}`)
   }
 
   const handleonClick = (data: any) => {
@@ -166,9 +173,11 @@ const ReccerJobManagement = () => {
     })
   }
 
+  console.log(showJobs)
+
   return (
     <>
-      <div className='flex justify-center mt-4 item-center'>
+      <div className='flex justify-center gap-5 mt-4 item-center'>
         <div
           className={classNames(
             'flex items-center flex-shrink-0 w-[54.5%] h-1/2 p-2 mt-1 border rounded-lg ',
@@ -275,24 +284,34 @@ const ReccerJobManagement = () => {
             </Menu>
           </div>
 
-          <MagnifyingGlassIcon className={classNames(`w-[20px]`)} />
-          <input
-            value={dataSearch.key}
-            onChange={(e) => setDataSearch({ ...dataSearch, key: e.target.value })}
-            type='text'
-            placeholder='Search your Keywords'
-            className={classNames(
-              'w-[85%] h-full text-[12px] ml-3 focus:outline-none text-base text-zinc-400 bg-transparent'
-            )}
-          />
+          <div className={classNames('flex items-center w-full')}>
+            <MagnifyingGlassIcon className={classNames(`w-[20px]`)} />
+            <form onSubmit={(e) => handleSearch(e)} className='w-full'>
+              <input
+                value={dataSearch.key}
+                onChange={(e) => setDataSearch({ ...dataSearch, key: e.target.value })}
+                type='text'
+                placeholder='Search your Keywords'
+                className={classNames(
+                  'w-full h-full text-[12px] ml-3 focus:outline-none text-base text-zinc-400 bg-transparent'
+                )}
+              />
+            </form>
+          </div>
         </div>
 
-        <div className={classNames('gap-2 ml-10 items-center justify-center')}>
+        <div className={classNames('flex items-center flex-shrink-0 gap-2')}>
+          <PrimaryButton text='Search' className='bg-[#05966A] hover:bg-emerald-700' onClick={() => performSearch()} />
+
+          <PrimaryButton text='Reset' className='bg-red-600 hover:bg-red-700' onClick={() => handleReset()} />
+        </div>
+
+        {/* <div className={classNames('gap-2 ml-10 items-center justify-center')}>
           <button
             className={classNames(
               'bg-[#05966A] hover:bg-emerald-700 text-white p-3 rounded-md flex w-full text-center items-center justify-center'
             )}
-            onClick={() => handleSearch()}
+            onClick={() => performSearch()}
           >
             Search
           </button>
@@ -308,7 +327,7 @@ const ReccerJobManagement = () => {
               Reset
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className='flex justify-center items-center 2 mt-[10px] '>

@@ -12,6 +12,7 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import RecInterviewerManageCard from '../../../components/RecInterviewerManageCard/RecInterviewerManageCard'
 import axiosInstance from '../../../utils/AxiosInstance'
+import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton'
 
 export type QueryConfig = {
   [key in keyof RecInterviewerListConfig]: string
@@ -60,7 +61,7 @@ const ReccerInterviewerManagement = () => {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
           const response = await fetchIntervieWithQuery(query)
-          setshowinterviewers(response.data.result)
+          setshowinterviewers(response.data.result.content)
           setPageSize(response.data.result.totalPages)
         }
         setDataSearch({
@@ -84,7 +85,7 @@ const ReccerInterviewerManagement = () => {
         try {
           const query = qs.stringify(queryConfig)
           const response = await fetchIntervieWithQuery(query)
-          setshowinterviewers(response.data.result)
+          setshowinterviewers(response.data.result.content)
           setPageSize(response.data.result.totalPages)
         } catch (error) {
           console.log(error)
@@ -127,6 +128,8 @@ const ReccerInterviewerManagement = () => {
     }
   }
 
+  console.log(showinterviewers)
+
   return (
     <>
       <form onSubmit={handleSearch} className='flex justify-center mt-6 item-center'>
@@ -150,14 +153,7 @@ const ReccerInterviewerManagement = () => {
         </div>
         {/* Button */}
         <div className={classNames('gap-2 ml-10 items-center justify-center')}>
-          <button
-            className={classNames(
-              'bg-[#05966A] hover:bg-emerald-700 text-white p-3 rounded-md flex w-full text-center items-center justify-center'
-            )}
-            type='submit'
-          >
-            Search
-          </button>
+          <PrimaryButton type='submit' text='Search' className='bg-[#05966A] hover:bg-emerald-700' />
         </div>
       </form>
       <>

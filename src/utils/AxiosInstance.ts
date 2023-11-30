@@ -76,7 +76,6 @@ axiosInstance.interceptors.response.use(
         if (!hasRefreshToken()) {
           console.warn(`Clean the access token because we have to refresh token`)
           clearLocalToken()
-
           // Reload the page if it is was not a login page
           if (!window.location.toString().includes(`/login`)) {
             window.location.reload()
@@ -90,7 +89,6 @@ axiosInstance.interceptors.response.use(
               console.warn(`Failed to refill the access token: ${err.response.data.message}`)
               clearLocalToken()
               clearRefreshToken()
-
               window.location.reload()
             })
             .catch(() => {

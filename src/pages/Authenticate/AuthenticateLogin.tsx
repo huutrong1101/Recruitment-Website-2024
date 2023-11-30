@@ -41,7 +41,7 @@ export default function AuthenticateLogin() {
         navigate('/')
       }
     } catch (err: any) {
-      toast.error(`Failed to signed in with error: ${err.message}`)
+      toast.error(`${err.message}`)
       throw err
     }
   }

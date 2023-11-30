@@ -50,7 +50,8 @@ export const APPLICANTS_STATUS: LocalizationDeclarationType = {
   FAIL: 'Failed',
   PASSED: 'Passed',
   FAILED: 'Received',
-  PENDING: 'Pending'
+  PENDING: 'Pending',
+  REVIEWING: 'Reviewing'
 }
 
 export const ADMIN_APPLICANTS_STATUS: LocalizationDeclarationType = {

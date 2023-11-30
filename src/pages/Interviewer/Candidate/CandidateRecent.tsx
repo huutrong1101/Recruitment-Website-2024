@@ -73,86 +73,12 @@ const CandidateRecent = () => {
     dispatch(fetchINTCandidatesData(query))
   }, [query])
 
+  console.log(INTCandidates)
+
   return (
     <div className='CandidateRecent'>
       <div className='px-6 py-6 mt-8 border-2 shadow-xl rounded-xl'>
         <div className='mb-5 text-2xl font-semibold '>Candidate Recent</div>
-        {/* <TableContainer component={Paper} sx={{ border: '1px solid rgba(0, 0, 0, 0.4)', boxShadow: 'none' }}>
-          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-            <TableHead className='bg-gray-200'>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Position</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>State</TableCell>
-                <TableCell>Score</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {INTCandidatesStatus === STATUS.LOADING ? (
-                <TableRow className='flex items-center justify-end'>
-                  <TableCell colSpan={6}>
-                    <div className='flex justify-center'>
-                      <LoadSpinner className='w-8 h-8' />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data.candidateInteview.map((candidate: any, index: any) => (
-                  <TableRow key={index} className={`even:bg-slate-50`}>
-                    <TableCell component='th' scope='row'>
-                      <div className='flex items-center'>
-                        <img src={candidate?.avatar} className='w-10 h-10 mr-4 rounded-full' />
-                        <div>{candidate?.name}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{candidate?.position}</TableCell>
-                    <TableCell>{formatDDMMYY(candidate?.date)}</TableCell>
-                    <TableCell>
-                      <span className={`badge-${candidate?.state}`}>{ADMIN_APPLICANTS_STATUS[candidate?.state]}</span>
-                    </TableCell>
-                    <TableCell>{candidate?.score === -1 ? 'null' : `${candidate.score}/100`}</TableCell>
-                    <TableCell>
-                      <Link to={`/interviewer/candidate-recent/${candidate.interviewId}`}>
-                        <PencilIcon className='w-4 h-4' />
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-
-              {INTCandidatesStatus === STATUS.IDLE && emptyRows > 0 && (
-                <TableRow style={{ height: 70 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          <div className='flex justify-end h-[53px] items-center	'>
-            <label htmlFor='rows-per-page'>Rows per page:</label>
-            <select className='mx-[30px]' id='rows-per-page' value={rowsPerPage} onChange={handleChangeRowsPerPage}>
-              {rowsPerPageOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <div>
-              {page * rowsPerPage + 1}-
-              {(page + 1) * rowsPerPage > INTTotalCandidates ? INTTotalCandidates : (page + 1) * rowsPerPage} of{' '}
-              {INTTotalCandidates}
-            </div>
-            <ChevronLeftIcon
-              className={`w-5 h-4 mx-[20px] ${page === 0 ? 'text-gray-400' : 'cursor-pointer'}`}
-              onClick={handleDecreasePage}
-            />
-            <ChevronRightIcon
-              className={`w-5 h-4 mr-[30px] ${page === INTTotalPages - 1 ? 'text-gray-400' : 'cursor-pointer'}`}
-              onClick={handleIncreasePage}
-            />
-          </div>
-        </TableContainer> */}
         <Card className='w-full h-full'>
           <CardBody className='px-0 overflow-hidden'>
             <div className='overflow-x-auto'>
@@ -169,8 +95,8 @@ const CandidateRecent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.candidateInteview.map((candidate, index) => {
-                    const isLast = index === data.candidateInteview.length - 1
+                  {INTCandidates.map((candidate: any, index: any) => {
+                    const isLast = index === INTCandidates.length - 1
                     const classes = isLast ? 'p-4' : 'p-4 border-b border-blue-gray-50'
                     return (
                       <tr key={index}>
@@ -179,7 +105,7 @@ const CandidateRecent = () => {
                             <Typography variant='small' color='blue-gray' className='font-bold'>
                               <div className='flex items-center'>
                                 <img src={candidate?.avatar} className='w-10 h-10 mr-4 rounded-full' />
-                                <div>{candidate?.name}</div>
+                                <div>{candidate?.candidateName}</div>
                               </div>
                             </Typography>
                           </div>
@@ -198,22 +124,20 @@ const CandidateRecent = () => {
                           <Typography variant='small' color='blue-gray' className='font-normal'>
                             {typeof candidate?.state === 'string' && (
                               <CandidateStatusBadge
-                                status={
-                                  candidate?.state as 'NOT_RECEIVED' | 'FAILED' | 'RECEIVED' | 'PASSED' | 'PENDING'
-                                }
+                                status={candidate?.state as 'PENDING' | 'REVIEWING' | 'PASS' | 'FAIL'}
                               />
                             )}
                           </Typography>
                         </td>
                         <td className={classes}>
                           <Typography variant='small' color='blue-gray' className='font-normal'>
-                            {candidate?.score === -1 ? 'No Score' : `${candidate.score}/100`}
+                            {candidate?.score === null ? 'No Score' : `${candidate.score}`}
                           </Typography>
                         </td>
                         <td className={classes}>
                           <Typography variant='small' color='blue-gray' className='font-normal'>
                             <button>
-                              <Link to={`/interviewer/candidate-recent/${candidate.interviewId}`}>
+                              <Link to={`/interviewer/candidate-recent/${candidate.candidateId}`}>
                                 <Tooltip content='Read Detail'>
                                   <PencilIcon className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg' />
                                 </Tooltip>

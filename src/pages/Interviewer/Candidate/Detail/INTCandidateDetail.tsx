@@ -11,7 +11,7 @@ import { fetchINTCandidatesByID } from '../../../../redux/reducer/INTCandidatesS
 // Status
 import LoadSpinner from '../../../../components/LoadSpinner/LoadSpinner'
 import { STATUS } from '../../../../utils/contanst'
-import { data } from '../../../../data/fetchData'
+import moment from 'moment'
 
 export const formatDDMMYY = (date: any) => {
   if (!(date instanceof Date)) {
@@ -26,15 +26,13 @@ export const formatDDMMYY = (date: any) => {
 const INTCandidateDetail = () => {
   const { id } = useParams()
   const dispatch = useAppDispatch()
-  const { INTSingleCandidate, INTSingleCandidateStatus } = useAppSelector((state: any) => state.INTCandidates)
-  const [candidateData, setCandidateData] = useState()
+  const { INTSingleCandidate, INTSingleCandidateStatus, INTCandidates } = useAppSelector(
+    (state: any) => state.INTCandidates
+  )
 
   useEffect(() => {
-    // dispatch(fetchINTCandidatesByID(id))
-    const candidate = data.candidateInteview.find((candidate) => candidate.interviewId === id)
-    console.log(candidate)
-    setCandidateData(candidate)
-  }, [id])
+    dispatch(fetchINTCandidatesByID(id))
+  }, [])
 
   if (INTSingleCandidateStatus === STATUS.LOADING) {
     return (
@@ -50,26 +48,26 @@ const INTCandidateDetail = () => {
           <div className='flex'>
             <div className='w-5/12'>
               <div className='flex items-center pl-[1.5rem]'>
-                <img src={candidateData?.avatar} className=' w-[180px] h-[180px] border-4 ' />
+                <img src={INTSingleCandidate?.avatar} className=' w-[180px] h-[180px] border-4 ' />
               </div>
             </div>
             <div className='w-7/12'>
               <div className='flex'>
-                <div className='mr-4 text-xl'>{candidateData?.name}</div>
+                <div className='mr-4 text-xl'>{INTSingleCandidate?.name}</div>
               </div>
               <div className='mt-5 text-sm text-gray-400 '>Contacts</div>
               <div className='ml-4'>
                 <div className='mt-2 text-base'>
-                  Phone: <span className='ml-2 text-sm'>{candidateData?.phone}</span>
+                  Phone: <span className='ml-2 text-sm'>{INTSingleCandidate?.phone}</span>
                 </div>
                 <div className='text-base'>
-                  Address: <span className='ml-2 text-sm'>{candidateData?.address}</span>
+                  Address: <span className='ml-2 text-sm'>{INTSingleCandidate?.address}</span>
                 </div>
                 <div className='text-base'>
-                  Birtday: <span className='ml-2 text-sm'>{formatDDMMYY(candidateData?.dateOfBirth)}</span>
+                  Birtday: <span className='ml-2 text-sm'>{formatDDMMYY(INTSingleCandidate?.dateOfBirth)}</span>
                 </div>
                 <div className='text-base'>
-                  Email: <span className='ml-2 text-sm'>{candidateData?.email}</span>
+                  Email: <span className='ml-2 text-sm'>{INTSingleCandidate?.email}</span>
                 </div>
               </div>
             </div>
@@ -78,8 +76,8 @@ const INTCandidateDetail = () => {
           <div className='flex'>
             <div className='w-5/12 pl-[2rem]'>
               <div className='text-gray-400'>Educations</div>
-              {candidateData?.information &&
-                JSON.parse(candidateData?.information)?.education?.map((item: any) => (
+              {INTSingleCandidate?.information &&
+                INTSingleCandidate?.information?.education?.map((item: any) => (
                   <div className='ml-4'>
                     <div className='flex items-center mt-2 text-sm'>
                       <AcademicCapIcon className='w-[15px] h-[15px] mt-[3px] mr-1' />
@@ -91,8 +89,8 @@ const INTCandidateDetail = () => {
                   </div>
                 ))}
               <div className='mt-3 mb-2 text-gray-400'>Experiences</div>
-              {candidateData?.information &&
-                JSON.parse(candidateData?.information)?.experience?.map((item: any) => (
+              {INTSingleCandidate?.information &&
+                INTSingleCandidate?.information?.experience?.map((item: any) => (
                   <div className='ml-4'>
                     <div className='flex mt-2 text-sm'>
                       <BriefcaseIcon className='w-[15px] h-[15px] mt-[3px] mr-1' />
@@ -100,7 +98,7 @@ const INTCandidateDetail = () => {
                     </div>
                     <div className='text-gray-500 text-xs flex ml-[19px]'>{item.position}</div>
                     <div className='text-gray-500 text-xs flex ml-[19px]'>
-                      {item.dateFrom} - {item.dateTo}
+                      {moment(item.dateFrom).format('DD/MM/YYYY')} - {moment(item.dateTo).format('DD/MM/YYYY')};
                     </div>
                   </div>
                 ))}
@@ -117,11 +115,11 @@ const INTCandidateDetail = () => {
             <div className='w-7/12'>
               <div className='mt-2 text-gray-400'>Description</div>
               <div className='mt-2 ml-4'>
-                <p>{candidateData?.about}</p>
+                <p>{INTSingleCandidate?.about}</p>
               </div>
               <div className='mt-2 text-gray-400'>Projects</div>
-              {candidateData?.information &&
-                JSON.parse(candidateData?.information)?.project?.map((item: any) => <div className='ml-4'></div>)}
+              {INTSingleCandidate?.information &&
+                INTSingleCandidate?.information?.project?.map((item: any) => <div className='ml-4'></div>)}
             </div>
           </div>
         </div>

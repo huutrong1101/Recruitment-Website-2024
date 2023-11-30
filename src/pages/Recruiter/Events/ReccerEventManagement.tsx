@@ -1,6 +1,6 @@
 import { ChevronDownIcon, ChevronUpIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import classNames from 'classnames'
-import { isEqual, isUndefined, omitBy } from 'lodash'
+import { isEqual, isUndefined, omitBy, isEmpty, omit } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useState, Fragment } from 'react'
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
@@ -30,7 +30,7 @@ export default function ReccerEventManagement() {
     {
       page: queryParams.page || '1',
       limit: queryParams.limit || 8,
-      state: queryParams.state || true,
+      type: queryParams.type || true,
       name: queryParams.name || ''
     },
     isUndefined
@@ -101,7 +101,8 @@ export default function ReccerEventManagement() {
   // Search
   const navigate = useNavigate()
   const [dataSearch, setDataSearch] = useState({
-    key: ''
+    key: '',
+    active: ''
   })
 
   const handleonClick = (data: any) => {
@@ -110,22 +111,27 @@ export default function ReccerEventManagement() {
     setShowDuration(false)
 
     setDataSearch({
-      ...dataSearch
-      // active: newData.toString()
+      ...dataSearch,
+      active: newData.toString()
     })
   }
 
-  const handleSearch = async (e: any) => {
-    e.preventDefault()
+  const performSearch = async () => {
     try {
       setIsLoading(true)
+
+      const searchParams = {
+        ...queryConfig,
+        name: dataSearch.key,
+        active: dataSearch.active,
+        page: '1'
+      }
+
+      const filteredSearchParams = omitBy(searchParams, isEmpty)
+
       navigate({
         pathname: '/recruiter/events',
-        search: createSearchParams({
-          ...queryConfig,
-          index: '1',
-          name: dataSearch.key
-        }).toString()
+        search: createSearchParams(filteredSearchParams).toString()
       })
     } catch (error) {
       console.error(error)
@@ -134,33 +140,29 @@ export default function ReccerEventManagement() {
     }
   }
 
+  const handleSearch = async (e: any) => {
+    e.preventDefault()
+    performSearch()
+  }
+
+  const handleReset = () => {
+    setDataSearch({
+      key: '',
+      active: ''
+    })
+
+    setDuration('')
+
+    navigate({
+      pathname: '../events',
+      search: createSearchParams(omit(queryConfig, ['name', 'active', 'type', 'page', 'limit'])).toString()
+    })
+  }
+
   return (
     <>
       <div>
         <div className={classNames('flex justify-center mt-4 item-center gap-5')}>
-          {/* <form onSubmit={(e) => handleSearch(e)} className={classNames(`flex flex-row gap-2 items-center`)}>
-            <div
-              className={classNames(
-                'flex justify-center items-center w-full border rounded-xl',
-                'focus-within:border-emerald-400 w-full'
-              )}
-            >
-              <div className='flex items-center p-3 rounded-xl'>
-                <MagnifyingGlassIcon className='w-5 h-5 mx-2 mr-4' />
-                <input
-                  type='text'
-                  placeholder='Search for events'
-                  className='w-full h-full text-base bg-transparent text-zinc-400 focus:outline-none'
-                  value={dataSearch.key}
-                  onChange={(e) => setDataSearch({ ...dataSearch, key: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div>
-              <PrimaryButton type='submit' text={`Search`} className={`w-4`} />
-            </div>
-          </form> */}
           <div
             className={classNames(
               'flex items-center flex-shrink-0 w-[54.5%] h-1/2 p-2 mt-1 border rounded-lg',
@@ -216,22 +218,30 @@ export default function ReccerEventManagement() {
               </Menu>
             </div>
 
-            <MagnifyingGlassIcon className={classNames(`w-[20px]`)} />
-            <input
-              value={dataSearch.key}
-              onChange={(e) => setDataSearch({ ...dataSearch, key: e.target.value })}
-              type='text'
-              placeholder='Search your Keywords'
-              className={classNames(
-                'w-[85%] h-full text-[12px] ml-3 focus:outline-none text-base text-zinc-400 bg-transparent'
-              )}
-            />
+            <div className={classNames('flex items-center w-full')}>
+              <MagnifyingGlassIcon className={classNames(`w-[20px]`)} />
+              <form onSubmit={(e) => handleSearch(e)} className='w-full'>
+                <input
+                  value={dataSearch.key}
+                  onChange={(e) => setDataSearch({ ...dataSearch, key: e.target.value })}
+                  type='text'
+                  placeholder='Search your Keywords'
+                  className={classNames(
+                    'w-full h-full text-[12px] ml-3 focus:outline-none text-base text-zinc-400 bg-transparent'
+                  )}
+                />
+              </form>
+            </div>
           </div>
 
           <div className={classNames('flex items-center flex-shrink-0 gap-2')}>
-            <PrimaryButton text='Search' className='bg-[#05966A] hover:bg-emerald-700' />
+            <PrimaryButton
+              text='Search'
+              className='bg-[#05966A] hover:bg-emerald-700'
+              onClick={() => performSearch()}
+            />
 
-            <PrimaryButton text='Reset' className='bg-red-600 hover:bg-red-700' />
+            <PrimaryButton text='Reset' className='bg-red-600 hover:bg-red-700' onClick={() => handleReset()} />
           </div>
         </div>
 

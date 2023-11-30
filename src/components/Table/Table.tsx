@@ -19,10 +19,8 @@ export default function Table<T>({ rows, data, isModal }: TableProps<T>) {
   let [isOpen, setIsOpen] = useState(false)
 
   const [itemClick, setItemClick] = useState({
-    interviewId: '',
     interviewLink: '',
     interviewerNames: [],
-    jobId: '',
     jobName: '',
     time: ''
   })

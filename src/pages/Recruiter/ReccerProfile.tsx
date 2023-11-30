@@ -51,7 +51,10 @@ function UserProfileInformation() {
         dispatch(setUser({ ...user, avatar: result }))
         setUploading(false)
       })
-      .catch((error) => toast.error(error.response.message))
+      .catch((error) => {
+        setUploading(false)
+        toast.error(error.response.data.message)
+      })
   }
 
   const handleUpdateProfile = (data: any) => {

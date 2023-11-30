@@ -25,5 +25,5 @@ export interface EventListConfig {
   page?: number | string
   limit?: number | string
   name?: string
-  state?: string
+  type?: string
 }

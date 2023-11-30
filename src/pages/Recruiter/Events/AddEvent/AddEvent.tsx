@@ -77,25 +77,25 @@ export default function AddEvent() {
     formData.append('startAt', startAt)
     formData.append('deadline', deadline)
     formData.append('location', location)
-    formData.append('time', time + ':00')
-    formData.append('name', 'Giáng sinh an lành')
+    formData.append('time', '07:35')
+
     setIsPending(true) // Thiết lập trạng thái pending khi bắt đầu gửi yêu cầu
 
-    console.log({ startAt, deadline })
+    console.log({ startAt, deadline, time })
 
     // Gửi yêu cầu POST đến URL http://localhost:8080/api/v1/recruiter/events/create với FormData
-    // toast
-    //   .promise(axiosInstance.post('recruiter/events', formData), {
-    //     pending: 'The event is creating and broadcasting to every users via email',
-    //     success: 'Successfully created the event'
-    //   })
-    //   .then(() => navigate('/recruiter/events'))
-    //   .catch((error) => {
-    //     toast.error(error.response?.data?.message || 'An error occurred.')
-    //   })
-    //   .finally(() => {
-    //     setIsPending(false)
-    //   })
+    toast
+      .promise(axiosInstance.post('recruiter/events', formData), {
+        pending: 'The event is creating and broadcasting to every users via email',
+        success: 'Successfully created the event'
+      })
+      .then(() => navigate('/recruiter/events'))
+      .catch((error) => {
+        toast.error(error.response?.data?.message || 'An error occurred.')
+      })
+      .finally(() => {
+        setIsPending(false)
+      })
   }
 
   return (

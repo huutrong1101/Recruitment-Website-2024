@@ -42,14 +42,7 @@ const INTInterviewsSlice = createSlice({
         state.INTInterviewsStatus = STATUS.IDLE
       })
       .addCase(fetchINTInterviewsData.rejected, (state, action) => {
-        if (action.error.message === 'Request failed with status code 500') {
-          state.INTInterviewsStatus = STATUS.ERROR500
-        } else if (action.error.message === 'Request failed with status code 404') {
-          state.INTInterviewsStatus = STATUS.ERROR404
-        } else {
-          toast.error(`${action.error.message}`)
-          state.INTInterviewsStatus = STATUS.IDLE
-        }
+        state.INTInterviewsStatus = STATUS.IDLE
       })
 
       .addCase(fetchINTInterviewByID.pending, (state) => {
@@ -60,14 +53,7 @@ const INTInterviewsSlice = createSlice({
         state.INTSingleInterviewStatus = STATUS.IDLE
       })
       .addCase(fetchINTInterviewByID.rejected, (state, action) => {
-        if (action.error.message === 'Request failed with status code 500') {
-          state.INTSingleInterviewStatus = STATUS.ERROR500
-        } else if (action.error.message === 'Request failed with status code 404') {
-          state.INTSingleInterviewStatus = STATUS.ERROR404
-        } else {
-          toast.error(`${action.error.message}`)
-          state.INTSingleInterviewStatus = STATUS.IDLE
-        }
+        state.INTSingleInterviewStatus = STATUS.IDLE
       })
 
       .addCase(fetchSkills.fulfilled, (state, action) => {
@@ -85,7 +71,7 @@ export const { setText, setSkill, setType } = INTInterviewsSlice.actions
 export const fetchINTInterviewsData = createAsyncThunk(
   'INTInterviews/fetchINTInterviewsData',
   async (query: string) => {
-    const response = await axiosInstance.get(`/interviewer/interviews${query}`)
+    const response = await axiosInstance.get(`/interviewers/interviews${query}`)
     return response.data.result
   }
 )
@@ -93,17 +79,17 @@ export const fetchINTInterviewsData = createAsyncThunk(
 export const fetchINTInterviewByID = createAsyncThunk<any, string | undefined>(
   'INTInterviews/fetchINTInterviewByID',
   async (interviewID: string | undefined) => {
-    const response = await axiosInstance.get(`/interviewer/interviews/${interviewID}`)
+    const response = await axiosInstance.get(`/interviewers/interviews/${interviewID}`)
     return response.data.result
   }
 )
 
 export const fetchSkills = createAsyncThunk('INTInterviews/fetchSkill', async () => {
-  const response = await axiosInstance.get(`/interviewer/skills`)
+  const response = await axiosInstance.get(`/interviewers/skills`)
   return response.data.result
 })
 
 export const fetchTypes = createAsyncThunk('INTInterviews/fetchTypes', async () => {
-  const response = await axiosInstance.get(`/interviewer/type-questions`)
+  const response = await axiosInstance.get(`/interviewers/type`)
   return response.data.result
 })

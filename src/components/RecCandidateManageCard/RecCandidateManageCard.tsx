@@ -7,6 +7,8 @@ import user from '../../../images/uses.png'
 const RecCandidateCard = (props: any) => {
   const candidate = props.candidate
 
+  console.log(candidate)
+
   return (
     <Link to={`/recruiter/candidates/${candidate.candidateId}`}>
       <div className='max-w-xs'>
@@ -30,7 +32,7 @@ const RecCandidateCard = (props: any) => {
             <img className='w-32 h-32 mx-auto rounded-full' src={candidate.avatar || user} alt='John Doe' />
           </div>
           <div className='p-2'>
-            <h3 className='text-xl font-medium leading-8 text-center text-gray-900'>{candidate.fullName}</h3>
+            <h3 className='text-xl font-medium leading-8 text-center text-gray-900'>{candidate.candidateFullName}</h3>
             <div className='flex flex-row items-center justify-center'>
               {candidate.information?.skills?.slice(0, 2).map((skill: any, index: any) => (
                 <div key={index} className='bg-[#C6DED5] ml-2 text-[#218F6E] text-xs px-2.5 py-0.5 rounded-full'>
@@ -46,7 +48,7 @@ const RecCandidateCard = (props: any) => {
                 </tr>
                 <tr>
                   <td className='px-2 py-2 font-semibold text-gray-500'>Email</td>
-                  <td className='px-2 py-2'>{candidate.email}</td>
+                  <td className='px-2 py-2'>{candidate.candidateEmail}</td>
                 </tr>
               </tbody>
             </table>

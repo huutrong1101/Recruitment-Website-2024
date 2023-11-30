@@ -62,6 +62,9 @@ import InterviewInformation from './pages/Interviewer/InterviewInformation'
 import InterviewProfile from './pages/Interviewer/InterviewProfile'
 import INTCandidateDetail from './pages/Interviewer/Candidate/Detail/INTCandidateDetail'
 import InterviewDetail from './pages/Interviewer/Interview/Detail/InterviewDetail'
+import InterviewSched from './pages/Recruiter/Jobs/CreateInterview/InterviewSched'
+import UserProfileInterviews from './pages/UserProfile/UserProfileInterviews/UserProfileInterviews'
+import ScorePage from './pages/Interviewer/Interview/ScorePage'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -125,6 +128,7 @@ function App() {
               <Route path='information' element={<UserProfileMyInformation />} />
               <Route path='resume' element={<UserProfileMyResume />} />
               <Route path='submitted-jobs' element={<UserProfileSubmittedJob />} />
+              <Route path='interviews' element={<UserProfileInterviews />} />
             </Route>
             <Route path='/print-resume' element={<PrintResume />} />
           </Route>
@@ -162,6 +166,8 @@ function App() {
             <Route path='events' element={<ReccerEventManagement />} />
             <Route path='events/:eventId' element={<ReccerEventDetail />} />
             <Route path='addevent' element={<AddEvent />} />
+
+            <Route path='jobdetail/:jobId/interview-schedule/:userId' element={<InterviewSched />} />
           </Route>
         </Route>
 
@@ -176,6 +182,7 @@ function App() {
             <Route path='candidate-recent' element={<CandidateRecent />} />
             <Route path='candidate-recent/:id' element={<INTCandidateDetail />} />
             <Route path='question' element={<ManageQuestion />} />
+            <Route index path='interview-recent/:id/score-page' element={<ScorePage />} />
           </Route>
         </Route>
       </Routes>

@@ -28,6 +28,7 @@ const INTQuestionsSlice = createSlice({
     },
     selectQuestions(state, action: PayloadAction<{ ID: string; question: any }>) {
       const { ID: interviewID, question } = action.payload
+      console.log({ interviewID, question })
       if (interviewID in state.selectedQuestions) {
         const isQuestionExist = state.selectedQuestions[interviewID].find(
           (item) => item.questionId === question.questionId
@@ -67,52 +68,28 @@ const INTQuestionsSlice = createSlice({
         state.searchQuestionsStatus = STATUS.IDLE
       })
       .addCase(fetchINTQuestionData.rejected, (state, action) => {
-        toast.error(`${action.error.message}`)
         state.searchQuestionsStatus = STATUS.IDLE
         state.searchQuestions = []
       })
 
-      .addCase(fetchINTAssignedQuestions.pending, (state) => {
-        state.assignedQuestionsStatus = STATUS.LOADING
-      })
+      // .addCase(fetchINTAssignedQuestions.pending, (state) => {
+      //   state.assignedQuestionsStatus = STATUS.LOADING
+      // })
       .addCase(fetchINTAssignedQuestions.fulfilled, (state, action) => {
-        state.assignedQuestions = action.payload.content
+        state.assignedQuestions = action.payload
         state.assignedQuestionsStatus = STATUS.IDLE
       })
       .addCase(fetchINTAssignedQuestions.rejected, (state, action) => {
-        if (action.error.message === 'Request failed with status code 500') {
-          state.assignedQuestionsStatus = STATUS.ERROR500
-        } else if (action.error.message === 'Request failed with status code 404') {
-          state.assignedQuestionsStatus = STATUS.ERROR404
-        } else {
-          toast.error(`${action.error.message}`)
-          state.assignedQuestionsStatus = STATUS.ERROR
-        }
+        state.assignedQuestionsStatus = STATUS.ERROR
       })
 
       .addCase(assignQuestionForInterview.pending, (state, action) => {
         state.assignedQuestionsStatus = STATUS.LOADING
       })
       .addCase(assignQuestionForInterview.fulfilled, (state, action) => {
-        toast.success(`${action.payload.message}`)
         state.assignedQuestionsStatus = STATUS.IDLE
       })
       .addCase(assignQuestionForInterview.rejected, (state, action) => {
-        if (action.error.message === 'Request failed with status code 409') {
-          toast.warning(`Questions has been assigned for the interview`, {
-            style: {
-              background: '#FFD700',
-              color: '#000'
-            }
-          })
-        } else {
-          toast.info(`${action.error.message}`, {
-            style: {
-              background: '#007bff',
-              color: '#fff'
-            }
-          })
-        }
         state.assignedQuestionsStatus = STATUS.IDLE
       })
 
@@ -120,74 +97,72 @@ const INTQuestionsSlice = createSlice({
         state.assignedQuestionsStatus = STATUS.LOADING
       })
       .addCase(deleteQuestionOfInterview.fulfilled, (state, action) => {
-        toast.success(`${action.payload.message}`)
         state.assignedQuestionsStatus = STATUS.IDLE
       })
       .addCase(deleteQuestionOfInterview.rejected, (state, action) => {
-        toast.error(`${action.error.message}`)
         state.assignedQuestionsStatus = STATUS.IDLE
       })
 
-      .addCase(markScore.pending, (state, action) => {
-        toast.info(`Loading.....`, {
-          autoClose: false,
-          style: {
-            background: '#007bff',
-            color: '#fff'
-          }
-        })
-      })
-      .addCase(markScore.fulfilled, (state, action) => {
-        toast.dismiss()
-        toast.success(`Mark score successfully`)
-      })
-      .addCase(markScore.rejected, (state, action) => {
-        toast.dismiss()
-        if (action.error.message === 'Request failed with status code 422') {
-          toast.warning(`Entry point must be in the range 0-10`, {
-            style: {
-              background: '#FFD700',
-              color: '#000'
-            }
-          })
-        } else if (action.error.message === 'Request failed with status code 500') {
-          toast.warning(`Scores must be entered for all questions`, {
-            style: {
-              background: '#FFD700',
-              color: '#000'
-            }
-          })
-        } else {
-          toast.error(`${action.error.message}`)
-        }
-      })
+    // .addCase(markScore.pending, (state, action) => {
+    //   toast.info(`Loading.....`, {
+    //     autoClose: false,
+    //     style: {
+    //       background: '#007bff',
+    //       color: '#fff'
+    //     }
+    //   })
+    // })
+    // .addCase(markScore.fulfilled, (state, action) => {
+    //   toast.dismiss()
+    //   toast.success(`Mark score successfully`)
+    // })
+    // .addCase(markScore.rejected, (state, action) => {
+    //   toast.dismiss()
+    //   if (action.error.message === 'Request failed with status code 422') {
+    //     toast.warning(`Entry point must be in the range 0-10`, {
+    //       style: {
+    //         background: '#FFD700',
+    //         color: '#000'
+    //       }
+    //     })
+    //   } else if (action.error.message === 'Request failed with status code 500') {
+    //     toast.warning(`Scores must be entered for all questions`, {
+    //       style: {
+    //         background: '#FFD700',
+    //         color: '#000'
+    //       }
+    //     })
+    //   } else {
+    //     toast.error(`${action.error.message}`)
+    //   }
+    // })
 
-      .addCase(addQuestionToRepo.pending, (state, action) => {
-        toast.info(`Loading.....`, {
-          autoClose: false,
-          style: {
-            background: '#007bff',
-            color: '#fff'
-          }
-        })
-      })
-      .addCase(addQuestionToRepo.fulfilled, (state, action) => {
-        toast.dismiss()
-        toast.success(`Assign question successfully`)
-      })
-      .addCase(addQuestionToRepo.rejected, (state, action) => {
-        toast.dismiss()
-        if (action.error.message === 'Request failed with status code 409') {
-          toast.warning(`Question already exists`, {
-            style: {
-              background: '#FFD700',
-              color: '#000'
-            }
-          })
-        } else {
-          toast.error(action.error.message)
-        }
-      })
+    // .addCase(addQuestionToRepo.pending, (state, action) => {
+    //   toast.info(`Loading.....`, {
+    //     autoClose: false,
+    //     style: {
+    //       background: '#007bff',
+    //       color: '#fff'
+    //     }
+    //   })
+    // })
+    // .addCase(addQuestionToRepo.fulfilled, (state, action) => {
+    //   toast.dismiss()
+    //   toast.success(`Assign question successfully`)
+    // })
+    // .addCase(addQuestionToRepo.rejected, (state, action) => {
+    //   toast.dismiss()
+    //   if (action.error.message === 'Request failed with status code 409') {
+    //     toast.warning(`Question already exists`, {
+    //       style: {
+    //         background: '#FFD700',
+    //         color: '#000'
+    //       }
+    //     })
+    //   } else {
+    //     toast.error(action.error.message)
+    //   }
+    // })
   }
 })
 
@@ -197,14 +172,14 @@ export const { selectQuestions, removeQuestions, setEmptySelectedQuestions, setS
 
 export const fetchINTQuestionData = createAsyncThunk(
   'INTQuestions/fetchINTQuestionData',
-  async (query: string = '') => {
-    const response = await axiosInstance.get(`/interviewer/questionList${query}`)
+  async (params: URLSearchParams) => {
+    const response = await axiosInstance.get('/interviewers/question', { params })
     return response.data.result
   }
 )
 
 export const fetchINTAssignedQuestions = createAsyncThunk('INTQuestions/fetchINTAssignQuestions', async (id: any) => {
-  const response = await axiosInstance.get(`/interviewer/interview/${id}/questions`)
+  const response = await axiosInstance.get(`/interviewers/interview/${id}/questions`)
   return response.data.result
 })
 
@@ -212,9 +187,7 @@ export const deleteQuestionOfInterview = createAsyncThunk(
   'INTQuestions/deleteQuestionOfInterview',
   async (data: any) => {
     const { ID, question } = data
-    const response = await axiosInstance.delete(
-      `/interviewer/interview/${ID}/questions/question/${question.questionId}`
-    )
+    const response = await axiosInstance.delete(`/interviewers/interview/${ID}/questions/${question.questionId}`)
     return response.data
   }
 )
@@ -235,7 +208,10 @@ export const assignQuestionForInterview = createAsyncThunk(
     if (!selectedQuestions[ID] || selectedQuestions[ID].length === 0) {
       throw 'All questions have been saved'
     }
-    const response = await axiosInstance.post(`/interviewer/interview/${ID}/questions`, assignQuestions)
+    console.log({ questions: assignQuestions })
+
+    const response = await axiosInstance.post(`/interviewers/interview/${ID}/questions`, { questions: assignQuestions })
+
     return response.data
   }
 )
@@ -252,15 +228,16 @@ export const addQuestionToRepo = createAsyncThunk('INTQuestions/addQuestionToRep
   const question: {
     content: string
     note: string
-    typeQuestion: string
-    skillId: string
+    type: string
+    skill: string
   } = {
     content: contentQ,
     note: noteQ,
-    typeQuestion: typeQ,
-    skillId: skillQ
+    type: typeQ,
+    skill: skillQ
   }
-  const response1 = await axiosInstance.post(`/interviewer/question`, question)
+
+  const response1 = await axiosInstance.post(`/interviewers/interview-questions`, question)
 
   const assignQuestions: { questionId: any; score: any; note: any }[] = [
     {
@@ -269,6 +246,9 @@ export const addQuestionToRepo = createAsyncThunk('INTQuestions/addQuestionToRep
       note: ''
     }
   ]
-  const response2 = await axiosInstance.post(`/interviewer/interview/${ID}/questions`, assignQuestions)
+  const response2 = await axiosInstance.post(`/interviewers/interview/${ID}/questions`, { questions: assignQuestions })
+
+  console.log({ question, assignQuestions })
+
   return response2.data
 })

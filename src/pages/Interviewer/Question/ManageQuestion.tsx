@@ -15,6 +15,7 @@ import { TYPE_alter } from '../../../utils/Localization'
 import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import { data } from '../../../data/fetchData'
 import UpdateQuestion from './UpdateQuestion'
+import AddQuestion from './AddQuestion'
 
 export type QueryConfig = {
   [key in keyof QuestionListConfig]: string
@@ -73,7 +74,7 @@ export default function QuestionInterview() {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
 
-          const response = await axiosInstance(`interviewer/question?${query}`)
+          const response = await axiosInstance(`interviewers/question?${query}`)
           setShowQuestion(response.data.result.content)
           setPageSize(response.data.result.totalPages)
         }
@@ -89,8 +90,8 @@ export default function QuestionInterview() {
   useEffect(() => {
     const fetchSkillType = async () => {
       setIsLoading(true)
-      const resSkill = await axiosInstance(`interviewer/skills`)
-      const resType = await axiosInstance(`interviewer/type-questions`)
+      const resSkill = await axiosInstance(`interviewers/skills`)
+      const resType = await axiosInstance(`interviewers/type`)
       setShowTypes(resType.data.result)
       setShowSkills(resSkill.data.result)
     }
@@ -103,7 +104,7 @@ export default function QuestionInterview() {
         setIsLoading(true)
         try {
           const query = qs.stringify(queryConfig)
-          const response = await axiosInstance(`interviewer/question?${query}`)
+          const response = await axiosInstance(`interviewers/question?${query}`)
           setShowQuestion(response.data.result.content)
           setPageSize(response.data.result.totalPages)
         } catch (error) {
@@ -132,12 +133,10 @@ export default function QuestionInterview() {
   function DeleteQuestion(id: any) {
     toast.promise(InterviewService.deleteQuestion(id), {
       pending: 'Deleting this question !!',
-      success: 'The question was deleted. Please RELOAD page',
-      error: 'có lỗi'
+      success: 'The question was deleted',
+      error: 'Có lỗi xãy ra trong quá trình xóa'
     })
   }
-
-  // console.log(showTypes)
 
   return (
     <div className='my-4 '>
@@ -191,15 +190,15 @@ export default function QuestionInterview() {
                           >
                             <Menu.Items className='flex flex-col items-start w-full h-full rounded-md shadow-md bg-gray-50 aboslute max-h-[20vh] overflow-hidden overflow-y-scroll'>
                               <div className='w-full h-full text-black border rounded-md border-zinc-200'>
-                                {showSkills.map((skill: any) => (
-                                  <Menu.Item key={skill.skillId}>
+                                {showSkills.map((skill: any, index) => (
+                                  <Menu.Item key={index}>
                                     {({ active }) => (
                                       <Link
                                         to={{
                                           pathname: '/interviewer/question',
                                           search: createSearchParams({
                                             ...queryConfig,
-                                            skill: skill.name,
+                                            skill: skill,
                                             page: '1'
                                           }).toString()
                                         }}
@@ -211,11 +210,11 @@ export default function QuestionInterview() {
                                         onClick={() => {
                                           setDataSearch({
                                             ...dataSearch,
-                                            skill: skill.name
+                                            skill: skill
                                           })
                                         }}
                                       >
-                                        {skill.name}
+                                        {skill}
                                       </Link>
                                     )}
                                   </Menu.Item>
@@ -239,7 +238,7 @@ export default function QuestionInterview() {
                           onClick={handleActive}
                         >
                           <div className='inline-flex justify-between w-full '>
-                            {TYPE_alter[dataSearch.type] || 'Type'}
+                            {dataSearch.type || 'Type'}
                             <ChevronDownIcon className='w-5 h-5 pt-1' />
                           </div>
                         </Menu.Button>
@@ -278,7 +277,7 @@ export default function QuestionInterview() {
                                         })
                                       }}
                                     >
-                                      {TYPE_alter[type]}
+                                      {type}
                                     </Link>
                                   )}
                                 </Menu.Item>
@@ -320,14 +319,14 @@ export default function QuestionInterview() {
                           <div className='px-4  min-w-[145vh] '>
                             {' '}
                             {/*max-w-[145vh] */}
-                            {data.question.length > 0 ? (
-                              data.question.map((question: any) => (
+                            {showQuestion.length > 0 ? (
+                              showQuestion.map((question: any) => (
                                 <tr
                                   className='flex flex-row items-center py-2 my-2 text-left border-2 border-white cursor-pointer text-md hover: hover:border-emerald-600 hover:rounded-lg hover:text-black hover:transition-all '
                                   key={question.questionId}
                                 >
                                   <td className='mx-3 basis-1/6'>{question.skill}</td>
-                                  <td className='mx-3 basis-1/6'>{TYPE_alter[question.typeQuestion]}</td>
+                                  <td className='mx-3 basis-1/6'>{question.typeQuestion}</td>
                                   <td className='flex-wrap mx-3 truncate basis-2/6 '>{question.content}</td>
                                   <td className='flex-wrap mx-3 truncate basis-2/6 '>{question.note}</td>
                                   <td className='inline-flex justify-center gap-x-2 basis-1/6'>
@@ -382,7 +381,7 @@ export default function QuestionInterview() {
           </div>
         </div>
       </div>
-      {/* <AddQuestion onClick={handleOnClick} observation={addQuestion} /> */}
+      <AddQuestion onClick={handleOnClick} observation={addQuestion} />
       <UpdateQuestion onClick={handleUpdateClick} observation={updateQuestion} questionID={questionID} />
     </div>
   )
