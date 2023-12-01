@@ -34,44 +34,37 @@ export default function Suggested() {
 
   useEffect(() => {
     const getSuggestedCandidates = async () => {
-      const response = await axiosInstance.get(`recruiter/jobs/${jobId}/suggested-users`)
+      const response = await axiosInstance.get(`recruiter/jobs/${jobId}/suggested-user`)
       setSuggestCandidate(response.data.result.content)
     }
     getSuggestedCandidates()
   }, [jobId])
+
+  console.log(suggestCandidate)
 
   return (
     <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
       <div>
         <h1 className='text-2xl font-semibold'>Suggested Candidate</h1>
         <div className={classNames(`flex md:flex-row gap-12 justify-center flex-wrap`, `py-4`)}>
-          {data.candidate?.length > 0 ? (
-            data.candidate.slice(0, 3).map((candidates, index) => (
+          {suggestCandidate?.length > 0 ? (
+            suggestCandidate.slice(0, 3).map((candidates, index) => (
               <div className='w-[22%] bg-white rounded-xl drop-shadow-lg border-2 border-gray-300'>
                 <button className='flex flex-col px-4 pt-4 text-left'>
-                  <EnvelopeIcon className='w-6 h-6' onClick={() => handleInvite(candidates.userId)} />
+                  <EnvelopeIcon className='w-6 h-6' onClick={() => handleInvite(candidates.candidateId)} />
                 </button>
                 <div className='flex flex-col items-center justify-center px-6 pb-4 '>
                   <AvatarCandidate imageUrl={candidates.avatar} size='sm' />
                   <div key={index} className='text-lg font-semibold'>
-                    {candidates.fullName}
+                    {candidates.candidateFullName}
                   </div>
-                  {/* <div key={index} className="flex flex-row">
-                {candidates.skills.map((skill:any, index:number) => (
-                  <p
-                    key={index}
-                    className="rounded-lg bg-[#78AF9A] bg-opacity-40  p-1 mx-1 my-1 text-sm text-[#218F6E] flex flex-col items-center"
-                  >
-                    {skill}
-                  </p>
-                ))}
-              </div> */}
+
                   <div className='flex flex-row font-light text-gray-500'>
                     <p>Phone: </p>
                     <div className='font-semibold text-black'>{candidates.phone}</div>
                   </div>
                   <div className='pt-4'>
-                    <Link to={`/recruiter/candidates/${candidates.userId}`}>
+                    <Link to={`/recruiter/candidates/${candidates.candidateId}`}>
                       <button className='px-4 py-2 text-white rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 dark:border-emerald-600'>
                         Profile
                       </button>

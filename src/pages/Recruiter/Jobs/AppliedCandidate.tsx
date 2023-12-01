@@ -18,6 +18,7 @@ import axiosInstance from '../../../utils/AxiosInstance'
 import { APPLY_STATUS } from '../../../utils/Localization'
 import { StateService } from '../../../services/changeState'
 import { AppliedCandidateListConfig } from '../../../types/services'
+import CandidateStatusBadge from '../../Interviewer/Candidate/CandidateStatusBadge'
 
 interface UserProps {
   candidateId: string
@@ -97,9 +98,9 @@ export default function Applied(num: any) {
     const data = {
       candidateId: candidateId || '',
       jobId: jobId || '',
-      state: 'passed'
+      state: 'PASS'
     }
-    const countReceivedStates = applyCandidate?.map((data) => data.state).filter((state) => state === 'PASSED').length
+    const countReceivedStates = applyCandidate?.map((data) => data.state).filter((state) => state === 'PASS').length
 
     if (countReceivedStates < num.num) {
       toast
@@ -117,7 +118,7 @@ export default function Applied(num: any) {
     const data = {
       candidateId: candidateId || '',
       jobId: jobId || '',
-      state: 'failed'
+      state: 'FAIL'
     }
     toast
       .promise(StateService.changeState(data), {
@@ -147,13 +148,10 @@ export default function Applied(num: any) {
     <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
       <div className='flex flex-row items-center'>
         <h1 className='flex-1 text-2xl font-semibold'>Applied Candidate</h1>
-        <span className='text-base text-gray-700'>
-          {applyCandidate.length} applicant
-          {applyCandidate.length > 1 ? `s` : ``}
-        </span>
+        <span className='text-base text-gray-700'>{applyCandidate && applyCandidate.length} applicant</span>
       </div>
 
-      {applyCandidate?.length > 0 ? (
+      {applyCandidate && applyCandidate?.length > 0 ? (
         <div className='relative p-4 overflow-x-auto max-h-96 h-80'>
           <table className='w-full text-sm text-left text-gray-500'>
             <thead className='text-xs text-gray-700 uppercase bg-gray-50'>
@@ -247,12 +245,12 @@ export default function Applied(num: any) {
                       </td>
                       <td className='px-6 py-4'>{applyCandidate.candidateEmail}</td>
                       <td className='px-6 py-4'>
-                        {applyCandidate.interviewerFullNames.length === 0
+                        {applyCandidate.interviewerFullNames && applyCandidate.interviewerFullNames.length === 0
                           ? 'None'
                           : applyCandidate.interviewerFullNames
                               .slice(0, 2)
                               .map((name: any, index: any) => <div key={index}>{name}</div>)}
-                        {applyCandidate.interviewerFullNames?.length > 2 && (
+                        {applyCandidate.interviewerFullNames && applyCandidate.interviewerFullNames?.length > 2 && (
                           <Popover>
                             <PopoverHandler>
                               <div className='hover:underline cursor-context-menu w-fit'>"Show all"</div>
@@ -267,26 +265,16 @@ export default function Applied(num: any) {
                           </Popover>
                         )}
                       </td>
-                      <td className='px-6 py-4'>
-                        {applyCandidate.score ? applyCandidate.score + ' / 100' : 'Pending'}
-                      </td>
+                      <td className='px-6 py-4'>{applyCandidate.score ? applyCandidate.score : 'Pending'}</td>
                       <td className='p-2 px-4 py-4 mx-2 my-1 rounded-lg'>
-                        <span
-                          className={`rounded-lg p-2 mx-2 my-1  ${
-                            applyCandidate.state === 'PASSED'
-                              ? 'bg-green-400 text-green-800'
-                              : applyCandidate.state === 'FAILED'
-                              ? 'bg-red-300'
-                              : applyCandidate.state === 'NOT_RECEIVED'
-                              ? 'bg-yellow-100'
-                              : 'bg-green-200'
-                          }`}
-                        >
-                          {APPLY_STATUS[applyCandidate.state]}
-                        </span>
+                        {typeof applyCandidate?.state === 'string' && (
+                          <CandidateStatusBadge
+                            status={applyCandidate?.state as 'PENDING' | 'REVIEWING' | 'PASS' | 'FAIL'}
+                          />
+                        )}
                       </td>
                       <td>
-                        {applyCandidate.state !== 'NOT_RECEIVED' ? (
+                        {applyCandidate.state !== 'PENDING' ? (
                           applyCandidate.score !== null ? (
                             <div>
                               {

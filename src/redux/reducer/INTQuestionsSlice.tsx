@@ -180,6 +180,7 @@ export const fetchINTQuestionData = createAsyncThunk(
 
 export const fetchINTAssignedQuestions = createAsyncThunk('INTQuestions/fetchINTAssignQuestions', async (id: any) => {
   const response = await axiosInstance.get(`/interviewers/interview/${id}/questions`)
+  console.log('check')
   return response.data.result
 })
 
@@ -212,14 +213,17 @@ export const assignQuestionForInterview = createAsyncThunk(
 
     const response = await axiosInstance.post(`/interviewers/interview/${ID}/questions`, { questions: assignQuestions })
 
-    return response.data
+    console.log(response.data)
+
+    // return response.data
   }
 )
 
 export const markScore = createAsyncThunk('INTQuestions/markScore', async (data: any) => {
   const { ID, assignedQuestions } = data
-  const response1 = await axiosInstance.put(`/interviewer/interview/${ID}/questions`, assignedQuestions)
-  const response2 = await axiosInstance.put(`/interviewer/interview/${ID}/totalScore`)
+  console.log({ ID, assignedQuestions })
+  const response1 = await axiosInstance.put(`/interviewers/interview/${ID}/questions`, { questions: assignedQuestions })
+  const response2 = await axiosInstance.put(`/interviewers/interview/${ID}/totalScore`)
   return response2.data
 })
 

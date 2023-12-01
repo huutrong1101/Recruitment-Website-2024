@@ -183,7 +183,7 @@ const InterviewDetail = () => {
     dispatch(fetchTypes())
   }, [])
 
-  console.log({ assignedQuestions, selectedQuestions })
+  console.log({ assignedQuestions, selectedQuestions, assignedQuestionsStatus })
 
   // if (INTSingleInterviewStatus === STATUS.IDLE || INTSingleInterviewStatus === STATUS.LOADING) {
   return (
@@ -213,7 +213,54 @@ const InterviewDetail = () => {
         </div>
       </div>
 
-      {!checkCompleteMarkScore(assignedQuestions) && (
+      {checkCompleteMarkScore(assignedQuestions) && assignedQuestionsStatus === STATUS.LOADING && (
+        <div className='flex justify-center'>
+          <LoadSpinner className='w-8 h-8 mt-8' />
+        </div>
+      )}
+      {checkCompleteMarkScore(assignedQuestions) && assignedQuestionsStatus === STATUS.IDLE ? (
+        <div className='px-6 py-6 border-2 shadow-xl mt-14 rounded-xl'>
+          <div className='text-2xl font-semibold'>Result of Interview</div>
+          <table className='w-full mt-4 border border-collapse border-gray-300 rounded'>
+            <thead>
+              <tr className='bg-gray-200'>
+                <th className='w-6/12 px-4 py-2'>Question</th>
+                <th className='w-5/12 px-4 py-2'>Note</th>
+                <th className='w-1/12 px-4 py-2'>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {assignedQuestions?.map((item: any) => (
+                <tr key={item.questionId} className='bg-white'>
+                  <td className='px-4 py-2 border'>{item.content}</td>
+                  <td className='px-4 py-2 border'>{item.note}</td>
+                  <td className='px-4 py-2 text-center border'>{item.score}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className='flex justify-end mt-4 text-base'>
+            <div className='mr-8'>
+              Number of questions:
+              <span className='text-xl font-medium'> {assignedQuestions.length}</span>
+            </div>
+            <div className='mr-8'>
+              Total score:
+              <span className='text-xl font-medium'>
+                {' '}
+                {calculateTotalScore(assignedQuestions)}/{10 * assignedQuestions.length}
+              </span>
+            </div>
+            <div>
+              Score out of 100:
+              <span className='text-xl font-medium'>
+                {' '}
+                {Math.round((calculateTotalScore(assignedQuestions) * 1.0 * 100) / (10 * assignedQuestions.length))}
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : (
         <div className='px-6 py-6 border-2 shadow-xl mt-14 rounded-xl'>
           <div className='text-2xl font-semibold'>Assign Questions For Interview</div>
           <form className='relative flex justify-center mt-2'>
@@ -338,7 +385,7 @@ const InterviewDetail = () => {
                         <tr className='bg-white'>
                           <td className='px-4 py-2 border'>{item.content}</td>
                           <td className='px-4 py-2 text-center border'>{item.typeQuestion}</td>
-                          <td className='px-4 py-2 text-center border'>{item.skill.name}</td>
+                          <td className='px-4 py-2 text-center border'>{item.skill}</td>
                           <td className='px-4 py-2 text-center border'>
                             <TrashIcon
                               onClick={() => {
@@ -380,54 +427,6 @@ const InterviewDetail = () => {
           </div>
         </div>
       )}
-      {checkCompleteMarkScore(assignedQuestions) && assignedQuestionsStatus === STATUS.LOADING && (
-        <div className='flex justify-center'>
-          <LoadSpinner className='w-8 h-8 mt-8' />
-        </div>
-      )}
-      {checkCompleteMarkScore(assignedQuestions) && assignedQuestionsStatus === STATUS.IDLE && (
-        <div className='px-6 py-6 border-2 shadow-xl mt-14 rounded-xl'>
-          <div className='text-2xl font-semibold'>Result of Interview</div>
-          <table className='w-full mt-4 border border-collapse border-gray-300 rounded'>
-            <thead>
-              <tr className='bg-gray-200'>
-                <th className='w-6/12 px-4 py-2'>Question</th>
-                <th className='w-5/12 px-4 py-2'>Note</th>
-                <th className='w-1/12 px-4 py-2'>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assignedQuestions?.map((item: any) => (
-                <tr key={item.questionId} className='bg-white'>
-                  <td className='px-4 py-2 border'>{item.content}</td>
-                  <td className='px-4 py-2 border'>{item.note}</td>
-                  <td className='px-4 py-2 text-center border'>{item.score}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className='flex justify-end mt-4 text-base'>
-            <div className='mr-8'>
-              Number of questions:
-              <span className='text-xl font-medium'> {assignedQuestions.length}</span>
-            </div>
-            <div className='mr-8'>
-              Total score:
-              <span className='text-xl font-medium'>
-                {' '}
-                {calculateTotalScore(assignedQuestions)}/{10 * assignedQuestions.length}
-              </span>
-            </div>
-            <div>
-              Score out of 100:
-              <span className='text-xl font-medium'>
-                {' '}
-                {Math.round((calculateTotalScore(assignedQuestions) * 1.0 * 100) / (10 * assignedQuestions.length))}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {view ? (
         <div className='mt-14'>
@@ -455,22 +454,22 @@ const InterviewDetail = () => {
           )}
         </div>
       )}
-      {/* {view && !checkCompleteMarkScore(assignedQuestions) && !isDateReached(INTSingleInterview?.time) && ( */}
-      <div className='flex justify-end mt-8'>
-        <Link to={`/interviewer/interview-recent/${id}/score-page`}>
-          <button className='px-4 py-2 font-bold text-white bg-orange-600 rounded hover:bg-orange-800'>
-            Start Interview
-          </button>
-        </Link>
-      </div>
-      {/* )}
+      {view && !checkCompleteMarkScore(assignedQuestions) && !isDateReached(INTSingleInterview?.time) && (
+        <div className='flex justify-end mt-8'>
+          <Link to={`/interviewer/interview-recent/${id}/score-page`}>
+            <button className='px-4 py-2 font-bold text-white bg-orange-600 rounded hover:bg-orange-800'>
+              Start Interview
+            </button>
+          </Link>
+        </div>
+      )}
       {view && !checkCompleteMarkScore(assignedQuestions) && isDateReached(INTSingleInterview?.time) && (
         <div className='flex justify-end mt-8'>
           <button className='px-4 py-2 font-bold text-white bg-blue-600 rounded hover:bg-blue-800'>
             Not Arrived Yet
           </button>
         </div>
-      )} */}
+      )}
     </div>
   )
   // } else if (INTSingleInterviewStatus === STATUS.ERROR500 || assignedQuestionsStatus === STATUS.ERROR500) {

@@ -16,6 +16,7 @@ import { checkCompleteMarkScore, isDateReached, truncatedString } from './Detail
 import { STATUS } from '../../../utils/contanst'
 import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import Modal from '../../../components/Modal/Modal'
+import { toast } from 'react-toastify'
 
 function AddQuestionModal({ visible, onAccept, onCancel }: any) {}
 
@@ -94,6 +95,11 @@ export default function ScorePage() {
 
   const handleMarkScore = async () => {
     await dispatch(markScore({ ID, assignedQuestions }))
+      .unwrap()
+      .then(() => {
+        toast.success(`Successfully.`)
+        navigate('/interviewer/interview-recent')
+      })
   }
 
   const [isFetch, setIsFetch] = useState(false)
