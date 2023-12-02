@@ -52,27 +52,26 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
   const [pagination, setPagination] = useState({
     loading: false,
     pageNumber: 1,
-    pageSize: 10,
     totalElements: 10,
     totalPages: 1
   })
 
   useEffect(() => {
-    const index = searchParams.get('index') || 1
-    const size = searchParams.get('size') || 5
+    const page = searchParams.get('page') || 1
+    const limit = searchParams.get('limit') || 5
     setPagination({ ...pagination, loading: true })
 
-    getCandidateInterviews({ index, size })
+    getCandidateInterviews({ page, limit })
       .then((response) => {
         const { result } = response.data
-        const { pageNumber, pageSize, totalElements, totalPages } = result
+        const { pageNumber, totalElements, totalPages } = result
+        console.log(result.content)
         // Normalize the result onto a fitted table data
         // Set onto a data list for rendering
         setInterviews(normalizeResponseResult(result))
         setPagination({
           ...pagination,
           pageNumber,
-          pageSize,
           totalElements,
           totalPages,
           loading: false
@@ -85,12 +84,12 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
 
   const handleNextPage = () => {
     setSearchParams((prev) => {
-      const index = prev.get('index') || '1'
-      const size = prev.get('size') || '5'
+      const page = prev.get('page') || '1'
+      const limit = prev.get('limit') || '5'
 
       return {
-        size,
-        index: (Number.parseInt(index) + 1).toString()
+        limit,
+        page: (Number.parseInt(page) + 1).toString()
       }
     })
 
@@ -98,12 +97,12 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
   }
   const handlePreviousPage = () => {
     setSearchParams((prev) => {
-      const index = prev.get('index') || '1'
-      const size = prev.get('size') || '5'
+      const page = prev.get('page') || '1'
+      const limit = prev.get('limit') || '5'
 
       return {
-        size,
-        index: (Number.parseInt(index) - 1).toString()
+        limit,
+        page: (Number.parseInt(page) - 1).toString()
       }
     })
 
@@ -112,11 +111,11 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
 
   const handleChangeLimit = (value: number) => {
     setSearchParams((prev) => {
-      const index = prev.get('index') || '1'
+      const page = prev.get('page') || '1'
 
       return {
-        size: value.toString() || '5',
-        index
+        limit: value.toString() || '5',
+        page
       }
     })
 
@@ -150,7 +149,7 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
         {/* Filter groups */}
         <div className={classnames(`flex flex-row items-center gap-4`)}>
           <div className='w-40'>
-            <Listbox value={searchParams.get('size') || 5} onChange={handleChangeLimit} disabled={pagination.loading}>
+            <Listbox value={searchParams.get('limit') || 5} onChange={handleChangeLimit} disabled={pagination.loading}>
               <div className={classnames(`relative`)}>
                 <Listbox.Button
                   className={classnames(
@@ -163,7 +162,7 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
                   <span>
                     <HiListBullet />
                   </span>
-                  <span>{searchParams.get('size') || 5} applicants</span>
+                  <span>{searchParams.get('limit') || 5} applicants</span>
                 </Listbox.Button>
                 <Transition
                   as={Fragment}

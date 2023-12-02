@@ -30,34 +30,30 @@ const InterviewRecent = () => {
   const { INTCandidates } = useAppSelector((state: any) => state.INTCandidates)
   const dispatch = useAppDispatch()
 
+  const [currentPage, setCurrentPage] = useState(1)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
-  const [query, setQuery] = useState(`?size=${rowsPerPage}&page=${page + 1}`)
+  const [query, setQuery] = useState(`?limit=${rowsPerPage}&page=${page + 1}`)
 
   const handleIncreasePage = () => {
     if (page < INTTotalPages - 1) {
-      setPage(page + 1)
       const newPage = page + 1
-      setQuery(`?size=${rowsPerPage}&page=${newPage + 1}`)
+      setCurrentPage(newPage + 1)
+      setPage(newPage)
+      setQuery(`?limit=${rowsPerPage}&page=${newPage + 1}`)
     }
   }
   const handleDecreasePage = () => {
     if (page > 0) {
-      setPage(page - 1)
       const newPage = page - 1
-      setQuery(`?size=${rowsPerPage}&page=${newPage + 1}`)
+      setCurrentPage(newPage + 1)
+      setPage(newPage)
+      setQuery(`?limit=${rowsPerPage}&page=${newPage + 1}`)
     }
   }
 
-  const handleChangeRowsPerPage = (event: any) => {
-    const rowsPerPageValue = parseInt(event.target.value, 10)
-    if (rowsPerPageValue !== rowsPerPage) {
-      setRowsPerPage(rowsPerPageValue)
-      setPage(0)
-      const newPage = 0
-      const newRowsPerPage = rowsPerPageValue
-      setQuery(`?size=${newRowsPerPage}&page=${newPage + 1}`)
-    }
+  const handleChangeRowsPerPage = (page: number) => {
+    setQuery(`?limit=${rowsPerPage}&page=${page}`)
   }
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, INTTotalInterviews - page * rowsPerPage)
@@ -139,33 +135,31 @@ const InterviewRecent = () => {
             </div>
           </CardBody>
           <CardFooter className='flex items-center justify-between p-4 border-t border-blue-gray-50'>
-            <Button variant='outlined' size='sm'>
+            <Button variant='outlined' size='sm' onClick={handleDecreasePage}>
               Previous
             </Button>
             <div className='flex items-center gap-2'>
-              <IconButton variant='outlined' size='sm'>
-                1
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                2
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                3
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                ...
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                8
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                9
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                10
-              </IconButton>
+              {Array(INTTotalPages)
+                .fill(0)
+                .map((_, index) => {
+                  const pageNumber = index + 1
+                  const isCurrentPage = pageNumber === currentPage
+                  return (
+                    <IconButton
+                      variant='outlined'
+                      size='sm'
+                      onClick={() => {
+                        handleChangeRowsPerPage(pageNumber)
+                        setCurrentPage(pageNumber)
+                      }}
+                      className={isCurrentPage ? 'border-cyan-500' : 'border-transparent'}
+                    >
+                      {pageNumber}
+                    </IconButton>
+                  )
+                })}
             </div>
-            <Button variant='outlined' size='sm'>
+            <Button variant='outlined' size='sm' onClick={handleIncreasePage}>
               Next
             </Button>
           </CardFooter>

@@ -25,16 +25,16 @@ export default function AddEvent() {
     setAvatar(file)
   }
   // SubmitButon
-  const [startAt, setstartAt] = useState('')
-  const [startAt1, setstartAt1] = useState('')
+  const [startAt, setstartAt] = useState(moment().format('YYYY-MM-DD'))
+  const [startAt1, setstartAt1] = useState(moment().format('YYYY-MM-DD'))
   const navigate = useNavigate()
 
-  useEffect(() => {
-    // Set the default value for "Day Start" to the current date
-    const currentDate = moment().format('YYYY-MM-DD')
-    setstartAt(currentDate)
-    setstartAt1(currentDate)
-  }, [])
+  // useEffect(() => {
+  //   // Set the default value for "Day Start" to the current date
+  //   const currentDate = moment().format('YYYY-MM-DD')
+  //   setstartAt(currentDate)
+  //   setstartAt1(currentDate)
+  // }, [])
 
   const [deadline, setDeadline] = useState('')
 
@@ -77,16 +77,16 @@ export default function AddEvent() {
     formData.append('startAt', startAt)
     formData.append('deadline', deadline)
     formData.append('location', location)
-    formData.append('time', '07:35')
+    formData.append('time', time)
 
     setIsPending(true) // Thiết lập trạng thái pending khi bắt đầu gửi yêu cầu
 
-    console.log({ startAt, deadline, time })
+    console.log({ time, startAt })
 
     // Gửi yêu cầu POST đến URL http://localhost:8080/api/v1/recruiter/events/create với FormData
     toast
       .promise(axiosInstance.post('recruiter/events', formData), {
-        pending: 'The event is creating and broadcasting to every users via email',
+        pending: 'The event is creating',
         success: 'Successfully created the event'
       })
       .then(() => navigate('/recruiter/events'))

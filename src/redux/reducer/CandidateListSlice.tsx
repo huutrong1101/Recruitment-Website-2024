@@ -49,7 +49,7 @@ export const fetchCandidateSkill = () => {
   return async function fetchCandidatesSkillThunk(dispatch: Dispatch) {
     dispatch(setCandidatesListStatus(STATUS.LOADING))
     try {
-      const response = await axiosInstance.get(`candidate/skills`)
+      const response = await axiosInstance.get(`/skills`)
       const data = await response.data
       dispatch(setCandidateskillList(data.result))
       dispatch(setCandidatesListStatus(STATUS.IDLE))

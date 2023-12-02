@@ -119,6 +119,15 @@ export default function UserProfileMyResume() {
     setIsUpload(false)
   }
 
+  function limitFileName(name: string, maxLength: number) {
+    if (name.length <= maxLength) {
+      return name
+    } else {
+      const truncatedName = name.substring(0, maxLength - 3)
+      return `${truncatedName}...${name.slice(-4)}`
+    }
+  }
+
   return (
     <div className={classNames(`flex-1 flex flex-col gap-4`)}>
       {/* Resume */}
@@ -159,13 +168,14 @@ export default function UserProfileMyResume() {
                 {resumeList.length > 0 ? (
                   <>
                     {resumeList.map((resume: any) => {
+                      const truncatedName = limitFileName(resume.name, 25)
                       const date = moment(resume.createdDate).format('Do MMM, YYYY')
                       return (
                         <UserResume
                           key={resume.resumeId}
                           id={resume.resumeId}
                           priorityCV={priorityCV}
-                          name={resume.name}
+                          name={truncatedName}
                           date={date}
                           onDelete={() => {
                             handleDelete(resume.resumeId)

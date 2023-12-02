@@ -13,6 +13,7 @@ import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import RecCandidateCard from '../../../components/RecCandidateManageCard/RecCandidateManageCard'
 import { data } from '../../../data/fetchData'
 import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton'
+import Pagination from '../../../components/Pagination/Pagination'
 
 export type QueryConfig = {
   [key in keyof RecCandidateList]: string
@@ -30,7 +31,7 @@ const ReccerCandidateManagement = () => {
   const queryConfig: QueryConfig = omitBy(
     {
       page: queryParams.page || '1',
-      size: queryParams.size || 8,
+      limit: queryParams.limit || 4,
       name: queryParams.name,
       skill: queryParams.skill
     },
@@ -42,7 +43,7 @@ const ReccerCandidateManagement = () => {
   const candidates: RecCandidateInterface[] = useAppSelector((state) => state.CandidateList.candidatesList)
   const totalCandidates = useAppSelector((state) => state.CandidateList.candidateTotal)
 
-  const [pageSize, setPageSize] = useState(Math.ceil(totalCandidates / Number(queryParams.size ?? 3)))
+  const [pageSize, setPageSize] = useState(Math.ceil(totalCandidates / Number(queryParams.limit ?? 3)))
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -69,7 +70,7 @@ const ReccerCandidateManagement = () => {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
           const response = await axiosInstance(`/recruiter/applied-candidates?${query}`)
-          setshowCandidates(response.data.result)
+          setshowCandidates(response.data.result.content)
           setPageSize(response.data.result.totalPages)
         }
         setDataSearch({
@@ -93,7 +94,7 @@ const ReccerCandidateManagement = () => {
         try {
           const query = qs.stringify(queryConfig)
           const response = await axiosInstance(`/recruiter/applied-candidates?${query}`)
-          setshowCandidates(response.data.result)
+          setshowCandidates(response.data.result.content)
           setPageSize(response.data.result.totalPages)
         } catch (error) {
           console.log(error)
@@ -179,6 +180,7 @@ const ReccerCandidateManagement = () => {
           </div>
         )}
       </>
+      <Pagination queryConfig={queryConfig} pageSize={pageSize} url='/recruiter/candidates' />
     </>
   )
 }

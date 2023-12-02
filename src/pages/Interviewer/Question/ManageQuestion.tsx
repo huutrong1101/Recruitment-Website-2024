@@ -16,6 +16,8 @@ import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import { data } from '../../../data/fetchData'
 import UpdateQuestion from './UpdateQuestion'
 import AddQuestion from './AddQuestion'
+import Pagination from '../../../components/Pagination/Pagination'
+import PaginationInterview from './PaginationInterview'
 
 export type QueryConfig = {
   [key in keyof QuestionListConfig]: string
@@ -32,7 +34,7 @@ export default function QuestionInterview() {
   const queryConfig: QueryConfig = omitBy(
     {
       page: queryParams.page || '1',
-      size: queryParams.size || 5,
+      limit: queryParams.limit || 5,
       skill: queryParams.skill,
       type: queryParams.type,
       note: queryParams.note,
@@ -59,7 +61,7 @@ export default function QuestionInterview() {
   const questions: QuestionListInterface[] = useAppSelector((state) => state.QuestionList.questionList)
   const skills: QuestionListInterface[] = useAppSelector((state) => state.QuestionList.skills)
   const types: QuestionListInterface[] = useAppSelector((state) => state.QuestionList.types)
-  const [pageSize, setPageSize] = useState(Math.ceil(totalQuestions / Number(queryParams.size || 5)))
+  const [pageSize, setPageSize] = useState(Math.ceil(totalQuestions / Number(queryParams.limit || 5)))
   const [isLoading, setIsLoading] = useState(false)
 
   const [showQuestion, setShowQuestion] = useState(questions)
@@ -367,13 +369,13 @@ export default function QuestionInterview() {
                 {/* pagination */}
                 <div className='flex justify-between w-full m-4'>
                   <div
-                    className='px-2 px-3 py-1 text-lg transition-colors rounded-lg cursor-pointer text-emerald-600 hover:bg-emerald-700 hover:text-emerald-300'
+                    className='px-2 py-1 text-lg transition-colors rounded-lg cursor-pointer text-emerald-600 hover:bg-emerald-700 hover:text-emerald-300'
                     onClick={ListAllQuesstion}
                   >
                     Remove all filters
                   </div>
                   <div className='mr-10'>
-                    {/* <PaginationInterview queryConfig={queryConfig} pageSize={pageSize} /> */}
+                    <PaginationInterview queryConfig={queryConfig} pageSize={pageSize} />
                   </div>
                 </div>
               </div>

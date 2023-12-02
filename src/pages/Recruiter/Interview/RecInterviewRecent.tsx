@@ -6,7 +6,7 @@ import axiosInstance from '../../../utils/AxiosInstance'
 export default function RecInterviewRecent() {
   const { interviewerId } = useParams()
   const [interview, setInterview] = useState([])
-  const [interview2, setInterview2] = useState([])
+
   let navigate = useNavigate()
   const routeChange = (jobId: string) => {
     let path = `../jobdetail/${jobId}`
@@ -16,10 +16,10 @@ export default function RecInterviewRecent() {
     const getInterviewHistory = async () => {
       try {
         const response = await axiosInstance.get(`recruiter/interviewers/${interviewerId}/interviews`)
+
         if (response.data.result != null) {
-          setInterview(response.data.result.contents)
+          setInterview(response.data.result.content)
         }
-        setInterview2(response.data.result)
       } catch (error) {
         console.log(error)
       }
@@ -35,7 +35,7 @@ export default function RecInterviewRecent() {
     <div className='p-6 bg-white border rounded-2xl'>
       <div className='relative overflow-x-auto'>
         <h1 className='text-2xl font-semibold'>Interview Recent</h1>
-        {interview2 ? (
+        {interview ? (
           <table className='w-full mt-5 text-sm text-left text-gray-500'>
             <thead className='text-xs text-gray-700 uppercase bg-gray-50 '>
               <tr>

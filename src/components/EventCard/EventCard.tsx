@@ -21,6 +21,17 @@ export default function EventCard({ event }: EventCardProps) {
     shortenedTitle = title.substring(0, maxCharacters) + '...'
   }
 
+  function limitWords(text: string, limit: number) {
+    const words = text.split(' ')
+    const limitedText = words.slice(0, limit).join(' ')
+
+    if (words.length > limit) {
+      return `${limitedText} ...`
+    }
+
+    return limitedText
+  }
+
   return (
     <Link to={`/events/${event.eventId}`}>
       <div className='bg-white border rounded-lg shadow-lg hover:border-emerald-700'>
@@ -49,7 +60,7 @@ export default function EventCard({ event }: EventCardProps) {
               {event.title}
             </h3>
 
-            <p className={classNames(`mt-4 text-xs line-clamp-4 text-gray-400`)}>{event.description}</p>
+            <p className={classNames(`mt-4 text-xs line-clamp-4 text-gray-400`)}>{limitWords(event.description, 10)}</p>
           </div>
         </div>
       </div>

@@ -133,7 +133,7 @@ export default function UserProfileSubmittedJob() {
             />
           </div> */}
           <div className='w-40'>
-            <Listbox value={searchParams.get('size') || 5} onChange={handleChangeLimit} disabled={pagination.loading}>
+            <Listbox value={searchParams.get('limit') || 5} onChange={handleChangeLimit} disabled={pagination.loading}>
               <div className={classnames(`relative`)}>
                 <Listbox.Button
                   className={classnames(

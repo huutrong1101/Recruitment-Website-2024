@@ -1,6 +1,6 @@
 export interface QuestionListConfig {
   page?: number | string
-  size?: number | string
+  limit?: number | string
   skill?: string
   type?: string
   note?: number | string

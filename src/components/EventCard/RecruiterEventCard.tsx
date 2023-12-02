@@ -7,6 +7,16 @@ import { Link } from 'react-router-dom'
 import blog_image from '../../../images/blog_image.png'
 
 export default function RecruiterEventCard({ event }: any) {
+  function limitWords(text: string, limit: number) {
+    const words = text.split(' ')
+    const limitedText = words.slice(0, limit).join(' ')
+
+    if (words.length > limit) {
+      return `${limitedText} ...`
+    }
+
+    return limitedText
+  }
   return (
     <Link to={`/recruiter/events/${event.eventId}`}>
       <div className='flex flex-col bg-white border rounded-lg shadow-lg cursor-pointer rounded-t-xl hover:border-emerald-700'>
@@ -48,7 +58,7 @@ export default function RecruiterEventCard({ event }: any) {
           </div>
 
           <div className={classNames(`line-clamp-2 text-sm text-gray-500 text-justify leading-4`)}>
-            {he.decode(event.description)}
+            {he.decode(limitWords(event.description, 10))}
           </div>
         </div>
       </div>

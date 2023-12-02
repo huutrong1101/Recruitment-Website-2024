@@ -180,8 +180,9 @@ export const fetchINTQuestionData = createAsyncThunk(
 
 export const fetchINTAssignedQuestions = createAsyncThunk('INTQuestions/fetchINTAssignQuestions', async (id: any) => {
   const response = await axiosInstance.get(`/interviewers/interview/${id}/questions`)
-  console.log('check')
+  console.log(`/interviewers/interview/${id}/questions`)
   return response.data.result
+  return []
 })
 
 export const deleteQuestionOfInterview = createAsyncThunk(

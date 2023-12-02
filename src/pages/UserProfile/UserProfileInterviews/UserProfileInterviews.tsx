@@ -204,7 +204,7 @@ export default function UserProfileInterviews() {
   useEffect(() => {
     // console.log(searchParams);
     const page = searchParams.get('page') || '1'
-    const limit = searchParams.get('limit') || '10'
+    const limit = searchParams.get('limit') || '5'
     dispatch(getUserInterviews({ page, limit }))
       .unwrap()
       .catch((response) => {

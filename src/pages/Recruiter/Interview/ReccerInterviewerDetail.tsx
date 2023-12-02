@@ -86,6 +86,10 @@ export default function ReccerInterviewerDetail() {
     url ? window.open(url) : toast.error('Not Available ')
   }
 
+  const handleDate = (inputDate: any) => {
+    return moment(inputDate).format('DD-MM-YYYY')
+  }
+
   return (
     <div>
       {interviewer ? (
@@ -147,7 +151,7 @@ export default function ReccerInterviewerDetail() {
                           >
                             <p>School: {edu.school}</p>
                             <p>Major: {edu.major}</p>
-                            <p>Graduated Year: {edu.graduatedYear}</p>
+                            <p>Graduated Year: {handleDate(edu.graduatedYear)}</p>
                           </div>
                         </>
                       ))}
@@ -186,7 +190,7 @@ export default function ReccerInterviewerDetail() {
                           >
                             <p>Company Name: {edu.companyName}</p>
                             <p>Position: {edu.position}</p>
-                            <p>From: {edu.dateFrom + ' to ' + edu.dateTo}</p>
+                            <p>From: {handleDate(edu.dateFrom) + ' to ' + handleDate(edu.dateTo)}</p>
                           </div>
                         </>
                       ))}
@@ -203,7 +207,7 @@ export default function ReccerInterviewerDetail() {
                           >
                             <p>Title: {edu.name}</p>
                             <p>Id: {edu.id}</p>
-                            <p>Received Date: {edu.receivedDate}</p>
+                            <p>Received Date: {handleDate(edu.receivedDate)}</p>
                           </div>
                           <button
                             className='w-full p-1 text-center text-white border rounded-b-lg shadow bg-emerald-500 hover:bg-emerald-700 border-emerald-600'

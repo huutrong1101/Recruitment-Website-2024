@@ -183,7 +183,7 @@ const InterviewDetail = () => {
     dispatch(fetchTypes())
   }, [])
 
-  console.log({ assignedQuestions, selectedQuestions, assignedQuestionsStatus })
+  console.log(INTSingleInterview)
 
   // if (INTSingleInterviewStatus === STATUS.IDLE || INTSingleInterviewStatus === STATUS.LOADING) {
   return (
@@ -440,21 +440,21 @@ const InterviewDetail = () => {
           >
             Show More Candidate Information
           </button>
-          {!checkCompleteMarkScore(assignedQuestions) && isDateReached(INTSingleInterview?.time) && (
+          {!checkCompleteMarkScore(assignedQuestions) && (
             <Link to={`/interviewer/interview-recent/${id}/score-page`}>
               <button className='px-4 py-2 font-bold text-white bg-orange-600 rounded hover:bg-orange-800'>
                 Start Interview
               </button>
             </Link>
           )}
-          {!checkCompleteMarkScore(assignedQuestions) && !isDateReached(INTSingleInterview?.time) && (
+          {checkCompleteMarkScore(assignedQuestions) && (
             <button className='px-4 py-2 font-bold text-white bg-blue-600 rounded hover:bg-blue-800'>
               Not Arrived Yet
             </button>
           )}
         </div>
       )}
-      {view && !checkCompleteMarkScore(assignedQuestions) && !isDateReached(INTSingleInterview?.time) && (
+      {view && !checkCompleteMarkScore(assignedQuestions) && (
         <div className='flex justify-end mt-8'>
           <Link to={`/interviewer/interview-recent/${id}/score-page`}>
             <button className='px-4 py-2 font-bold text-white bg-orange-600 rounded hover:bg-orange-800'>
@@ -463,7 +463,7 @@ const InterviewDetail = () => {
           </Link>
         </div>
       )}
-      {view && !checkCompleteMarkScore(assignedQuestions) && isDateReached(INTSingleInterview?.time) && (
+      {view && !checkCompleteMarkScore(assignedQuestions) && (
         <div className='flex justify-end mt-8'>
           <button className='px-4 py-2 font-bold text-white bg-blue-600 rounded hover:bg-blue-800'>
             Not Arrived Yet

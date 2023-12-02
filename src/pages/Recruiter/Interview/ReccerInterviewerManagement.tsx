@@ -13,6 +13,7 @@ import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import RecInterviewerManageCard from '../../../components/RecInterviewerManageCard/RecInterviewerManageCard'
 import axiosInstance from '../../../utils/AxiosInstance'
 import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton'
+import Pagination from '../../../components/Pagination/Pagination'
 
 export type QueryConfig = {
   [key in keyof RecInterviewerListConfig]: string
@@ -30,7 +31,7 @@ const ReccerInterviewerManagement = () => {
   const queryConfig: QueryConfig = omitBy(
     {
       page: queryParams.page || '1',
-      size: queryParams.size || 8,
+      limit: queryParams.limit || 4,
       name: queryParams.name,
       skill: queryParams.skill
     },
@@ -42,7 +43,7 @@ const ReccerInterviewerManagement = () => {
   const interviewers: RecInterviewerInterface[] = useAppSelector((state) => state.RecInterviewerList.recInterviewerList)
   const totalInterviewers = useAppSelector((state) => state.RecInterviewerList.recInterviewerTotal)
 
-  const [pageSize, setPageSize] = useState(Math.ceil(totalInterviewers / Number(queryParams.size ?? 10)))
+  const [pageSize, setPageSize] = useState(Math.ceil(totalInterviewers / Number(queryParams.limit ?? 10)))
 
   const [isLoading, setIsLoading] = useState(false)
   const [showinterviewers, setshowinterviewers] = useState(interviewers)
@@ -178,6 +179,7 @@ const ReccerInterviewerManagement = () => {
           </div>
         )}
       </>
+      <Pagination queryConfig={queryConfig} pageSize={pageSize} url='/recruiter/interviewers' />
     </>
   )
 }

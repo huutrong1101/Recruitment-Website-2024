@@ -19,8 +19,8 @@ const deleteQuestion = async (questionID: string) => {
   return await axiosInstance.delete(`/interviewers/interview-questions/${questionID}`)
 }
 
-export async function getCandidateInterviews({ index, size }: any) {
-  const query = qs.stringify({ index, size })
+export async function getCandidateInterviews({ page, limit }: any) {
+  const query = qs.stringify({ page, limit })
 
   return axiosInstance.get(`/candidate/interviews?${query}`)
 }
