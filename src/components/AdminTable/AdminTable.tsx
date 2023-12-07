@@ -2,14 +2,14 @@ import { PencilIcon } from '@heroicons/react/24/solid'
 import { TrashIcon, UserMinusIcon } from '@heroicons/react/24/outline'
 import { Card, Typography, Button, CardBody, CardFooter, IconButton, Tooltip } from '@material-tailwind/react'
 import { data } from '../../data/fetchData'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink, createSearchParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { formatDay } from '../../utils/utils'
 import Modal from '../Modal/Modal'
 import { useAppSelector } from '../../hooks/hooks'
 import { AcountConfig } from '../../types/user.type'
 import useQueryParams from '../../hooks/useQueryParams'
-import { isEqual, isUndefined, omitBy } from 'lodash'
+import { isEmpty, isEqual, isUndefined, omitBy } from 'lodash'
 import axiosInstance from '../../utils/AxiosInstance'
 import qs from 'query-string'
 import { useDispatch } from 'react-redux'
@@ -24,12 +24,56 @@ interface TypeData {
   typeSelected: string
 }
 
-interface AcountInterface {
-  accountFullName: string
-  accountRole: string
-  accountPhone: string
-  accountEmail: string
-  createdDate: Date
+interface Education {
+  school: string
+  major: string
+}
+
+interface Experience {
+  companyName: string
+  position: string
+  dateFrom: string // ISO 8601 date string
+  dateTo: string // ISO 8601 date string
+}
+
+interface Certificate {
+  name: string
+  receivedDate: string // ISO 8601 date string
+  url: string
+}
+
+interface Project {
+  name: string
+  description: string
+  url: string
+}
+
+interface Skill {
+  value: number
+}
+
+interface Information {
+  education: Education[]
+  experience: Experience[]
+  certificate: Certificate[]
+  project: Project[]
+  skills: Skill[]
+}
+
+interface User {
+  accountId: string
+  fullName: string
+  role: string
+  createdDate: string // ISO 8601 date string
+  blackList: boolean
+  avatar: string
+  about: string
+  email: string
+  dateOfBirth: string // ISO 8601 date string
+  address: string
+  phone: string
+  skills: Skill[]
+  information: Information
 }
 
 export type QueryConfig = {
@@ -37,18 +81,18 @@ export type QueryConfig = {
 }
 
 export function AdminTable({ typeSelected }: TypeData) {
-  console.log(typeSelected)
   // let [isOpen, setIsOpen] = useState(false)
 
-  const accounts: AcountInterface[] = useAppSelector((state) => state.AdminacountList.adminmanagerAcountList)
+  const accounts: User[] = useAppSelector((state) => state.AdminacountList.adminmanagerAcountList)
   const totalListAccount = useAppSelector((state) => state.AdminacountList.totalListAcounts)
+  const [currentPage, setCurrentPage] = useState(1)
 
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const queryParams: QueryConfig = useQueryParams()
   const queryConfig: QueryConfig = omitBy(
     {
-      size: queryParams.limit || 5,
+      limit: queryParams.limit || 5,
       page: queryParams.page || 1,
       role: queryParams.role || (typeSelected === 'Blacklist' ? 'CANDIDATE' : typeSelected === '' ? '' : typeSelected),
       name: queryParams.name || '',
@@ -75,7 +119,7 @@ export function AdminTable({ typeSelected }: TypeData) {
   const [user, setUser] = useState(accounts)
 
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedUserId, setSelectedUserId] = useState<AcountInterface>()
+  const [selectedUserId, setSelectedUserId] = useState<User>()
 
   useEffect(() => {
     if (!isEqual(prevQueryConfig, queryConfig)) {
@@ -83,10 +127,9 @@ export function AdminTable({ typeSelected }: TypeData) {
         setIsLoading(true)
         try {
           const query = qs.stringify(queryConfig)
-          const response = await axiosInstance(`/admin/users/${typeSelected}`)
+          const response = await axiosInstance(`/admin/users/${typeSelected}?${query}`)
           setUser(response.data.result.content)
           setPageSize(response.data.result.totalPages)
-          // console.log(response.data.result.content)
         } catch (error) {
           console.log(error)
         } finally {
@@ -104,10 +147,9 @@ export function AdminTable({ typeSelected }: TypeData) {
       try {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
-          const response = await axiosInstance(`/admin/users/${typeSelected}`)
+          const response = await axiosInstance(`/admin/users/${typeSelected}?${query}`)
           setUser(response.data.result.content)
           setPageSize(response.data.result.totalPages)
-          console.log(response.data.result.content)
         }
       } catch (error) {
         console.log(error)
@@ -124,7 +166,7 @@ export function AdminTable({ typeSelected }: TypeData) {
 
   // console.log(user)
 
-  function openModal(user: AcountInterface, type: string) {
+  function openModal(user: User, type: string) {
     if (type === 'delete') {
       setModal({
         ...modal,
@@ -155,6 +197,56 @@ export function AdminTable({ typeSelected }: TypeData) {
 
   const handleDelete = () => {
     console.log('delete')
+  }
+
+  const handlePagination = (page: number) => {
+    setCurrentPage(page)
+    const searchParams = {
+      ...queryConfig,
+      page: page.toString(),
+      limit: '5'
+    }
+
+    const filteredSearchParams = omitBy(searchParams, isEmpty)
+
+    navigate({
+      pathname: '/admin/account',
+      search: createSearchParams(filteredSearchParams).toString()
+    })
+  }
+
+  const handleNext = () => {
+    const newPage = currentPage + 1
+    setCurrentPage(newPage)
+    const searchParams = {
+      ...queryConfig,
+      page: newPage.toString(),
+      limit: '5'
+    }
+
+    const filteredSearchParams = omitBy(searchParams, isEmpty)
+
+    navigate({
+      pathname: '/admin/account',
+      search: createSearchParams(filteredSearchParams).toString()
+    })
+  }
+
+  const handlePrev = () => {
+    const newPage = currentPage - 1
+    setCurrentPage(newPage)
+    const searchParams = {
+      ...queryConfig,
+      page: newPage.toString(),
+      limit: '5'
+    }
+
+    const filteredSearchParams = omitBy(searchParams, isEmpty)
+
+    navigate({
+      pathname: '/admin/account',
+      search: createSearchParams(filteredSearchParams).toString()
+    })
   }
 
   return (
@@ -198,27 +290,27 @@ export function AdminTable({ typeSelected }: TypeData) {
                     const isLast = index === user.length - 1
                     const classes = isLast ? 'p-4' : 'p-4 border-b border-blue-gray-50'
                     return (
-                      <tr key={index}>
+                      <tr key={index} className={`${item.blackList === true ? 'text-red-500' : ''}`}>
                         <td className={classes}>
                           <div className='flex items-center gap-3'>
                             <Typography variant='small' color='blue-gray' className='font-bold'>
-                              {item.accountFullName}
+                              {item.fullName}
                             </Typography>
                           </div>
                         </td>
                         <td className={classes}>
                           <Typography variant='small' color='blue-gray' className='font-normal'>
-                            {item.accountRole}
+                            {item.role}
                           </Typography>
                         </td>
                         <td className={classes}>
                           <Typography variant='small' color='blue-gray' className='font-normal'>
-                            {item.accountPhone}
+                            {item.phone}
                           </Typography>
                         </td>
                         <td className={classes}>
                           <Typography variant='small' color='blue-gray' className='font-normal'>
-                            {item.accountEmail}
+                            {item.email}
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -246,7 +338,7 @@ export function AdminTable({ typeSelected }: TypeData) {
                           <td className={classes}>
                             <div className='flex items-start justify-start gap-2'>
                               {/* Change Role Acount */}
-                              {item.accountRole !== 'ADMIN' && typeSelected !== 'BLACKLIST' ? (
+                              {item.role !== 'ADMIN' && typeSelected !== 'BLACKLIST' ? (
                                 <>
                                   <button>
                                     <Tooltip content='Edit User'>
@@ -259,10 +351,10 @@ export function AdminTable({ typeSelected }: TypeData) {
                                 </>
                               ) : null}
                               {/*  Acount BlackList */}
-                              {item.accountRole !== 'ADMIN' && typeSelected == 'BLACKLIST' ? (
+                              {item.role !== 'ADMIN' && typeSelected == 'BLACKLIST' ? (
                                 <>
                                   <button>
-                                    <NavLink to={`/admin/blacklist/${item.accountFullName}`} onClick={() => {}}>
+                                    <NavLink to={`/admin/blacklist/${item.accountId}`} onClick={() => {}}>
                                       <Tooltip content='Edit User'>
                                         <PencilIcon className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg' />
                                       </Tooltip>
@@ -271,7 +363,7 @@ export function AdminTable({ typeSelected }: TypeData) {
                                 </>
                               ) : null}
                               {/* Delete  */}
-                              {item.accountRole !== 'ADMIN' && typeSelected !== 'BLACKLIST' && (
+                              {item.role !== 'ADMIN' && typeSelected !== 'BLACKLIST' && (
                                 <>
                                   <button>
                                     <Tooltip content='Delete User'>
@@ -284,17 +376,17 @@ export function AdminTable({ typeSelected }: TypeData) {
                                 </>
                               )}
                               {/*  */}
-                              {item.accountRole === 'CANDIDATE' && typeSelected !== 'BLACKLIST' ? (
+                              {item.role === 'CANDIDATE' && typeSelected !== 'BLACKLIST' ? (
                                 <>
-                                  {/* {user.blacklist !== true ? (
-                                <button>
-                                  <NavLink to={`/admin/users/blacklist/${user.userId}`} onClick={() => {}}>
-                                    <Tooltip content='Add Blacklist'>
-                                      <UserMinusIcon className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg' />
-                                    </Tooltip>
-                                  </NavLink>
-                                </button>
-                              ) : null} */}
+                                  {item.blackList !== true ? (
+                                    <button>
+                                      <NavLink to={`/admin/users/blacklist/${item.accountId}`} onClick={() => {}}>
+                                        <Tooltip content='Add Blacklist'>
+                                          <UserMinusIcon className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg' />
+                                        </Tooltip>
+                                      </NavLink>
+                                    </button>
+                                  ) : null}
                                 </>
                               ) : null}
                             </div>
@@ -310,33 +402,28 @@ export function AdminTable({ typeSelected }: TypeData) {
         </div>
       </CardBody>
       <CardFooter className='flex items-center justify-between p-4 border-t border-blue-gray-50'>
-        <Button variant='outlined' size='sm'>
+        <Button variant='outlined' size='sm' onClick={handlePrev}>
           Previous
         </Button>
         <div className='flex items-center gap-2'>
-          <IconButton variant='outlined' size='sm'>
-            1
-          </IconButton>
-          <IconButton variant='text' size='sm'>
-            2
-          </IconButton>
-          <IconButton variant='text' size='sm'>
-            3
-          </IconButton>
-          <IconButton variant='text' size='sm'>
-            ...
-          </IconButton>
-          <IconButton variant='text' size='sm'>
-            8
-          </IconButton>
-          <IconButton variant='text' size='sm'>
-            9
-          </IconButton>
-          <IconButton variant='text' size='sm'>
-            10
-          </IconButton>
+          {Array(pageSize)
+            .fill(0)
+            .map((_, index) => {
+              const pageNumber = index + 1
+
+              return (
+                <IconButton
+                  variant='outlined'
+                  size='sm'
+                  className={pageNumber === currentPage ? 'border-cyan-500' : 'border-transparent'}
+                  onClick={() => handlePagination(pageNumber)}
+                >
+                  {pageNumber}
+                </IconButton>
+              )
+            })}
         </div>
-        <Button variant='outlined' size='sm'>
+        <Button variant='outlined' size='sm' onClick={handleNext}>
           Next
         </Button>
       </CardFooter>
@@ -360,7 +447,7 @@ export function AdminTable({ typeSelected }: TypeData) {
                   <h1>
                     Bạn có muốn xóa người dùng{' '}
                     <span className='font-bold text-red-500'>
-                      {selectedUserId?.accountFullName} - {selectedUserId?.accountEmail}
+                      {selectedUserId?.fullName} - {selectedUserId?.email}
                     </span>{' '}
                     ra khỏi hệ thống?
                   </h1>
@@ -370,63 +457,41 @@ export function AdminTable({ typeSelected }: TypeData) {
                   <h2 className='mb-4 text-2xl font-bold'>{selectedUserId?.fullName}</h2>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Email:</span>
-                    {/* <span>{selectedUserId?.email}</span> */}
-                    <span>User Email</span>
+                    <span>{selectedUserId?.email}</span>
                   </div>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Phone:</span>
-                    {/* <span>{selectedUserId?.phone}</span> */}
-                    <span>User Phone</span>
+                    <span>{selectedUserId?.phone}</span>
                   </div>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Date of Birth:</span>
-                    {/* <span>{selectedUserId?.dateOfBirth || 'N/A'}</span> */}
-                    <span>User Date</span>
+                    <span>{selectedUserId?.dateOfBirth || 'N/A'}</span>
                   </div>
-                  <div className='flex mb-2'>
-                    <span className='mr-2 font-semibold'>Gender:</span>
-                    {/* <span>{selectedUserId?.gender}</span> */}
-                    <span>User Gender</span>
-                  </div>
+
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Address:</span>
-                    {/* <span>{selectedUserId?.address}</span> */}
-                    <span>User Address</span>
+                    <span>{selectedUserId?.address}</span>
                   </div>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>About:</span>
-                    {/* <span>{selectedUserId?.about}</span> */}
-                    <span>User About</span>
+                    <span>{selectedUserId?.about}</span>
                   </div>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Skills:</span>
-                    {/* <ul>{selectedUserId?.skills.map((skill, index) => <li key={index}>{skill}</li>)}</ul> */}
-                    <span>Skill</span>
+                    <ul>{selectedUserId?.skills.map((skill, index) => <li key={index}>{skill.value}</li>)}</ul>
                   </div>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Role:</span>
-                    {/* <span>{selectedUserId?.role}</span> */}
-                    <span>User Role</span>
+                    <span>{selectedUserId?.role}</span>
                   </div>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Created At:</span>
-                    {/* <span>{formatDay(user?.createdAt)}</span> */}
-                    <span>Date Created</span>
+                    <span>{formatDay(selectedUserId?.createdDate)}</span>
                   </div>
-                  <div className='flex mb-2'>
-                    <span className='mr-2 font-semibold'>Updated At:</span>
-                    {/* <span>{formatDay(user?.updatedAt)}</span> */}
-                    <span>Date Update</span>
-                  </div>
+
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Blacklist:</span>
-                    {/* <span>{user?.blacklist ? 'Yes' : 'No'}</span> */}
-                    <span>Yes</span>
-                  </div>
-                  <div className='flex'>
-                    <span className='mr-2 font-semibold'>Active:</span>
-                    {/* <span>{user?.active ? 'Yes' : 'No'}</span> */}
-                    <span>Yes</span>
+                    <span>{selectedUserId?.blackList ? 'Yes' : 'No'}</span>
                   </div>
                 </div>
               ) : (

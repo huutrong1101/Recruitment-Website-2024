@@ -11,6 +11,8 @@ import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import InterviewHistory from '../../../components/RecCandidateManageCard/InterviewHistory'
 import RecCandidateinfoCard from '../../../components/RecCandidateManageCard/RecCandidateInfoCard'
 
+const TABLE_HEAD = ['POSITION RECURUITMENT', 'DATE', 'STATE']
+
 export default function RecCandidateDetailCard(props: any) {
   const candidate = props.candidate
 

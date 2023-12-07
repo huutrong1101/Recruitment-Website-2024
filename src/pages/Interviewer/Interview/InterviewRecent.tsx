@@ -3,20 +3,14 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 
 // Component & Icon
-import { ChevronLeftIcon, ChevronRightIcon, PencilIcon } from '@heroicons/react/24/outline'
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { PencilIcon } from '@heroicons/react/24/outline'
 
 // Function from Slice
 
 // Status
-import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
-import { ADMIN_APPLICANTS_STATUS } from '../../../utils/Localization'
-import Error from '../Candidate/Error'
 import { fetchINTInterviewsData } from '../../../redux/reducer/INTInterviewsSlice'
-import { STATUS } from '../../../utils/contanst'
 import { formatDDMMYY } from '../Candidate/CandidateRecent'
 import { Card, Typography, Button, CardBody, CardFooter, IconButton, Tooltip } from '@material-tailwind/react'
-import { data } from '../../../data/fetchData'
 import CandidateStatusBadge from '../Candidate/CandidateStatusBadge'
 
 const rowsPerPageOptions = [5, 10, 15]
