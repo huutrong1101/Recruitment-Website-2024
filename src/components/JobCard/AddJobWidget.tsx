@@ -29,7 +29,7 @@ export default function AddJobWidget(props: any) {
             minRows={1}
             value={nameData}
             className='w-3/5 p-1 text-justify bg-white border rounded-lg resize-none'
-            placeholder="Company's Name here..."
+            placeholder="Job's Name here..."
             onChange={(event) => setNameData(event.target.value)}
           />
           <div className='inline-flex '>

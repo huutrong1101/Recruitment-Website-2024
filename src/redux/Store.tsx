@@ -14,6 +14,7 @@ import INTCandidatesSlice from './reducer/INTCandidatesSlice'
 import INTInterviewsSlice from './reducer/INTInterviewsSlice'
 import INTQuestionsSlice from './reducer/INTQuestionsSlice'
 import UserInterviewSlice from './reducer/UserInterviewSlice'
+import AdminListAcountRecentSlice from './reducer/AdminListAcountRecentSlice'
 
 export const ApplicationStore = configureStore({
   reducer: {
@@ -35,7 +36,9 @@ export const ApplicationStore = configureStore({
     QuestionList: QuestionListSlice,
     INTCandidates: INTCandidatesSlice,
     INTInterviews: INTInterviewsSlice,
-    INTQuestions: INTQuestionsSlice
+    INTQuestions: INTQuestionsSlice,
+
+    AdminacountList: AdminListAcountRecentSlice
   }
 })
 

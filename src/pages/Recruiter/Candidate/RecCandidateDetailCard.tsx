@@ -202,18 +202,6 @@ export default function RecCandidateDetailCard(props: any) {
                   )}
                 >
                   <RecCandidateinfoCard cardData={CandidateInformaiton} />
-                  <div className='flex items-center justify-center w-full p-3 mt-3 bg-white rounded-md shadow '>
-                    {candidate?.resumeDetailDTO ? (
-                      <div className='flex items-center justify-center'>
-                        <GrDocumentText />
-                        <span className='font-medium cursor-pointer ms-2 hover:underline' onClick={handleEdit}>
-                          {candidate?.resumeDetailDTO?.name}
-                        </span>
-                      </div>
-                    ) : (
-                      'No resume available'
-                    )}
-                  </div>
                 </div>
               </div>
             </div>

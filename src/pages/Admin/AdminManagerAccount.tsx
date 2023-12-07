@@ -16,18 +16,19 @@ export type QueryConfig = {
 
 const types = [
   { id: 1, name: 'All', typename: '' },
-  { id: 2, name: 'Recruiter', typename: 'RECRUITER' },
-  { id: 3, name: 'Interviewer', typename: 'INTERVIEWER' },
-  { id: 4, name: 'Candidate', typename: 'CANDIDATE' },
-  { id: 5, name: 'Blacklist', typename: 'BLACKLIST' },
-  { id: 6, name: 'Deleted', typename: 'DELETED' }
+  { id: 2, name: 'Recruiter', typename: 'recruiter' },
+  { id: 3, name: 'Interviewer', typename: 'interviewer' },
+  { id: 4, name: 'Candidate', typename: 'candidate' },
+  { id: 5, name: 'Blacklist', typename: 'blacklist' }
 ]
 
 const field = typeSearchAdmin[0].type.toString()
 
 export default function AdminManagerAccount() {
   const [typeSelected, setTypeSelected] = useState('')
+
   const [isLoading, setIsLoading] = useState(false)
+
   const [dataSearch, setDataSearch] = useState({
     key: '',
     field: field
@@ -66,6 +67,7 @@ export default function AdminManagerAccount() {
     //   }).toString()
     // })
   }
+
   return (
     <div className=''>
       <form onSubmit={handleSearch} className='flex justify-center mt-5 mb-5 item-center'>

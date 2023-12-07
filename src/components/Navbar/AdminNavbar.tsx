@@ -63,7 +63,7 @@ export default function AdminNavbar({ showNav, setShowNav }: AdminNavbarProps) {
               <div className='p-1'>
                 <Menu.Item>
                   <Link
-                    to='#'
+                    to={user && user?.role === 'RECRUITER' ? '/recruiter/profile' : '/interviewer/profile'}
                     className='flex items-center p-2 text-sm text-gray-700 transition-colors rounded hover:bg-emerald-500 hover:text-white group'
                   >
                     <PencilIcon className='w-4 h-4 mr-2' />

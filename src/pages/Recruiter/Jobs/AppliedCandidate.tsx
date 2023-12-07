@@ -6,7 +6,7 @@ import {
   ChevronUpDownIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline'
-import { Popover, PopoverContent, PopoverHandler } from '@material-tailwind/react'
+import { Card, CardBody, Popover, PopoverContent, PopoverHandler, Typography } from '@material-tailwind/react'
 import classNames from 'classnames'
 import { isEqual, isUndefined, omitBy } from 'lodash'
 import qs from 'query-string'
@@ -29,6 +29,8 @@ interface UserProps {
 export type QueryConfig = {
   [key in keyof AppliedCandidateListConfig]: string
 }
+
+const TABLE_HEAD = ['NAME', 'EMAIL', "INTERVIEWER'S NAME", 'SCORE', 'STATE']
 
 export default function Applied(num: any) {
   const { jobId } = useParams()
@@ -141,8 +143,6 @@ export default function Applied(num: any) {
       setSort('ASC')
     }
   }
-
-  console.log(applyCandidate)
 
   return (
     <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
