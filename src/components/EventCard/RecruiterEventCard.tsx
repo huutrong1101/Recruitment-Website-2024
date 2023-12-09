@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import he from 'he'
 import moment from 'moment'
-import { useEffect } from 'react'
 import { HiCalendarDays } from 'react-icons/hi2'
 import { Link } from 'react-router-dom'
 import blog_image from '../../../images/blog_image.png'

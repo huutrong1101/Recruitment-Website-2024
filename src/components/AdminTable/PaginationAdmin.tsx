@@ -1,8 +1,6 @@
-import React from 'react'
-import { Card, Typography, Button, CardBody, CardFooter, IconButton, Tooltip } from '@material-tailwind/react'
-import { QueryConfig } from './AdminTable'
+import { Button } from '@material-tailwind/react'
 import { Link, createSearchParams } from 'react-router-dom'
-import classNames from 'classnames'
+import { QueryConfig } from '../../pages/Admin/AdminManagerAccount'
 
 interface Props {
   queryConfig: QueryConfig

@@ -1,65 +1,52 @@
-import classNames from "classnames";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { RecInterviewerInterface } from "../../services/services";
-import axiosInstance from "../../utils/AxiosInstance";
+import classNames from 'classnames'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import axiosInstance from '../../utils/AxiosInstance'
+import { RecInterviewerInterface } from '../../types/services'
 
 export default function RecInterviewerIn4Card({ cardData }: any) {
-  const { interviewerId } = useParams();
-  const [interviewer, setInterviewer] =
-    useState<RecInterviewerInterface | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { interviewerId } = useParams()
+  const [interviewer, setInterviewer] = useState<RecInterviewerInterface | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
   useEffect(() => {
     const getInterviewerDetail = async () => {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
-        const response = await axiosInstance.get(
-          `recruiter/interviewers/${interviewerId}`,
-        );
-        setInterviewer(response.data.result);
+        const response = await axiosInstance.get(`recruiter/interviewers/${interviewerId}`)
+        setInterviewer(response.data.result)
       } catch (error) {
-        console.log(error);
+        console.log(error)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
-    getInterviewerDetail();
-  }, [interviewerId]);
+    }
+    getInterviewerDetail()
+  }, [interviewerId])
   return (
     <div
       className={classNames(
         `w-full bg-gray-200 drop-shadow-md px-4 py-6 rounded-xl border sticky top-20`,
-        `flex flex-col gap-4`,
+        `flex flex-col gap-4`
       )}
     >
       <h1 className={classNames(`font-semibold text-xl`)}>Personal Details</h1>
       <div className={classNames(`flex flex-col gap-3`)}>
         {cardData &&
           cardData.map((item: any) => {
-            return (
-              <JobInformationCardItem
-                icon={item.icon}
-                name={item.name}
-                value={item.value}
-              />
-            );
+            return <JobInformationCardItem icon={item.icon} name={item.name} value={item.value} />
           })}
       </div>
     </div>
-  );
+  )
 }
 
 interface JobInformationCardItemProps {
-  icon: React.ReactElement;
-  name: string;
-  value: string;
+  icon: React.ReactElement
+  name: string
+  value: string
 }
 
-function JobInformationCardItem({
-  icon,
-  name,
-  value,
-}: JobInformationCardItemProps) {
+function JobInformationCardItem({ icon, name, value }: JobInformationCardItemProps) {
   return (
     <div className={classNames(`flex flex-row items-center gap-4`)}>
       <div className={classNames(`w-1/12 mx-2 text-3xl`)}>{icon}</div>
@@ -68,5 +55,5 @@ function JobInformationCardItem({
         <span className={classNames(`text-teal-700`)}>{value}</span>
       </div>
     </div>
-  );
+  )
 }

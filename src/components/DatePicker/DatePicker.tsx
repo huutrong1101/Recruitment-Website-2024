@@ -12,7 +12,7 @@ interface DateTimePickerValueProps {
 }
 
 export default function DateTimePickerValue({ value, onChange, type }: DateTimePickerValueProps) {
-  const minDateTime = dayjs() // Thời gian hiện tại
+  const minDate = dayjs() // Thời gian hiện tại
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -22,7 +22,7 @@ export default function DateTimePickerValue({ value, onChange, type }: DateTimeP
             label='End At'
             value={value}
             onChange={onChange}
-            minDateTime={minDateTime}
+            minDate={minDate}
             defaultValue={dayjs('2022-04-17')}
           />
         ) : (
@@ -30,7 +30,7 @@ export default function DateTimePickerValue({ value, onChange, type }: DateTimeP
             label='Choose Date and Time'
             value={value}
             onChange={onChange}
-            minDateTime={minDateTime} // Giới hạn ngày và giờ tối thiểu
+            minDate={minDate} // Giới hạn ngày và giờ tối thiểu
           />
         )}
       </DemoContainer>

@@ -47,7 +47,7 @@ export default function AdminJobDetail() {
         {
           icon: <ComputerDesktopIcon />,
           name: 'Position',
-          value: JOB_POSITION[job.position.name]
+          value: JOB_POSITION[job.position]
         },
         {
           icon: <CurrencyDollarIcon />,
