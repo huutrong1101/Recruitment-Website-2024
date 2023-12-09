@@ -25,7 +25,6 @@ export default function AuthenticateLogin() {
         .unwrap()
         .then(() => {
           toast.success(`Successfully signed in.`)
-          console.log(`Navigate from `, from, navigate === null ? `/` : from)
         })
 
       const token = getLocalToken()
@@ -38,7 +37,11 @@ export default function AuthenticateLogin() {
       } else if (userData.payload.role === 'INTERVIEWER') {
         navigate('/interviewer')
       } else {
-        navigate('/')
+        if (from) {
+          navigate(from)
+        } else {
+          navigate('/')
+        }
       }
     } catch (err: any) {
       toast.error(`${err.message}`)

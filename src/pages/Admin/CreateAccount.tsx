@@ -11,8 +11,9 @@ import { authRegister } from '../../redux/reducer/AuthSlice'
 import image from '../../../images/sprite.png'
 import { Menu, Transition } from '@headlessui/react'
 import classNames from 'classnames'
+import { AuthService } from '../../services/AuthService'
 
-const ROLE = ['RECRUITER', 'INTERVIEW']
+const ROLE = ['RECRUITER', 'INTERVIEWER']
 
 export default function CreateAccount() {
   const {
@@ -30,16 +31,18 @@ export default function CreateAccount() {
   const navigate = useNavigate()
 
   const onSubmit = (data: any) => {
-    console.log({ ...data, role })
-    // dispatch(authRegister(data))
-    //   .unwrap()
-    //   .then(() => {
-    //     // toast.success(`Successfully register the`)
-    //     navigate('/email/incomplete')
-    //   })
-    //   .catch((data) => {
-    //     toast.error(data.message)
-    //   })
+    const newData = { ...data, position: role }
+    console.log(newData)
+
+    toast
+      .promise(AuthService.createAccount(newData), {
+        pending: `Creating account`,
+        success: `Completed`
+      })
+      .then(() => {
+        navigate('/admin')
+      })
+      .catch((error) => toast.error(error.response.data.message))
   }
 
   return (

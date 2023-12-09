@@ -42,10 +42,25 @@ const createNewPassword = async (token: string, data: FormData) => {
   return await axiosInstance.post(`/user/reset-password?token=${token}`, data)
 }
 
+const addBlacklist = async (accountId: string) => {
+  return await axiosInstance.post(`/admin/users/blacklist/${accountId}`)
+}
+
+const removeBlacklist = async (accountId: string) => {
+  return await axiosInstance.delete(`/admin/candidate/${accountId}`)
+}
+
+const createAccount = async (data: any) => {
+  return await axiosInstance.post(`/admin/create_account`, data)
+}
+
 export const AuthService = {
   register,
   login,
   verifyOtp,
   forgetPassword,
-  createNewPassword
+  createNewPassword,
+  addBlacklist,
+  removeBlacklist,
+  createAccount
 }

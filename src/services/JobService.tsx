@@ -60,9 +60,7 @@ async function getJobFromId(jobId: string) {
   if (!jobId) {
     throw new Error(`The value jobId cannot be undefined`)
   }
-  return axiosInstance.get(`/jobs/${jobId}`, {
-    headers: { Authorization: `` }
-  })
+  return axiosInstance.get(`/jobs/${jobId}`)
 }
 
 async function getIfUserAppliedTheJob(jobId: string) {

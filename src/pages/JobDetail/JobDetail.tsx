@@ -21,7 +21,8 @@ import Logo from './../../../images/logo_FPT.png'
 import JobDescriptionWidget from './JobDescriptionWidget'
 import JobInformationCard from './JobInformationCard'
 import { JobInterface } from '../../types/job.type'
-import { fetchJobDetail } from '../../redux/reducer/JobDetailSlice'
+import { checkApplyJob, fetchJobDetail } from '../../redux/reducer/JobDetailSlice'
+import axiosInstance from '../../utils/AxiosInstance'
 
 export default function JobDetail() {
   const { jobId } = useParams()
@@ -31,8 +32,7 @@ export default function JobDetail() {
   const { status } = useAppSelector((state) => state.JobDetail)
   const { job } = useAppSelector((state) => state.JobDetail.response)
   const { isApplied } = useAppSelector((state) => state.JobDetail.response)
-
-  console.log(isApplied)
+  const { user } = useAppSelector((state) => state.Auth)
 
   const [jobInformation, setJobInformation] = useState([
     { icon: <UserIcon />, name: 'Employee Type', value: '' },
@@ -66,6 +66,13 @@ export default function JobDetail() {
     dispatch(fetchJobDetail({ jobId }))
       .unwrap()
       .catch((message) => toast.error(message))
+
+    if (user) {
+      dispatch(checkApplyJob({ jobId }))
+        .unwrap()
+        .catch((message) => toast.error(message))
+    }
+
     return () => {}
   }, [jobId])
 
@@ -73,37 +80,37 @@ export default function JobDetail() {
     navigate('/jobs')
   }
 
-  useEffect(() => {
-    if (job) {
-      setJobInformation([
-        {
-          icon: <UserIcon />,
-          name: 'Employee Type',
-          value: JOB_POSITION[job.jobType]
-        },
-        {
-          icon: <MapPinIcon />,
-          name: 'Location',
-          value: JOB_POSITION[job.location]
-        },
-        {
-          icon: <ComputerDesktopIcon />,
-          name: 'Position',
-          value: JOB_POSITION[job.position]
-        },
-        {
-          icon: <CurrencyDollarIcon />,
-          name: 'Salary',
-          value: job.salaryRange
-        },
-        {
-          icon: <ClockIcon />,
-          name: 'End At',
-          value: moment(job.deadline).format('Do MMM, YYYY')
-        }
-      ])
-    }
-  }, [job])
+  // useEffect(() => {
+  //   if (job) {
+  //     setJobInformation([
+  //       {
+  //         icon: <UserIcon />,
+  //         name: 'Employee Type',
+  //         value: JOB_POSITION[job.jobType]
+  //       },
+  //       {
+  //         icon: <MapPinIcon />,
+  //         name: 'Location',
+  //         value: JOB_POSITION[job.location]
+  //       },
+  //       {
+  //         icon: <ComputerDesktopIcon />,
+  //         name: 'Position',
+  //         value: JOB_POSITION[job.position]
+  //       },
+  //       {
+  //         icon: <CurrencyDollarIcon />,
+  //         name: 'Salary',
+  //         value: job.salaryRange
+  //       },
+  //       {
+  //         icon: <ClockIcon />,
+  //         name: 'End At',
+  //         value: moment(job.deadline).format('Do MMM, YYYY')
+  //       }
+  //     ])
+  //   }
+  // }, [job])
 
   const otherJobs = jobs.filter((job) => job.jobId !== jobId)
 

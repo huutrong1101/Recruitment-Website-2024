@@ -2,6 +2,12 @@ interface LocalizationDeclarationType {
   [index: string]: string
 }
 
+export const TYPE_FILTER: LocalizationDeclarationType = {
+  Email: 'email',
+  Name: 'name',
+  Phone: 'phone'
+}
+
 export const JOB_POSITION: LocalizationDeclarationType = {
   FULL_TIME: 'Full Time',
   PART_TIME: 'Part Time',

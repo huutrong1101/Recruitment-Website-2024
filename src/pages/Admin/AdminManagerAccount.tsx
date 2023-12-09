@@ -2,13 +2,14 @@ import { useState, Fragment } from 'react'
 import { AcountConfig } from '../../types/user.type'
 import { Outlet, createSearchParams, useNavigate } from 'react-router-dom'
 import useQueryParams from '../../hooks/useQueryParams'
-import { isUndefined, omitBy } from 'lodash'
+import { isUndefined, omit, omitBy } from 'lodash'
 import classNames from 'classnames'
 import { BsFilterLeft } from 'react-icons/bs'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { Menu, Transition } from '@headlessui/react'
 import { typeSearchAdmin } from '../../utils/contanst'
 import { AdminTable } from '../../components/AdminTable/AdminTable'
+import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 
 export type QueryConfig = {
   [key in keyof AcountConfig]: string
@@ -25,52 +26,76 @@ const types = [
 const field = typeSearchAdmin[0].type.toString()
 
 export default function AdminManagerAccount() {
-  const [typeSelected, setTypeSelected] = useState('')
+  const navigate = useNavigate()
 
   const [isLoading, setIsLoading] = useState(false)
+
+  const [typeSelected, setTypeSelected] = useState('')
 
   const [dataSearch, setDataSearch] = useState({
     key: '',
     field: field
   })
-  const navigate = useNavigate()
+
+  const [dataSend, setDataSend] = useState({
+    keyword: '',
+    typeSearch: field
+  })
 
   const queryParams: QueryConfig = useQueryParams()
-
   const queryConfig: QueryConfig = omitBy(
     {
-      page: queryParams.page || '1',
       limit: queryParams.limit || 5,
-      role:
-        queryParams.role || (typeSelected === 'Blacklist' ? 'CANDIDATE' : typeSelected === 'All' ? '' : typeSelected),
-      name: queryParams.name,
-      phone: queryParams.phone,
-      email: queryParams.email
+      page: queryParams.page || 1,
+
+      searchText: queryParams.searchText || dataSend.keyword,
+      searchBy: queryParams.searchBy?.toLowerCase() || dataSend.typeSearch.toLowerCase()
     },
     isUndefined
   )
 
   const handleSearch = async (e: any) => {
     e.preventDefault()
-    console.log(dataSearch)
+    performSearch()
+  }
+
+  const performSearch = () => {
+    try {
+      setDataSend({
+        keyword: dataSearch.key,
+        typeSearch: dataSearch.field
+      })
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleGetData = (type: any) => {
     setTypeSelected(type.typename)
+  }
 
-    // navigate({
-    //   pathname: '/admin/users',
-    //   search: createSearchParams({
-    //     ...queryConfig,
-    //     role: type.typename === 'Blacklist' ? 'CANDIDATE' : typeSelected === 'All' ? '' : type.typename,
-    //     page: '1'
-    //   }).toString()
-    // })
+  const handleReset = () => {
+    setDataSearch({
+      key: '',
+      field: typeSearchAdmin[0].type.toString()
+    })
+
+    setDataSend({
+      keyword: '',
+      typeSearch: ''
+    })
+
+    navigate({
+      pathname: '/admin/account',
+      search: createSearchParams(omit(queryParams, ['page', 'limit', 'searchBy', 'searchText'])).toString()
+    })
   }
 
   return (
     <div className=''>
-      <form onSubmit={handleSearch} className='flex justify-center mt-5 mb-5 item-center'>
+      <div className='flex justify-center mt-5 mb-5 item-center'>
         <div
           className={classNames(
             'flex items-center flex-shrink-0 w-1/8 p-2 border rounded-lg mr-5 gap-2',
@@ -128,18 +153,20 @@ export default function AdminManagerAccount() {
           )}
         >
           <MagnifyingGlassIcon className={classNames(`w-[20px]`)} />
-          <input
-            value={dataSearch.key}
-            onChange={(e) => setDataSearch({ ...dataSearch, key: e.target.value })}
-            type='text'
-            placeholder='Search your Keywords'
-            className={classNames(
-              'w-full h-full text-[12px] ml-3 focus:outline-none text-base text-zinc-400 bg-slate-50'
-            )}
-          />
+          <form onSubmit={(e) => handleSearch(e)} className='w-full'>
+            <input
+              value={dataSearch.key}
+              onChange={(e) => setDataSearch({ ...dataSearch, key: e.target.value })}
+              type='text'
+              placeholder='Search your Keywords'
+              className={classNames(
+                'w-full h-full text-[12px] ml-3 focus:outline-none text-base text-zinc-400 bg-transparent'
+              )}
+            />
+          </form>
         </div>
         {/* Button */}
-        <div className={classNames('gap-2 ml-5 w-1/8 items-center justify-center')}>
+        {/* <div className={classNames('gap-2 ml-5 w-1/8 items-center justify-center')}>
           <button
             className={classNames(
               'bg-[#05966A] hover:bg-emerald-700 text-white p-3 rounded-md flex w-full text-center items-center justify-center'
@@ -148,8 +175,13 @@ export default function AdminManagerAccount() {
           >
             Search
           </button>
+        </div> */}
+        <div className={classNames('flex items-center flex-shrink-0 gap-2 ml-3 ')}>
+          <PrimaryButton text='Search' className='bg-[#05966A] hover:bg-emerald-700' onClick={() => performSearch()} />
+
+          <PrimaryButton text='Reset' className='bg-red-600 hover:bg-red-700' onClick={() => handleReset()} />
         </div>
-      </form>
+      </div>
 
       <div className='relative flex-col justify-center bg-white'>
         <div className='inline-flex items-start justify-start p-1 mb-1 overflow-x-auto border rounded-lg border-zinc-900 border-opacity-10'>
@@ -177,7 +209,7 @@ export default function AdminManagerAccount() {
         </div>
         <div>
           {/* <AdminTable typeSelected={typeSelected} /> */}
-          <AdminTable typeSelected={typeSelected} />
+          <AdminTable typeSelected={typeSelected} queryConfig={queryConfig} />
         </div>
       </div>
       <Outlet />

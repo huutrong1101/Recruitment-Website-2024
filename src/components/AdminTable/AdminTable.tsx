@@ -9,12 +9,13 @@ import Modal from '../Modal/Modal'
 import { useAppSelector } from '../../hooks/hooks'
 import { AcountConfig } from '../../types/user.type'
 import useQueryParams from '../../hooks/useQueryParams'
-import { isEmpty, isEqual, isUndefined, omitBy } from 'lodash'
+import { isEmpty, isEqual, isUndefined, omit, omitBy } from 'lodash'
 import axiosInstance from '../../utils/AxiosInstance'
 import qs from 'query-string'
-import { useDispatch } from 'react-redux'
-import { fetchAdminManagerAcountList } from '../../redux/reducer/AdminListAcountRecentSlice'
 import LoadSpinner from '../LoadSpinner/LoadSpinner'
+import { QueryConfig } from '../../pages/Admin/AdminManagerAccount'
+import { toast } from 'react-toastify'
+import { AuthService } from '../../services/AuthService'
 
 const TABLE_HEAD = ['Name', 'Role', 'Phone', 'Email', 'Date created', 'Actions']
 
@@ -22,6 +23,7 @@ const TABLE_HEAD_DELETED = ['Name', 'Role', 'Phone', 'Email', 'Date created', 'D
 
 interface TypeData {
   typeSelected: string
+  queryConfig: QueryConfig
 }
 
 interface Education {
@@ -76,32 +78,16 @@ interface User {
   information: Information
 }
 
-export type QueryConfig = {
-  [key in keyof AcountConfig]: string
-}
-
-export function AdminTable({ typeSelected }: TypeData) {
+export function AdminTable({ typeSelected, queryConfig }: TypeData) {
   // let [isOpen, setIsOpen] = useState(false)
 
   const accounts: User[] = useAppSelector((state) => state.AdminacountList.adminmanagerAcountList)
   const totalListAccount = useAppSelector((state) => state.AdminacountList.totalListAcounts)
   const [currentPage, setCurrentPage] = useState(1)
 
-  const navigate = useNavigate()
-
   const queryParams: QueryConfig = useQueryParams()
-  const queryConfig: QueryConfig = omitBy(
-    {
-      limit: queryParams.limit || 5,
-      page: queryParams.page || 1,
-      role: queryParams.role || (typeSelected === 'Blacklist' ? 'CANDIDATE' : typeSelected === '' ? '' : typeSelected),
-      name: queryParams.name || '',
-      blacklist: queryParams.blacklist || typeSelected == 'Blacklist' ? 'true' : '',
-      phone: queryParams.phone || '',
-      email: queryParams.email || ''
-    },
-    isUndefined
-  )
+
+  const navigate = useNavigate()
 
   const [modal, setModal] = useState({
     type: '',
@@ -139,7 +125,25 @@ export function AdminTable({ typeSelected }: TypeData) {
       fetchJobs()
       setPrevQueryConfig(queryConfig)
     }
-  }, [typeSelected, queryConfig, prevQueryConfig])
+  }, [queryConfig, prevQueryConfig])
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setIsLoading(true)
+      try {
+        const query = qs.stringify(queryConfig)
+        const response = await axiosInstance(`/admin/users/${typeSelected}?${query}`)
+        setUser(response.data.result.content)
+        setPageSize(response.data.result.totalPages)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchJobs()
+    setPrevQueryConfig(queryConfig)
+  }, [typeSelected])
 
   useEffect(() => {
     const fetchPosition = async () => {
@@ -172,11 +176,11 @@ export function AdminTable({ typeSelected }: TypeData) {
         ...modal,
         isOpen: true,
         type: type,
-        title: 'Delete User',
+        title: 'ADD BLACKLIST',
         titleClass: 'text-xl font-bold leading-7 text-center text-red-600',
         cancelTitle: 'Cancel',
         successClass: 'text-red-900 bg-red-100 hover:bg-red-200 focus-visible:ring-red-500',
-        successTitle: 'OK',
+        successTitle: 'YES',
         size: 'max-w-2xl'
       })
     } else if (type === 'edit') {
@@ -191,12 +195,55 @@ export function AdminTable({ typeSelected }: TypeData) {
         successTitle: 'OK',
         size: 'max-w-xl'
       })
+    } else if (type === 'remove_delete') {
+      setModal({
+        ...modal,
+        isOpen: true,
+        type: type,
+        title: 'REMOVE BLACKLIST',
+        titleClass: 'text-xl font-bold leading-7 text-center text-green-600',
+        cancelTitle: 'Cancel',
+        successClass: 'text-green-900 bg-green-100 hover:bg-green-200 focus-visible:ring-green-500',
+        successTitle: 'YES',
+        size: 'max-w-2xl'
+      })
     }
+
     setSelectedUserId(user)
   }
 
-  const handleDelete = () => {
-    console.log('delete')
+  const handleAddBlacklist = (accountId: string) => {
+    toast
+      .promise(AuthService.addBlacklist(accountId), {
+        pending: `Adding to blacklist`,
+        success: `This account is added to blacklist`
+      })
+      .then(() => {
+        closeModal()
+      })
+      .catch((error) => toast.error(error.response.data.message))
+  }
+
+  const handleRemoveBlacklist = (accountId: string) => {
+    toast
+      .promise(AuthService.removeBlacklist(accountId), {
+        pending: `Removing from blacklist`,
+        success: `This account is removed from blacklist`
+      })
+      .then(() => {
+        closeModal()
+      })
+      .catch((error) => toast.error(error.response.data.message))
+  }
+
+  const handleReset = () => {
+    setCurrentPage(1)
+    navigate({
+      pathname: '/admin/account',
+      search: createSearchParams(
+        omit(queryParams, ['name', 'phone', 'email', 'role', 'blacklist', 'page', 'limit'])
+      ).toString()
+    })
   }
 
   const handlePagination = (page: number) => {
@@ -249,6 +296,10 @@ export function AdminTable({ typeSelected }: TypeData) {
     })
   }
 
+  useEffect(() => {
+    handleReset()
+  }, [typeSelected])
+
   return (
     <Card className='w-full h-full'>
       <CardBody className='px-0 overflow-hidden'>
@@ -281,48 +332,43 @@ export function AdminTable({ typeSelected }: TypeData) {
             </thead>
             <tbody>
               {isLoading ? (
-                <div className='flex items-center justify-center  w-full h-[50px] text-[13px] mt-10 mb-10'>
-                  <LoadSpinner className='text-2xl text-[#059669] ' />
-                </div>
+                <tr className='mt-2'>
+                  <td colSpan={TABLE_HEAD.length} className='py-4 text-center'>
+                    <div className='flex items-center justify-center  w-full h-[50px] text-[13px] mt-10 mb-10'>
+                      <LoadSpinner className='text-2xl text-[#059669] ' />
+                    </div>
+                  </td>
+                </tr>
               ) : (
                 <>
-                  {user.map((item, index) => {
-                    const isLast = index === user.length - 1
-                    const classes = isLast ? 'p-4' : 'p-4 border-b border-blue-gray-50'
-                    return (
-                      <tr key={index} className={`${item.blackList === true ? 'text-red-500' : ''}`}>
-                        <td className={classes}>
-                          <div className='flex items-center gap-3'>
-                            <Typography variant='small' color='blue-gray' className='font-bold'>
-                              {item.fullName}
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant='small' color='blue-gray' className='font-normal'>
-                            {item.role}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant='small' color='blue-gray' className='font-normal'>
-                            {item.phone}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant='small' color='blue-gray' className='font-normal'>
-                            {item.email}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <div className='flex items-center gap-3'>
-                            <div className='flex flex-col'>
-                              <Typography variant='small' color='blue-gray' className='font-normal opacity-70'>
-                                {formatDay(item.createdDate)}
+                  {user && user.length > 0 ? (
+                    user.map((item, index) => {
+                      const isLast = index === user.length - 1
+                      const classes = isLast ? 'p-4' : 'p-4 border-b border-blue-gray-50'
+                      return (
+                        <tr key={index} className={`${item.blackList === true ? 'text-red-500' : ''}`}>
+                          <td className={classes}>
+                            <div className='flex items-center gap-3'>
+                              <Typography variant='small' color='blue-gray' className='font-bold'>
+                                {item.fullName}
                               </Typography>
                             </div>
-                          </div>
-                        </td>
-                        {typeSelected === 'DELETED' && (
+                          </td>
+                          <td className={classes}>
+                            <Typography variant='small' color='blue-gray' className='font-normal'>
+                              {item.role}
+                            </Typography>
+                          </td>
+                          <td className={classes}>
+                            <Typography variant='small' color='blue-gray' className='font-normal'>
+                              {item.phone}
+                            </Typography>
+                          </td>
+                          <td className={classes}>
+                            <Typography variant='small' color='blue-gray' className='font-normal'>
+                              {item.email}
+                            </Typography>
+                          </td>
                           <td className={classes}>
                             <div className='flex items-center gap-3'>
                               <div className='flex flex-col'>
@@ -332,69 +378,85 @@ export function AdminTable({ typeSelected }: TypeData) {
                               </div>
                             </div>
                           </td>
-                        )}
+                          {typeSelected === 'DELETED' && (
+                            <td className={classes}>
+                              <div className='flex items-center gap-3'>
+                                <div className='flex flex-col'>
+                                  <Typography variant='small' color='blue-gray' className='font-normal opacity-70'>
+                                    {formatDay(item.createdDate)}
+                                  </Typography>
+                                </div>
+                              </div>
+                            </td>
+                          )}
 
-                        {typeSelected !== 'DELETED' && (
-                          <td className={classes}>
-                            <div className='flex items-start justify-start gap-2'>
-                              {/* Change Role Acount */}
-                              {item.role !== 'ADMIN' && typeSelected !== 'BLACKLIST' ? (
-                                <>
-                                  <button>
-                                    <Tooltip content='Edit User'>
-                                      <PencilIcon
-                                        onClick={() => openModal(item, 'edit')}
-                                        className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg'
-                                      />
-                                    </Tooltip>
-                                  </button>
-                                </>
-                              ) : null}
-                              {/*  Acount BlackList */}
-                              {item.role !== 'ADMIN' && typeSelected == 'BLACKLIST' ? (
-                                <>
-                                  <button>
-                                    <NavLink to={`/admin/blacklist/${item.accountId}`} onClick={() => {}}>
-                                      <Tooltip content='Edit User'>
-                                        <PencilIcon className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg' />
-                                      </Tooltip>
-                                    </NavLink>
-                                  </button>
-                                </>
-                              ) : null}
-                              {/* Delete  */}
-                              {item.role !== 'ADMIN' && typeSelected !== 'BLACKLIST' && (
-                                <>
-                                  <button>
-                                    <Tooltip content='Delete User'>
-                                      <TrashIcon
-                                        onClick={() => openModal(item, 'delete')}
-                                        className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg'
-                                      />
-                                    </Tooltip>
-                                  </button>
-                                </>
-                              )}
-                              {/*  */}
-                              {item.role === 'CANDIDATE' && typeSelected !== 'BLACKLIST' ? (
-                                <>
-                                  {item.blackList !== true ? (
+                          {typeSelected !== 'DELETED' && (
+                            <td className={classes}>
+                              <div className='flex items-start justify-start gap-2'>
+                                {/* Change Role Acount */}
+                                {item.role !== 'ADMIN' && typeSelected !== 'BLACKLIST' ? (
+                                  <>
                                     <button>
-                                      <NavLink to={`/admin/users/blacklist/${item.accountId}`} onClick={() => {}}>
-                                        <Tooltip content='Add Blacklist'>
-                                          <UserMinusIcon className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg' />
+                                      <Tooltip content='Edit User'>
+                                        <PencilIcon
+                                          onClick={() => openModal(item, 'edit')}
+                                          className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg'
+                                        />
+                                      </Tooltip>
+                                    </button>
+                                  </>
+                                ) : null}
+                                {/*  Acount BlackList */}
+                                {item.role !== 'ADMIN' && typeSelected === 'BLACKLIST' ? (
+                                  <>
+                                    <button>
+                                      <NavLink to={`/admin/blacklist/${item.accountId}`} onClick={() => {}}>
+                                        <Tooltip content='Edit User'>
+                                          <PencilIcon className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg' />
                                         </Tooltip>
                                       </NavLink>
                                     </button>
-                                  ) : null}
-                                </>
-                              ) : null}
-                            </div>
-                          </td>
-                        )}
-                      </tr>
-                    )
-                  })}
+                                  </>
+                                ) : null}
+                                {/* Delete  */}
+                                {item.role === 'CANDIDATE' &&
+                                  typeSelected !== 'BLACKLIST' &&
+                                  (item.blackList === true ? (
+                                    <>
+                                      <button>
+                                        <Tooltip content='Remove Blacklist'>
+                                          <TrashIcon
+                                            onClick={() => openModal(item, 'remove_delete')}
+                                            className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg'
+                                          />
+                                        </Tooltip>
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <button>
+                                        <Tooltip content='Add Blacklist'>
+                                          <TrashIcon
+                                            onClick={() => openModal(item, 'delete')}
+                                            className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg'
+                                          />
+                                        </Tooltip>
+                                      </button>
+                                    </>
+                                  ))}
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      )
+                    })
+                  ) : (
+                    <tr className='mt-2'>
+                      <td colSpan={TABLE_HEAD.length} className='py-4 text-center'>
+                        Not found result
+                      </td>
+                    </tr>
+                  )}
                 </>
               )}
             </tbody>
@@ -437,7 +499,15 @@ export function AdminTable({ typeSelected }: TypeData) {
         successClass={modal.successClass}
         successTitle={modal.successTitle}
         size={modal.size}
-        handleSucces={closeModal}
+        handleSucces={() => {
+          if (modal.type === 'delete' && selectedUserId?.accountId) {
+            handleAddBlacklist(selectedUserId.accountId)
+          } else if (modal.type === 'remove_delete' && selectedUserId?.accountId) {
+            handleRemoveBlacklist(selectedUserId.accountId)
+          } else {
+            closeModal()
+          }
+        }}
       >
         <div className='flex items-center justify-center gap-5 mt-2'>
           <div className='w-full'>
@@ -445,11 +515,11 @@ export function AdminTable({ typeSelected }: TypeData) {
               {modal.type === 'delete' ? (
                 <>
                   <h1>
-                    Bạn có muốn xóa người dùng{' '}
+                    Do you want to add{' '}
                     <span className='font-bold text-red-500'>
                       {selectedUserId?.fullName} - {selectedUserId?.email}
                     </span>{' '}
-                    ra khỏi hệ thống?
+                    to the blacklist?
                   </h1>
                 </>
               ) : modal.type === 'edit' ? (
@@ -496,7 +566,13 @@ export function AdminTable({ typeSelected }: TypeData) {
                 </div>
               ) : (
                 <>
-                  <h1>Hello world</h1>
+                  <h1>
+                    Do you want to remove{' '}
+                    <span className='font-bold text-green-700'>
+                      {selectedUserId?.fullName} - {selectedUserId?.email}
+                    </span>{' '}
+                    from the blacklist?
+                  </h1>
                 </>
               )}
             </div>

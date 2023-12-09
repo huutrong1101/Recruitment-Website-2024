@@ -27,7 +27,8 @@ export default function JobInformationCard({ cardData, jobId }: any) {
   }
 
   const handleNavigateToSignIn = () => {
-    navigate(`/auth/login`)
+    // navigate(`/auth/login`)
+    navigate(`/auth/login?from=${encodeURIComponent(window.location.pathname)}`)
   }
 
   const handleNavigateToApplicants = () => {

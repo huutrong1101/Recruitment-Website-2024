@@ -55,6 +55,15 @@ export const fetchJobDetail = createAsyncThunk('JobDetail/fetchJobDetail', async
     const jobResponse = await JobService.getJobFromId(jobId)
     // TODO: add job fetch and check if the user is applied onto this job or not
     thunkAPI.dispatch(setJobResponse(jobResponse.data.result))
+    // const isUserAppliedToTheJob = (await JobService.getIfUserAppliedTheJob(jobId)).data
+    // thunkAPI.dispatch(setJobIsApplied(isUserAppliedToTheJob.result !== null))
+  } catch (e) {
+    thunkAPI.rejectWithValue(`Failed to fetch a job`)
+  }
+})
+
+export const checkApplyJob = createAsyncThunk('JobDetail/checkApplyJob', async ({ jobId }: any, thunkAPI) => {
+  try {
     const isUserAppliedToTheJob = (await JobService.getIfUserAppliedTheJob(jobId)).data
     thunkAPI.dispatch(setJobIsApplied(isUserAppliedToTheJob.result !== null))
   } catch (e) {
