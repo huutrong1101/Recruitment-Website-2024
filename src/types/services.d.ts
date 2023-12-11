@@ -129,7 +129,7 @@ export interface JobReccerListConfig {
 
 export interface AdminJobListConfig {
   page?: number | string
-  size?: number | string
+  limit?: number | string
 }
 export interface AdminJobInterface {
   idJob: string

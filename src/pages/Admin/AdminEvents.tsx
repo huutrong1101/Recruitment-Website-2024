@@ -1,6 +1,6 @@
 import { ChevronDownIcon, EyeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState, Fragment } from 'react'
-import { isUndefined, omitBy } from 'lodash'
+import { isEmpty, isUndefined, omitBy } from 'lodash'
 import { useAppSelector } from '../../hooks/hooks'
 import useQueryParams from '../../hooks/useQueryParams'
 import classNames from 'classnames'
@@ -29,6 +29,8 @@ const AdminEvents = () => {
   const events: EventInterface[] = useAppSelector((state) => state.Home.events)
   const totalEvents = useAppSelector((state) => state.Home.totalEvents)
 
+  const [currentPage, setCurrentPage] = useState(1)
+
   const queryParams: QueryConfig = useQueryParams()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -39,13 +41,13 @@ const AdminEvents = () => {
 
   const queryConfig: QueryConfig = omitBy(
     {
-      size: queryParams.size || 5,
+      limit: queryParams.limit || 5,
       page: queryParams.page || '1'
     },
     isUndefined
   )
   const [prevQueryConfig, setPrevQueryConfig] = useState<QueryConfig>(queryConfig)
-  const [pageSize, setPageSize] = useState(Math.ceil(totalEvents / Number(queryParams.size || 5)))
+  const [pageSize, setPageSize] = useState(Math.ceil(totalEvents / Number(queryParams.limit || 5)))
   const [showEventLists, setAdminManagerEventList] = useState(events)
 
   const fetchEventWithQuery = async (query: string) => {
@@ -77,7 +79,7 @@ const AdminEvents = () => {
       try {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
-          const response = await axiosInstance(`admin/jobs?${query}`)
+          const response = await fetchEventWithQuery(query)
           setAdminManagerEventList(response.data.result.content)
           setPageSize(response.data.result.totalPages)
         }
@@ -111,6 +113,57 @@ const AdminEvents = () => {
       setIsLoading(false)
     }
   }
+
+  const handlePagination = (page: number) => {
+    setCurrentPage(page)
+    const searchParams = {
+      ...queryConfig,
+      page: page.toString(),
+      limit: '5'
+    }
+
+    const filteredSearchParams = omitBy(searchParams, isEmpty)
+
+    navigate({
+      pathname: '/admin/events',
+      search: createSearchParams(filteredSearchParams).toString()
+    })
+  }
+
+  const handleNext = () => {
+    const newPage = currentPage + 1
+    setCurrentPage(newPage)
+    const searchParams = {
+      ...queryConfig,
+      page: newPage.toString(),
+      limit: '5'
+    }
+
+    const filteredSearchParams = omitBy(searchParams, isEmpty)
+
+    navigate({
+      pathname: '/admin/events',
+      search: createSearchParams(filteredSearchParams).toString()
+    })
+  }
+
+  const handlePrev = () => {
+    const newPage = currentPage - 1
+    setCurrentPage(newPage)
+    const searchParams = {
+      ...queryConfig,
+      page: newPage.toString(),
+      limit: '5'
+    }
+
+    const filteredSearchParams = omitBy(searchParams, isEmpty)
+
+    navigate({
+      pathname: '/admin/events',
+      search: createSearchParams(filteredSearchParams).toString()
+    })
+  }
+
   return (
     <>
       {/* Search */}
@@ -211,7 +264,7 @@ const AdminEvents = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {events.map((event, index) => {
+                  {showEventLists.map((event, index) => {
                     const isLast = index === events.length - 1
                     const classes = isLast ? 'p-4' : 'p-4 border-b border-blue-gray-50'
                     return (
@@ -257,33 +310,28 @@ const AdminEvents = () => {
             </div>
           </CardBody>
           <CardFooter className='flex items-center justify-between p-4 border-t border-blue-gray-50'>
-            <Button variant='outlined' size='sm'>
+            <Button variant='outlined' size='sm' onClick={handlePrev}>
               Previous
             </Button>
             <div className='flex items-center gap-2'>
-              <IconButton variant='outlined' size='sm'>
-                1
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                2
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                3
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                ...
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                8
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                9
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                10
-              </IconButton>
+              {Array(pageSize)
+                .fill(0)
+                .map((_, index) => {
+                  const pageNumber = index + 1
+
+                  return (
+                    <IconButton
+                      variant='outlined'
+                      size='sm'
+                      className={pageNumber === currentPage ? 'border-cyan-500' : 'border-transparent'}
+                      onClick={() => handlePagination(pageNumber)}
+                    >
+                      {pageNumber}
+                    </IconButton>
+                  )
+                })}
             </div>
-            <Button variant='outlined' size='sm'>
+            <Button variant='outlined' size='sm' onClick={handleNext}>
               Next
             </Button>
           </CardFooter>

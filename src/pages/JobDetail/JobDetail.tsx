@@ -80,37 +80,37 @@ export default function JobDetail() {
     navigate('/jobs')
   }
 
-  // useEffect(() => {
-  //   if (job) {
-  //     setJobInformation([
-  //       {
-  //         icon: <UserIcon />,
-  //         name: 'Employee Type',
-  //         value: JOB_POSITION[job.jobType]
-  //       },
-  //       {
-  //         icon: <MapPinIcon />,
-  //         name: 'Location',
-  //         value: JOB_POSITION[job.location]
-  //       },
-  //       {
-  //         icon: <ComputerDesktopIcon />,
-  //         name: 'Position',
-  //         value: JOB_POSITION[job.position]
-  //       },
-  //       {
-  //         icon: <CurrencyDollarIcon />,
-  //         name: 'Salary',
-  //         value: job.salaryRange
-  //       },
-  //       {
-  //         icon: <ClockIcon />,
-  //         name: 'End At',
-  //         value: moment(job.deadline).format('Do MMM, YYYY')
-  //       }
-  //     ])
-  //   }
-  // }, [job])
+  useEffect(() => {
+    if (job) {
+      setJobInformation([
+        {
+          icon: <UserIcon />,
+          name: 'Employee Type',
+          value: JOB_POSITION[job.jobType]
+        },
+        {
+          icon: <MapPinIcon />,
+          name: 'Location',
+          value: JOB_POSITION[job.location]
+        },
+        {
+          icon: <ComputerDesktopIcon />,
+          name: 'Position',
+          value: JOB_POSITION[job.position]
+        },
+        {
+          icon: <CurrencyDollarIcon />,
+          name: 'Salary',
+          value: job.salaryRange
+        },
+        {
+          icon: <ClockIcon />,
+          name: 'End At',
+          value: moment(job.deadline).format('Do MMM, YYYY')
+        }
+      ])
+    }
+  }, [job])
 
   const otherJobs = jobs.filter((job) => job.jobId !== jobId)
 

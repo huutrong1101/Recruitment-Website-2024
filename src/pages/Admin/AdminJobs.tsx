@@ -1,6 +1,6 @@
 import { ChevronDownIcon, EyeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState, Fragment } from 'react'
-import { isUndefined, omitBy } from 'lodash'
+import { isEmpty, isUndefined, omitBy } from 'lodash'
 import { useAppSelector } from '../../hooks/hooks'
 import useQueryParams from '../../hooks/useQueryParams'
 import classNames from 'classnames'
@@ -15,6 +15,7 @@ import { Menu, Transition } from '@headlessui/react'
 import { Card, Typography, Button, CardBody, CardFooter, IconButton, Tooltip } from '@material-tailwind/react'
 import { PencilIcon } from '@heroicons/react/24/solid'
 import { formatDay } from '../../utils/utils'
+import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
 
 const TABLE_HEAD = ['Name', 'Date Created', 'Process', 'Recruiter', 'Actions']
 
@@ -28,6 +29,8 @@ const AdminJobs = () => {
   const jobs: JobInterface[] = useAppSelector((state) => state.Job.jobs)
   const totalListJobs = useAppSelector((state) => state.Job.totalJobs)
 
+  const [currentPage, setCurrentPage] = useState(1)
+
   const queryParams: QueryConfig = useQueryParams()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -38,26 +41,25 @@ const AdminJobs = () => {
 
   const queryConfig: QueryConfig = omitBy(
     {
-      size: queryParams.size || 5,
+      limit: queryParams.limit || 5,
       page: queryParams.page || '1'
     },
     isUndefined
   )
   const [prevQueryConfig, setPrevQueryConfig] = useState<QueryConfig>(queryConfig)
-  const [pageSize, setPageSize] = useState(Math.ceil(totalListJobs / Number(queryParams.size || 5)))
+  const [pageSize, setPageSize] = useState(Math.ceil(totalListJobs / Number(queryParams.limit || 5)))
   const [showJobLists, setAdminManagerJobList] = useState(jobs)
 
   console.log(showJobLists)
 
   const fetchJobWithQuery = async (query: string) => {
-    return await axiosInstance(`/jobs?${query}`, {
-      headers: { Authorization: null }
-    })
+    return await axiosInstance(`/jobs?${query}`)
   }
 
   useEffect(() => {
     if (!isEqual(prevQueryConfig, queryConfig)) {
       const fetchJobs = async () => {
+        setIsLoading(true)
         try {
           const query = qs.stringify(queryConfig)
           const response = await fetchJobWithQuery(query)
@@ -65,6 +67,8 @@ const AdminJobs = () => {
           setPageSize(response.data.result.totalPages)
         } catch (error) {
           console.log(error)
+        } finally {
+          setIsLoading(false)
         }
       }
       fetchJobs()
@@ -78,7 +82,7 @@ const AdminJobs = () => {
       try {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
-          const response = await axiosInstance(`admin/jobs?${query}`)
+          const response = await fetchJobWithQuery(query)
           setAdminManagerJobList(response.data.result.content)
           setPageSize(response.data.result.totalPages)
         }
@@ -112,6 +116,57 @@ const AdminJobs = () => {
       setIsLoading(false)
     }
   }
+
+  const handlePagination = (page: number) => {
+    setCurrentPage(page)
+    const searchParams = {
+      ...queryConfig,
+      page: page.toString(),
+      limit: '5'
+    }
+
+    const filteredSearchParams = omitBy(searchParams, isEmpty)
+
+    navigate({
+      pathname: '/admin/jobs',
+      search: createSearchParams(filteredSearchParams).toString()
+    })
+  }
+
+  const handleNext = () => {
+    const newPage = currentPage + 1
+    setCurrentPage(newPage)
+    const searchParams = {
+      ...queryConfig,
+      page: newPage.toString(),
+      limit: '5'
+    }
+
+    const filteredSearchParams = omitBy(searchParams, isEmpty)
+
+    navigate({
+      pathname: '/admin/jobs',
+      search: createSearchParams(filteredSearchParams).toString()
+    })
+  }
+
+  const handlePrev = () => {
+    const newPage = currentPage - 1
+    setCurrentPage(newPage)
+    const searchParams = {
+      ...queryConfig,
+      page: newPage.toString(),
+      limit: '5'
+    }
+
+    const filteredSearchParams = omitBy(searchParams, isEmpty)
+
+    navigate({
+      pathname: '/admin/jobs',
+      search: createSearchParams(filteredSearchParams).toString()
+    })
+  }
+
   return (
     <>
       {/* Search */}
@@ -212,79 +267,84 @@ const AdminJobs = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {jobs.map((job, index) => {
-                    const isLast = index === jobs.length - 1
-                    const classes = isLast ? 'p-4' : 'p-4 border-b border-blue-gray-50'
-                    return (
-                      <tr key={job.jobId}>
-                        <td className={classes}>
-                          <div className='flex items-center gap-3'>
-                            <Typography variant='small' color='blue-gray' className='font-bold'>
-                              {job.name}
+                  {isLoading ? (
+                    <tr className='mt-2'>
+                      <td colSpan={TABLE_HEAD.length} className='py-4 text-center'>
+                        <div className='flex items-center justify-center  w-full h-[50px] text-[13px] mt-10 mb-10'>
+                          <LoadSpinner className='text-2xl text-[#059669] ' />
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    showJobLists.map((job, index) => {
+                      const isLast = index === jobs.length - 1
+                      const classes = isLast ? 'p-4' : 'p-4 border-b border-blue-gray-50'
+                      return (
+                        <tr key={job.jobId}>
+                          <td className={classes}>
+                            <div className='flex items-center gap-3'>
+                              <Typography variant='small' color='blue-gray' className='font-bold'>
+                                {job.name}
+                              </Typography>
+                            </div>
+                          </td>
+                          <td className={classes}>
+                            <Typography variant='small' color='blue-gray' className='font-normal'>
+                              {formatDay(job.createdAt)}
                             </Typography>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant='small' color='blue-gray' className='font-normal'>
-                            {formatDay(job.createdAt)}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant='small' color='blue-gray' className='font-normal'>
-                            1/{job.quantity}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant='small' color='blue-gray' className='font-normal'>
-                            Nguyen Huu Trong
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant='small' color='blue-gray' className='font-normal'>
-                            <button>
-                              <Link to={`${job.jobId}`} onClick={() => {}}>
-                                <Tooltip content='Read Detail'>
-                                  <PencilIcon className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg' />
-                                </Tooltip>
-                              </Link>
-                            </button>
-                          </Typography>
-                        </td>
-                      </tr>
-                    )
-                  })}
+                          </td>
+                          <td className={classes}>
+                            <Typography variant='small' color='blue-gray' className='font-normal'>
+                              1/{job.quantity}
+                            </Typography>
+                          </td>
+                          <td className={classes}>
+                            <Typography variant='small' color='blue-gray' className='font-normal'>
+                              Nguyen Huu Trong
+                            </Typography>
+                          </td>
+                          <td className={classes}>
+                            <Typography variant='small' color='blue-gray' className='font-normal'>
+                              <button>
+                                <Link to={`${job.jobId}`} onClick={() => {}}>
+                                  <Tooltip content='Read Detail'>
+                                    <PencilIcon className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg' />
+                                  </Tooltip>
+                                </Link>
+                              </button>
+                            </Typography>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
           </CardBody>
           <CardFooter className='flex items-center justify-between p-4 border-t border-blue-gray-50'>
-            <Button variant='outlined' size='sm'>
+            <Button variant='outlined' size='sm' onClick={handlePrev}>
               Previous
             </Button>
             <div className='flex items-center gap-2'>
-              <IconButton variant='outlined' size='sm'>
-                1
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                2
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                3
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                ...
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                8
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                9
-              </IconButton>
-              <IconButton variant='text' size='sm'>
-                10
-              </IconButton>
+              {Array(pageSize)
+                .fill(0)
+                .map((_, index) => {
+                  const pageNumber = index + 1
+
+                  return (
+                    <IconButton
+                      variant='outlined'
+                      size='sm'
+                      className={pageNumber === currentPage ? 'border-cyan-500' : 'border-transparent'}
+                      onClick={() => handlePagination(pageNumber)}
+                    >
+                      {pageNumber}
+                    </IconButton>
+                  )
+                })}
             </div>
-            <Button variant='outlined' size='sm'>
+            <Button variant='outlined' size='sm' onClick={handleNext}>
               Next
             </Button>
           </CardFooter>
