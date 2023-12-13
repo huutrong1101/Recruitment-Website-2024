@@ -28,11 +28,11 @@ export default function UserProfileSubmittedJob() {
   })
 
   useEffect(() => {
-    const index = searchParams.get('index') || 1
-    const size = searchParams.get('size') || 5
+    const page = searchParams.get('page') || 1
+    const limit = searchParams.get('limit') || 5
     setPagination({ ...pagination, loading: true })
 
-    getCandidateSubmittedJobs({ index, size })
+    getCandidateSubmittedJobs({ page, limit })
       .then((response) => {
         const { result } = response.data
         const { pageNumber, pageSize, totalElements, totalPages } = result
@@ -73,12 +73,12 @@ export default function UserProfileSubmittedJob() {
 
   const handleNextPage = () => {
     setSearchParams((prev) => {
-      const index = prev.get('index') || '1'
-      const size = prev.get('size') || '5'
+      const page = prev.get('page') || '1'
+      const limit = prev.get('limit') || '5'
 
       return {
-        size,
-        index: (Number.parseInt(index) + 1).toString()
+        limit,
+        page: (Number.parseInt(page) + 1).toString()
       }
     })
 
@@ -86,12 +86,12 @@ export default function UserProfileSubmittedJob() {
   }
   const handlePreviousPage = () => {
     setSearchParams((prev) => {
-      const index = prev.get('index') || '1'
-      const size = prev.get('size') || '5'
+      const page = prev.get('page') || '1'
+      const limit = prev.get('limit') || '5'
 
       return {
-        size,
-        index: (Number.parseInt(index) - 1).toString()
+        limit,
+        page: (Number.parseInt(page) - 1).toString()
       }
     })
 
@@ -100,12 +100,12 @@ export default function UserProfileSubmittedJob() {
 
   const handleChangeLimit = (value: number) => {
     setSearchParams((prev) => {
-      const index = prev.get('index') || '1'
+      const page = prev.get('page') || '1'
       // const size = prev.get("size") || "5";
 
       return {
-        size: value.toString() || '5',
-        index
+        limit: value.toString() || '5',
+        page
       }
     })
 
@@ -146,7 +146,7 @@ export default function UserProfileSubmittedJob() {
                   <span>
                     <HiListBullet />
                   </span>
-                  <span>{searchParams.get('size') || 5} applicants</span>
+                  <span>{searchParams.get('limit') || 5} applicants</span>
                 </Listbox.Button>
                 <Transition
                   as={Fragment}

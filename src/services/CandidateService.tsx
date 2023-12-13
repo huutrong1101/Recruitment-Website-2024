@@ -12,8 +12,8 @@ export async function sendApplyRequestToJob({ jobId, resumeId }: { jobId: string
   return axiosInstance.post(`/candidate/jobs/${jobId}`, { resumeId })
 }
 
-export async function getCandidateSubmittedJobs({ index, size }: any) {
-  const query = qs.stringify({ index, size })
+export async function getCandidateSubmittedJobs({ page, limit }: any) {
+  const query = qs.stringify({ page, limit })
 
   return axiosInstance.get(`/candidate/jobs/applicants?${query}`)
 }
