@@ -1,4 +1,4 @@
-import { PencilIcon } from '@heroicons/react/24/solid'
+import { PencilIcon, LockClosedIcon, LockOpenIcon } from '@heroicons/react/24/solid'
 import { TrashIcon, UserMinusIcon } from '@heroicons/react/24/outline'
 import { Card, Typography, Button, CardBody, CardFooter, IconButton, Tooltip } from '@material-tailwind/react'
 import { data } from '../../data/fetchData'
@@ -16,6 +16,7 @@ import LoadSpinner from '../LoadSpinner/LoadSpinner'
 import { QueryConfig } from '../../pages/Admin/AdminManagerAccount'
 import { toast } from 'react-toastify'
 import { AuthService } from '../../services/AuthService'
+import { Dispatch, SetStateAction } from 'react'
 
 const TABLE_HEAD = ['Name', 'Role', 'Phone', 'Email', 'Date created', 'Actions']
 
@@ -24,6 +25,7 @@ const TABLE_HEAD_DELETED = ['Name', 'Role', 'Phone', 'Email', 'Date created', 'D
 interface TypeData {
   typeSelected: string
   queryConfig: QueryConfig
+  setTypeSelected: Dispatch<SetStateAction<string>>
 }
 
 interface Education {
@@ -62,7 +64,7 @@ interface Information {
   skills: Skill[]
 }
 
-interface User {
+export interface User {
   accountId: string
   fullName: string
   role: string
@@ -78,7 +80,7 @@ interface User {
   information: Information
 }
 
-export function AdminTable({ typeSelected, queryConfig }: TypeData) {
+export function AdminTable({ typeSelected, queryConfig, setTypeSelected }: TypeData) {
   // let [isOpen, setIsOpen] = useState(false)
 
   const accounts: User[] = useAppSelector((state) => state.AdminacountList.adminmanagerAcountList)
@@ -103,7 +105,6 @@ export function AdminTable({ typeSelected, queryConfig }: TypeData) {
   const [prevQueryConfig, setPrevQueryConfig] = useState<QueryConfig>(queryConfig)
   const [pageSize, setPageSize] = useState(Math.ceil(totalListAccount / Number(queryParams.limit || 5)))
   const [user, setUser] = useState(accounts)
-
   const [isLoading, setIsLoading] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<User>()
 
@@ -220,6 +221,7 @@ export function AdminTable({ typeSelected, queryConfig }: TypeData) {
       })
       .then(() => {
         closeModal()
+        setTypeSelected('blacklist')
       })
       .catch((error) => toast.error(error.response.data.message))
   }
@@ -232,6 +234,7 @@ export function AdminTable({ typeSelected, queryConfig }: TypeData) {
       })
       .then(() => {
         closeModal()
+        setTypeSelected('')
       })
       .catch((error) => toast.error(error.response.data.message))
   }
@@ -300,6 +303,7 @@ export function AdminTable({ typeSelected, queryConfig }: TypeData) {
     handleReset()
   }, [typeSelected])
 
+  console.log(typeSelected)
   return (
     <Card className='w-full h-full'>
       <CardBody className='px-0 overflow-hidden'>
@@ -307,27 +311,13 @@ export function AdminTable({ typeSelected, queryConfig }: TypeData) {
           <table className='w-full text-left table-auto min-w-max'>
             <thead>
               <tr>
-                {typeSelected === 'DELETED' ? (
-                  <>
-                    {TABLE_HEAD_DELETED.map((head) => (
-                      <th key={head} className='p-4 border-y border-blue-gray-100 bg-blue-gray-50/50'>
-                        <Typography variant='small' color='blue-gray' className='font-normal leading-none opacity-70'>
-                          {head}
-                        </Typography>
-                      </th>
-                    ))}
-                  </>
-                ) : (
-                  <>
-                    {TABLE_HEAD.map((head) => (
-                      <th key={head} className='p-4 border-y border-blue-gray-100 bg-blue-gray-50/50'>
-                        <Typography variant='small' color='blue-gray' className='font-normal leading-none opacity-70'>
-                          {head}
-                        </Typography>
-                      </th>
-                    ))}
-                  </>
-                )}
+                {TABLE_HEAD.map((head) => (
+                  <th key={head} className='p-4 border-y border-blue-gray-100 bg-blue-gray-50/50'>
+                    <Typography variant='small' color='blue-gray' className='font-normal leading-none opacity-70'>
+                      {head}
+                    </Typography>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -425,7 +415,7 @@ export function AdminTable({ typeSelected, queryConfig }: TypeData) {
                                     <>
                                       <button>
                                         <Tooltip content='Remove Blacklist'>
-                                          <TrashIcon
+                                          <LockOpenIcon
                                             onClick={() => openModal(item, 'remove_delete')}
                                             className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg'
                                           />
@@ -436,7 +426,7 @@ export function AdminTable({ typeSelected, queryConfig }: TypeData) {
                                     <>
                                       <button>
                                         <Tooltip content='Add Blacklist'>
-                                          <TrashIcon
+                                          <LockClosedIcon
                                             onClick={() => openModal(item, 'delete')}
                                             className='relative flex items-center justify-center w-5 h-5 gap-2 rounded-lg'
                                           />
@@ -535,7 +525,7 @@ export function AdminTable({ typeSelected, queryConfig }: TypeData) {
                   </div>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Date of Birth:</span>
-                    <span>{selectedUserId?.dateOfBirth || 'N/A'}</span>
+                    <span>{formatDay(selectedUserId?.dateOfBirth) || 'N/A'}</span>
                   </div>
 
                   <div className='flex mb-2'>
@@ -548,7 +538,9 @@ export function AdminTable({ typeSelected, queryConfig }: TypeData) {
                   </div>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Skills:</span>
-                    <ul>{selectedUserId?.skills.map((skill, index) => <li key={index}>{skill.value}</li>)}</ul>
+                    <ul className='flex items-center gap-2'>
+                      {selectedUserId?.skills.map((skill, index) => <li key={index}>{skill.label}</li>)}
+                    </ul>
                   </div>
                   <div className='flex mb-2'>
                     <span className='mr-2 font-semibold'>Role:</span>

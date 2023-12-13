@@ -222,8 +222,12 @@ export const assignQuestionForInterview = createAsyncThunk(
 
 export const markScore = createAsyncThunk('INTQuestions/markScore', async (data: any) => {
   const { ID, assignedQuestions } = data
-  console.log({ ID, assignedQuestions })
   const response1 = await axiosInstance.put(`/interviewers/interview/${ID}/questions`, { questions: assignedQuestions })
+  return response1.data
+})
+
+export const updateMarkScore = createAsyncThunk('INTQuestions/updateMarkScore', async (data: any) => {
+  const { ID } = data
   const response2 = await axiosInstance.put(`/interviewers/interview/${ID}/totalScore`)
   return response2.data
 })

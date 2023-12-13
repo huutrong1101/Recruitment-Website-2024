@@ -1,6 +1,6 @@
 import { ChevronDownIcon, EyeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState, Fragment } from 'react'
-import { isEmpty, isUndefined, omitBy } from 'lodash'
+import { isEmpty, isUndefined, omit, omitBy } from 'lodash'
 import { useAppSelector } from '../../hooks/hooks'
 import useQueryParams from '../../hooks/useQueryParams'
 import classNames from 'classnames'
@@ -8,21 +8,22 @@ import { isEqual } from 'lodash'
 import qs from 'query-string'
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 import axiosInstance from '../../utils/AxiosInstance'
-import { AdminJobListConfig } from '../../types/services'
-import { JobInterface } from '../../types/job.type'
+import { AdminEventListConfig } from '../../types/services'
 import { BsFilterLeft } from 'react-icons/bs'
 import { Menu, Transition } from '@headlessui/react'
 import { Card, Typography, Button, CardBody, CardFooter, IconButton, Tooltip } from '@material-tailwind/react'
 import { PencilIcon } from '@heroicons/react/24/solid'
 import { formatDay } from '../../utils/utils'
 import { EventInterface } from '../../types/event.type'
+import { User } from '../../components/AdminTable/AdminTable'
+import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 
 const TABLE_HEAD = ['Name', 'Date Created', 'Deadline', 'Recruiter', 'Actions']
 
 const listRecruiter = ['Nguyen Huu Trong', 'Le Bui Thao Duyen']
 
 export type QueryConfig = {
-  [key in keyof AdminJobListConfig]: string
+  [key in keyof AdminEventListConfig]: string
 }
 
 const AdminEvents = () => {
@@ -42,18 +43,23 @@ const AdminEvents = () => {
   const queryConfig: QueryConfig = omitBy(
     {
       limit: queryParams.limit || 5,
-      page: queryParams.page || '1'
+      page: queryParams.page || '1',
+      recruiterName: queryParams.recruiterName || '',
+      eventName: queryParams.eventName || ''
     },
     isUndefined
   )
   const [prevQueryConfig, setPrevQueryConfig] = useState<QueryConfig>(queryConfig)
   const [pageSize, setPageSize] = useState(Math.ceil(totalEvents / Number(queryParams.limit || 5)))
   const [showEventLists, setAdminManagerEventList] = useState(events)
+  const [interviewerList, setInterviewerList] = useState<User[]>([])
 
   const fetchEventWithQuery = async (query: string) => {
-    return await axiosInstance(`/events?${query}`, {
-      headers: { Authorization: null }
-    })
+    return await axiosInstance(`/admin/events?${query}`)
+  }
+
+  const fetchIntervieWithQuery = async () => {
+    return await axiosInstance(`/admin/users/recruiter`)
   }
 
   useEffect(() => {
@@ -80,6 +86,8 @@ const AdminEvents = () => {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
           const response = await fetchEventWithQuery(query)
+          const responseInterviewerList = await fetchIntervieWithQuery()
+          setInterviewerList(responseInterviewerList.data.result.content)
           setAdminManagerEventList(response.data.result.content)
           setPageSize(response.data.result.totalPages)
         }
@@ -98,20 +106,43 @@ const AdminEvents = () => {
 
   const handleSearch = async (e: any) => {
     e.preventDefault()
+    performSearch()
+  }
+
+  const performSearch = () => {
     try {
       setIsLoading(true)
+
+      const searchParams = {
+        ...queryConfig,
+        recruiterName: dataSearch.field,
+        eventName: dataSearch.key,
+        page: '1'
+      }
+
+      const filteredSearchParams = omitBy(searchParams, isEmpty)
+
       navigate({
-        pathname: '/admin/jobs',
-        search: createSearchParams({
-          ...queryConfig,
-          name: dataSearch.key
-        }).toString()
+        pathname: '/admin/events',
+        search: createSearchParams(filteredSearchParams).toString()
       })
     } catch (error) {
       console.error(error)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleReset = () => {
+    setDataSearch({
+      key: '',
+      field: ''
+    })
+
+    navigate({
+      pathname: '/admin/events',
+      search: createSearchParams(omit(queryConfig, ['recruiterName', 'eventName', 'page', 'limit'])).toString()
+    })
   }
 
   const handlePagination = (page: number) => {
@@ -192,7 +223,7 @@ const AdminEvents = () => {
             >
               <Menu.Items className='absolute left-0 z-10 w-full mt-1 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
                 <div className='py-1'>
-                  {listRecruiter.map((name, index) => (
+                  {interviewerList.map((interviewer, index) => (
                     <Menu.Item key={index}>
                       {({ active }) => (
                         <p
@@ -203,11 +234,11 @@ const AdminEvents = () => {
                           onClick={() =>
                             setDataSearch({
                               ...dataSearch,
-                              field: name
+                              field: interviewer.fullName
                             })
                           }
                         >
-                          {name}
+                          {interviewer.fullName}
                         </p>
                       )}
                     </Menu.Item>
@@ -235,15 +266,10 @@ const AdminEvents = () => {
           />
         </div>
         {/* Button */}
-        <div className={classNames('gap-2 ml-5 w-1/8 items-center justify-center')}>
-          <button
-            className={classNames(
-              'bg-[#05966A] hover:bg-emerald-700 text-white p-3 rounded-md flex w-full text-center items-center justify-center'
-            )}
-            type='submit'
-          >
-            Search
-          </button>
+        <div className={classNames('gap-2 ml-5 w-1/8 items-center justify-center flex flex-row')}>
+          <PrimaryButton text='Search' className='bg-[#05966A] hover:bg-emerald-700' onClick={() => performSearch()} />
+
+          <PrimaryButton text='Reset' className='bg-red-600 hover:bg-red-700' onClick={() => handleReset()} />
         </div>
       </form>
 
@@ -272,7 +298,7 @@ const AdminEvents = () => {
                         <td className={classes}>
                           <div className='flex items-center gap-3'>
                             <Typography variant='small' color='blue-gray' className='font-bold'>
-                              {event.name}
+                              {event.title}
                             </Typography>
                           </div>
                         </td>
@@ -288,7 +314,7 @@ const AdminEvents = () => {
                         </td>
                         <td className={classes}>
                           <Typography variant='small' color='blue-gray' className='font-normal'>
-                            Nguyen Huu Trong
+                            {event.author}
                           </Typography>
                         </td>
                         <td className={classes}>

@@ -26,6 +26,27 @@ export interface JobListConfig {
   active?: boolean
 }
 
+export interface AdminJobInterface {
+  jobId: string
+  position: string
+  location: string
+  jobType: string
+  process: number
+  name: string
+  authorId: string
+  quantity: number
+  benefit: string
+  salaryRange: string
+  requirement: string
+  description: string
+  isActive: boolean
+  deadline: string
+  createdAt: string
+  updatedAt: string
+  __v: number
+  skills: string[]
+}
+
 export interface JobDataInterface {
   listJobInfoSearch: { [index: string]: object[] }
 }

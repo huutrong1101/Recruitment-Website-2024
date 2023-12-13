@@ -130,6 +130,15 @@ export interface JobReccerListConfig {
 export interface AdminJobListConfig {
   page?: number | string
   limit?: number | string
+  recruiterName?: string
+  jobName?: string
+}
+
+export interface AdminEventListConfig {
+  page?: number | string
+  limit?: number | string
+  recruiterName?: string
+  eventName?: string
 }
 export interface AdminJobInterface {
   idJob: string

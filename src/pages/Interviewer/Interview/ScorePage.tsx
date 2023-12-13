@@ -8,7 +8,8 @@ import {
   fetchINTAssignedQuestions,
   markScore,
   setNote,
-  setScore
+  setScore,
+  updateMarkScore
 } from '../../../redux/reducer/INTQuestionsSlice'
 import { fetchINTCandidatesByID, fetchINTCandidatesByInterviewId } from '../../../redux/reducer/INTCandidatesSlice'
 import { fetchINTInterviewByID, fetchSkills, fetchTypes } from '../../../redux/reducer/INTInterviewsSlice'
@@ -17,6 +18,8 @@ import { STATUS } from '../../../utils/contanst'
 import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import Modal from '../../../components/Modal/Modal'
 import { toast } from 'react-toastify'
+import classNames from 'classnames'
+import moment from 'moment'
 
 function AddQuestionModal({ visible, onAccept, onCancel }: any) {}
 
@@ -94,12 +97,23 @@ export default function ScorePage() {
   }
 
   const handleMarkScore = async () => {
-    await dispatch(markScore({ ID, assignedQuestions }))
-      .unwrap()
-      .then(() => {
-        toast.success(`Successfully.`)
-        navigate('/interviewer/interview-recent')
-      })
+    try {
+      await dispatch(markScore({ ID, assignedQuestions }))
+        .unwrap()
+        .then(async () => {
+          await dispatch(updateMarkScore({ ID })).then(() => {
+            toast.success(`Successfully.`)
+            navigate('/interviewer/interview-recent')
+          })
+        })
+        .catch((data) => {
+          console.log(data)
+          toast.error('Điểm không hợp lê')
+        })
+    } catch (err: any) {
+      toast.error(`${err.message}`)
+      throw err
+    }
   }
 
   const [isFetch, setIsFetch] = useState(false)
@@ -114,6 +128,12 @@ export default function ScorePage() {
     dispatch(fetchSkills())
     dispatch(fetchTypes())
   }, [])
+
+  console.log(INTSingleCandidate)
+
+  const handleDate = (inputDate: any) => {
+    return moment(inputDate).format('DD-MM-YYYY')
+  }
 
   // useEffect(() => {
   //   if (checkCompleteMarkScore(assignedQuestions) || !isDateReached(INTSingleCandidate?.date)) {
@@ -140,41 +160,53 @@ export default function ScorePage() {
             <hr className='my-5' />
             <div className=''>
               <div className='text-gray-400'>Educations</div>
-              {INTSingleCandidate?.information &&
-                INTSingleCandidate?.information?.education?.map((item: any) => (
-                  <div className='ml-4'>
-                    <div className='flex items-center mt-2 text-sm'>
-                      <AcademicCapIcon className='w-[15px] h-[15px] mt-[3px] mr-1' />
-                      {item.school}
-                    </div>
-                    <div className='text-gray-500 text-xs flex ml-[19px]'>
-                      {item.major} - {item.graduatedYear}
-                    </div>
+              {INTSingleCandidate.information?.education?.map((edu: any, index: any) => (
+                <>
+                  <div
+                    key={index}
+                    className='px-2 py-2 mt-3 text-lg border rounded-lg shadow text-zinc-600 w-fit bg-emerald-50'
+                  >
+                    <p>School: {edu.school}</p>
+                    <p>Major: {edu.major}</p>
+                    <p>Graduated Year: {handleDate(edu.graduatedYear)}</p>
                   </div>
-                ))}
+                </>
+              ))}
               <div className='mt-3 mb-2 text-gray-400'>Experiences</div>
-              {INTSingleCandidate?.information &&
-                INTSingleCandidate?.information?.experience?.map((item: any) => (
-                  <div className='ml-4'>
-                    <div className='flex mt-2 text-sm'>
-                      <BriefcaseIcon className='w-[15px] h-[15px] mt-[3px] mr-1' />
-                      {item.companyName}
-                    </div>
-                    <div className='text-gray-500 text-xs flex ml-[19px]'>{item.position}</div>
-                    <div className='text-gray-500 text-xs flex ml-[19px]'>
-                      {item.dateFrom} - {item.dateTo}
-                    </div>
+              {INTSingleCandidate.information?.experience?.map((edu: any, index: any) => (
+                <>
+                  <div
+                    key={index}
+                    className='px-2 py-2 mt-3 text-lg border rounded-lg shadow text-zinc-600 w-fit bg-emerald-50'
+                  >
+                    <p>Company Name: {edu.companyName}</p>
+                    <p>Position: {edu.position}</p>
+                    <p>From: {handleDate(edu.dateFrom) + ' to ' + handleDate(edu.dateTo)}</p>
                   </div>
-                ))}
+                </>
+              ))}
               <div className='mt-3 mb-2 text-gray-400'>Projects</div>
-              {INTSingleCandidate?.information &&
-                INTSingleCandidate?.information?.project?.map((item: any) => <div className='ml-4'></div>)}
-              <div className='mt-3 mb-2 text-gray-400'>Skills</div>
-              <div className='flex'>
-                {INTSingleCandidate.jobSkills?.map((item: any) => (
-                  <div className='px-2 py-1 mr-2 text-sm text-white bg-green-600 hover:bg-green-800 rounded-xl'>
-                    {item.name}
+              {INTSingleCandidate.information?.project?.map((edu: any, index: any) => (
+                <div>
+                  <div
+                    key={index}
+                    className='px-2 py-2 mt-3 text-lg border rounded-t-lg shadow text-zinc-600 w-fit bg-emerald-50'
+                  >
+                    <p>Project: {edu.name}</p>
+                    <p>Description: {edu.description}</p>
                   </div>
+                </div>
+              ))}
+              <div className='mt-3 mb-2 text-gray-400'>Skills</div>
+
+              <div>
+                {INTSingleCandidate.information?.skills?.map((skill: any, index: any) => (
+                  <p
+                    key={index}
+                    className='inline-flex gap-2 px-4 py-2 mb-2 ml-2 text-white rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600'
+                  >
+                    {skill.label}
+                  </p>
                 ))}
               </div>
             </div>

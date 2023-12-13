@@ -165,17 +165,7 @@ export default function AdminManagerAccount() {
             />
           </form>
         </div>
-        {/* Button */}
-        {/* <div className={classNames('gap-2 ml-5 w-1/8 items-center justify-center')}>
-          <button
-            className={classNames(
-              'bg-[#05966A] hover:bg-emerald-700 text-white p-3 rounded-md flex w-full text-center items-center justify-center'
-            )}
-            type='submit'
-          >
-            Search
-          </button>
-        </div> */}
+
         <div className={classNames('flex items-center flex-shrink-0 gap-2 ml-3 ')}>
           <PrimaryButton text='Search' className='bg-[#05966A] hover:bg-emerald-700' onClick={() => performSearch()} />
 
@@ -209,7 +199,7 @@ export default function AdminManagerAccount() {
         </div>
         <div>
           {/* <AdminTable typeSelected={typeSelected} /> */}
-          <AdminTable typeSelected={typeSelected} queryConfig={queryConfig} />
+          <AdminTable typeSelected={typeSelected} setTypeSelected={setTypeSelected} queryConfig={queryConfig} />
         </div>
       </div>
       <Outlet />

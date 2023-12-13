@@ -1,7 +1,7 @@
 import { ChevronDownIcon, EyeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState, Fragment } from 'react'
-import { isEmpty, isUndefined, omitBy } from 'lodash'
-import { useAppSelector } from '../../hooks/hooks'
+import { isEmpty, isUndefined, omit, omitBy } from 'lodash'
+import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import useQueryParams from '../../hooks/useQueryParams'
 import classNames from 'classnames'
 import { isEqual } from 'lodash'
@@ -16,10 +16,11 @@ import { Card, Typography, Button, CardBody, CardFooter, IconButton, Tooltip } f
 import { PencilIcon } from '@heroicons/react/24/solid'
 import { formatDay } from '../../utils/utils'
 import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
+import { fetchCandidateList } from '../../redux/reducer/CandidateListSlice'
+import { User } from '../../components/AdminTable/AdminTable'
+import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 
 const TABLE_HEAD = ['Name', 'Date Created', 'Process', 'Recruiter', 'Actions']
-
-const listRecruiter = ['Nguyen Huu Trong', 'Le Bui Thao Duyen']
 
 export type QueryConfig = {
   [key in keyof AdminJobListConfig]: string
@@ -30,6 +31,7 @@ const AdminJobs = () => {
   const totalListJobs = useAppSelector((state) => state.Job.totalJobs)
 
   const [currentPage, setCurrentPage] = useState(1)
+  const [interviewerList, setInterviewerList] = useState<User[]>([])
 
   const queryParams: QueryConfig = useQueryParams()
   const [isLoading, setIsLoading] = useState(false)
@@ -42,7 +44,9 @@ const AdminJobs = () => {
   const queryConfig: QueryConfig = omitBy(
     {
       limit: queryParams.limit || 5,
-      page: queryParams.page || '1'
+      page: queryParams.page || '1',
+      recruiterName: queryParams.recruiterName || '',
+      jobName: queryParams.jobName || ''
     },
     isUndefined
   )
@@ -50,10 +54,12 @@ const AdminJobs = () => {
   const [pageSize, setPageSize] = useState(Math.ceil(totalListJobs / Number(queryParams.limit || 5)))
   const [showJobLists, setAdminManagerJobList] = useState(jobs)
 
-  console.log(showJobLists)
-
   const fetchJobWithQuery = async (query: string) => {
-    return await axiosInstance(`/jobs?${query}`)
+    return await axiosInstance(`/admin/jobs?${query}`)
+  }
+
+  const fetchIntervieWithQuery = async () => {
+    return await axiosInstance(`/admin/users/recruiter`)
   }
 
   useEffect(() => {
@@ -62,9 +68,10 @@ const AdminJobs = () => {
         setIsLoading(true)
         try {
           const query = qs.stringify(queryConfig)
-          const response = await fetchJobWithQuery(query)
-          setAdminManagerJobList(response.data.result.content)
-          setPageSize(response.data.result.totalPages)
+          const responseJob = await fetchJobWithQuery(query)
+
+          setAdminManagerJobList(responseJob.data.result.content)
+          setPageSize(responseJob.data.result.totalPages)
         } catch (error) {
           console.log(error)
         } finally {
@@ -82,9 +89,11 @@ const AdminJobs = () => {
       try {
         if (queryConfig) {
           const query = qs.stringify(queryConfig)
-          const response = await fetchJobWithQuery(query)
-          setAdminManagerJobList(response.data.result.content)
-          setPageSize(response.data.result.totalPages)
+          const responseJob = await fetchJobWithQuery(query)
+          const responseInterviewerList = await fetchIntervieWithQuery()
+          setInterviewerList(responseInterviewerList.data.result.content)
+          setAdminManagerJobList(responseJob.data.result.content)
+          setPageSize(responseJob.data.result.totalPages)
         }
       } catch (error) {
         console.log(error)
@@ -101,20 +110,43 @@ const AdminJobs = () => {
 
   const handleSearch = async (e: any) => {
     e.preventDefault()
+    performSearch()
+  }
+
+  const performSearch = () => {
     try {
       setIsLoading(true)
+
+      const searchParams = {
+        ...queryConfig,
+        recruiterName: dataSearch.field,
+        jobName: dataSearch.key,
+        page: '1'
+      }
+
+      const filteredSearchParams = omitBy(searchParams, isEmpty)
+
       navigate({
         pathname: '/admin/jobs',
-        search: createSearchParams({
-          ...queryConfig,
-          name: dataSearch.key
-        }).toString()
+        search: createSearchParams(filteredSearchParams).toString()
       })
     } catch (error) {
       console.error(error)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleReset = () => {
+    setDataSearch({
+      key: '',
+      field: ''
+    })
+
+    navigate({
+      pathname: '/admin/jobs',
+      search: createSearchParams(omit(queryConfig, ['recruiterName', 'jobName', 'page', 'limit'])).toString()
+    })
   }
 
   const handlePagination = (page: number) => {
@@ -167,6 +199,8 @@ const AdminJobs = () => {
     })
   }
 
+  console.log(showJobLists)
+
   return (
     <>
       {/* Search */}
@@ -195,7 +229,7 @@ const AdminJobs = () => {
             >
               <Menu.Items className='absolute left-0 z-10 w-full mt-1 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
                 <div className='py-1'>
-                  {listRecruiter.map((name, index) => (
+                  {interviewerList.map((interviewer, index) => (
                     <Menu.Item key={index}>
                       {({ active }) => (
                         <p
@@ -206,11 +240,11 @@ const AdminJobs = () => {
                           onClick={() =>
                             setDataSearch({
                               ...dataSearch,
-                              field: name
+                              field: interviewer.fullName
                             })
                           }
                         >
-                          {name}
+                          {interviewer.fullName}
                         </p>
                       )}
                     </Menu.Item>
@@ -237,16 +271,11 @@ const AdminJobs = () => {
             )}
           />
         </div>
-        {/* Button */}
-        <div className={classNames('gap-2 ml-5 w-1/8 items-center justify-center')}>
-          <button
-            className={classNames(
-              'bg-[#05966A] hover:bg-emerald-700 text-white p-3 rounded-md flex w-full text-center items-center justify-center'
-            )}
-            type='submit'
-          >
-            Search
-          </button>
+
+        <div className={classNames('gap-2 ml-5 w-1/8 items-center justify-center flex flex-row')}>
+          <PrimaryButton text='Search' className='bg-[#05966A] hover:bg-emerald-700' onClick={() => performSearch()} />
+
+          <PrimaryButton text='Reset' className='bg-red-600 hover:bg-red-700' onClick={() => handleReset()} />
         </div>
       </form>
 
@@ -284,7 +313,7 @@ const AdminJobs = () => {
                           <td className={classes}>
                             <div className='flex items-center gap-3'>
                               <Typography variant='small' color='blue-gray' className='font-bold'>
-                                {job.name}
+                                {job.jobName}
                               </Typography>
                             </div>
                           </td>
@@ -295,12 +324,12 @@ const AdminJobs = () => {
                           </td>
                           <td className={classes}>
                             <Typography variant='small' color='blue-gray' className='font-normal'>
-                              1/{job.quantity}
+                              {job.process}/{job.quantity}
                             </Typography>
                           </td>
                           <td className={classes}>
                             <Typography variant='small' color='blue-gray' className='font-normal'>
-                              Nguyen Huu Trong
+                              {job.author}
                             </Typography>
                           </td>
                           <td className={classes}>

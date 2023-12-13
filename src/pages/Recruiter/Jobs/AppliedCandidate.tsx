@@ -87,6 +87,7 @@ export default function Applied(num: any) {
   }, [queryConfig, prevQueryConfig])
 
   let navigate = useNavigate()
+
   const routeChange = (userId: string) => {
     const countReceivedStates = applyCandidate?.map((data) => data.state).filter((state) => state === 'PASSED').length
 
@@ -102,18 +103,21 @@ export default function Applied(num: any) {
       jobId: jobId || '',
       state: 'PASS'
     }
-    const countReceivedStates = applyCandidate?.map((data) => data.state).filter((state) => state === 'PASS').length
+    const updatedCandidateState = applyCandidate.map((candidate) => {
+      if (candidate.candidateId === candidateId) {
+        return { ...candidate, state: 'PASS' }
+      }
+      return candidate
+    })
 
-    if (countReceivedStates < num.num) {
-      toast
-        .promise(StateService.changeState(data), {
-          pending: `Changing`,
-          success: `The state was changed to pass`
-        })
-        .catch((error) => toast.error(error.response.data.result))
-    } else toast.error(`This job already have enough candidates`)
-    // console.log(countReceivedStates);
-    // console.log(num.num);
+    setApplyCandidate(updatedCandidateState)
+
+    toast
+      .promise(StateService.changeState(data), {
+        pending: `Changing`,
+        success: `The state was changed to pass`
+      })
+      .catch((error) => toast.error(error.response.data.result))
   }
 
   const handleFail = (candidateId: string) => {
@@ -122,6 +126,16 @@ export default function Applied(num: any) {
       jobId: jobId || '',
       state: 'FAIL'
     }
+
+    const updatedCandidateState = applyCandidate.map((candidate) => {
+      if (candidate.candidateId === candidateId) {
+        return { ...candidate, state: 'FAIL' }
+      }
+      return candidate
+    })
+
+    setApplyCandidate(updatedCandidateState)
+
     toast
       .promise(StateService.changeState(data), {
         pending: `Changing`,
