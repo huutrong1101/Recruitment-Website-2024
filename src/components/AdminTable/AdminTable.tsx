@@ -54,6 +54,7 @@ interface Project {
 
 interface Skill {
   value: number
+  label: string
 }
 
 interface Information {

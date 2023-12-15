@@ -16,6 +16,24 @@ export interface JobInterface {
   skills: []
 }
 
+export interface AdminJobInterface {
+  jobId: string
+  jobName: string
+  quantity: number
+  benefit: string
+  salaryRange: string
+  requirement: string
+  description: string
+  createdAt: string
+  deadline: string
+  position: string
+  location: string
+  jobType: string
+  author: string
+  process: number
+  skills: string[]
+}
+
 export interface JobListConfig {
   page?: number | string
   limit?: number | string

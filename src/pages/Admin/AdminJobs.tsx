@@ -9,7 +9,7 @@ import qs from 'query-string'
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 import axiosInstance from '../../utils/AxiosInstance'
 import { AdminJobListConfig } from '../../types/services'
-import { JobInterface } from '../../types/job.type'
+import { AdminJobInterface, JobInterface } from '../../types/job.type'
 import { BsFilterLeft } from 'react-icons/bs'
 import { Menu, Transition } from '@headlessui/react'
 import { Card, Typography, Button, CardBody, CardFooter, IconButton, Tooltip } from '@material-tailwind/react'
@@ -27,7 +27,7 @@ export type QueryConfig = {
 }
 
 const AdminJobs = () => {
-  const jobs: JobInterface[] = useAppSelector((state) => state.Job.jobs)
+  const jobs: AdminJobInterface[] = useAppSelector((state) => state.Job.jobs)
   const totalListJobs = useAppSelector((state) => state.Job.totalJobs)
 
   const [currentPage, setCurrentPage] = useState(1)
