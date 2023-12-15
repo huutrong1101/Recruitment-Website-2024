@@ -154,7 +154,6 @@ export default function AddJobCard({
               placeholder=''
               onChange={(event) => setSalary(event.target.value)}
             />
-            <span>VNĐ</span>
           </div>
         </div>
       </div>

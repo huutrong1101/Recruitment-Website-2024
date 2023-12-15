@@ -157,15 +157,15 @@ export default function JobDetail() {
                   >
                     <div>
                       <h1 className='text-2xl font-semibold'>Job description</h1>
-                      <p>{job?.description}</p>
+                      <p className='mt-2 whitespace-pre-line'>{job?.description}</p>
                     </div>
                     <div>
-                      <h1 className='text-2xl font-semibold'>Requirement</h1>
-                      <p>{job?.requirement}</p>
+                      <h1 className='text-2xl font-semibold whitespace-pre-line'>Requirement</h1>
+                      <p className='mt-2 whitespace-pre-line'>{job?.requirement}</p>
                     </div>
                     <div>
-                      <h1 className='text-2xl font-semibold'>Benefit</h1>
-                      <p>{job?.benefit}</p>
+                      <h1 className='text-2xl font-semibold whitespace-pre-line'>Benefit</h1>
+                      <p className='mt-2 whitespace-pre-line'>{job?.benefit}</p>
                     </div>
                     <div>
                       <h1 className='text-2xl font-semibold'>Skills Require</h1>

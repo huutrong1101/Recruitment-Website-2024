@@ -52,7 +52,7 @@ export default function RecruiterEventCard({ event }: any) {
               {/* {event.title.length > 25
               ? event.title.substring(0, 15) + "  ..."
               : event.title} */}
-              {he.decode(event.title)}
+              {he.decode(event.name)}
             </h1>
           </div>
 

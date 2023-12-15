@@ -8,10 +8,9 @@ interface StatisticsCardProps {
   icon: React.ReactElement
   title: string
   value: string
-  footer: React.ReactNode
 }
 
-export default function StatisticsCard({ color, icon, title, value, footer }: StatisticsCardProps) {
+export default function StatisticsCard({ color, icon, title, value }: StatisticsCardProps) {
   return (
     <Card>
       <CardHeader variant='gradient' className={`absolute grid w-16 h-16 ml-4 -mt-4 place-items-center ${color}`}>
@@ -25,7 +24,6 @@ export default function StatisticsCard({ color, icon, title, value, footer }: St
           {value}
         </Typography>
       </CardBody>
-      {footer && <CardFooter className='p-4 border-t border-blue-gray-50'>{footer}</CardFooter>}
     </Card>
   )
 }

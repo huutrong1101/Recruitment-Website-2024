@@ -4,8 +4,10 @@ import PropTypes from 'prop-types'
 import { BanknotesIcon, UserPlusIcon, UserIcon, ChartBarIcon } from '@heroicons/react/24/solid'
 import StatisticsCard from '../../components/Card/StatisticsCard'
 import chartsConfig from '../../configs/charts-config'
-import { ClockIcon } from '@heroicons/react/24/outline'
+import { BriefcaseIcon, ClockIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
 import StatisticsChart from '../../components/Card/StatisticsChart'
+import { useState, useEffect } from 'react'
+import axiosInstance from '../../utils/AxiosInstance'
 
 const statisticsCardsData = [
   {
@@ -119,36 +121,84 @@ export const statisticsChartsData = [
     color: 'bg-blue-500',
     title: 'Website View',
     description: 'Last Campaign Performance',
-    footer: 'campaign sent 2 days ago',
+
     chart: websiteViewsChart
   },
   {
     color: 'bg-pink-500',
     title: 'Daily Sales',
     description: '15% increase in today sales',
-    footer: 'updated 4 min ago',
+
     chart: dailySalesChart
   },
   {
     color: 'bg-green-500',
     title: 'Completed Tasks',
     description: 'Last Campaign Performance',
-    footer: 'just updated',
+
     chart: completedTasksChart
   }
 ]
 
+interface StatisticsData {
+  createdJobCount: number
+  createdEventCount: number
+  createdInterviewCount: number
+  candidatePassCount: number
+}
+
 export default function ReccerDashboard() {
+  const [statistics, setStatistics] = useState<StatisticsData>()
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance('/recruiter/statistics')
+        setStatistics(response.data.result)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const statisticsCardsData = [
+    {
+      color: 'bg-blue-500',
+      icon: <BriefcaseIcon className='w-6 h-6 text-white' />,
+      title: 'Created Job Count',
+      value: `${statistics?.createdJobCount}`
+    },
+    {
+      color: 'bg-pink-500',
+      icon: <EnvelopeIcon className='w-6 h-6 text-white' />,
+      title: 'Created Event Count',
+      value: `${statistics?.createdEventCount}`
+    },
+    {
+      color: 'bg-green-500',
+      icon: <UserPlusIcon className='w-6 h-6 text-white' />,
+      title: 'Created Interview Count',
+      value: `${statistics?.createdInterviewCount}`
+    },
+    {
+      color: 'bg-orange-500',
+      icon: <ChartBarIcon className='w-6 h-6 text-white' />,
+      title: 'Candidate Pass Count',
+      value: `${statistics?.candidatePassCount}`
+    }
+  ]
+
   return (
     <div className='mt-12'>
       <div className='grid mb-12 gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4'>
-        {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard key={title} {...rest} title={title} icon={icon} footer={footer} />
+        {statisticsCardsData.map(({ icon, title, ...rest }) => (
+          <StatisticsCard key={title} {...rest} title={title} icon={icon} />
         ))}
       </div>
       <div className='grid grid-cols-1 mb-6 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3'>
         {statisticsChartsData.map((props) => (
-          <StatisticsChart key={props.title} {...props} footer={props.footer} />
+          <StatisticsChart key={props.title} {...props} />
         ))}
       </div>
     </div>

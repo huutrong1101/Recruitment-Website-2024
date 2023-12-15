@@ -101,7 +101,6 @@ export default function UserProfileSubmittedJob() {
   const handleChangeLimit = (value: number) => {
     setSearchParams((prev) => {
       const page = prev.get('page') || '1'
-      // const size = prev.get("size") || "5";
 
       return {
         limit: value.toString() || '5',

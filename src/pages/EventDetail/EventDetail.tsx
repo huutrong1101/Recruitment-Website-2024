@@ -100,7 +100,6 @@ export default function EventDetail() {
               <div className={classnames('flex flex-col gap-1 items-center justify-center my-4')}>
                 <img src={avatar} alt='' className={classnames('w-[175px] h-[175px] rounded-full bg-gray-500')} />
                 <h3>{event?.author}</h3>
-                <h3>{event?.name}</h3>
               </div>
               <div className='flex items-center justify-center p-2 bg-gray-300'>
                 <h3

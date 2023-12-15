@@ -10,7 +10,6 @@ import { JobService } from '../../../services/JobService'
 import { fetchRecInterviewerSkill } from '../../../redux/reducer/RecInterviewerSilce'
 import AddJobWidget from '../../../components/JobCard/AddJobWidget'
 import AddJobCard from '../../../components/JobCard/AddJobCard'
-import moment from 'moment'
 import dayjs, { Dayjs } from 'dayjs'
 
 interface Skill {

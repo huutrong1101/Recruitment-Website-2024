@@ -57,10 +57,10 @@ export default function EventCard({ event }: EventCardProps) {
           {/* Description */}
           <div className={classNames('mt-2')}>
             <h3 className={classNames('text-black text-base font-medium tracking-wider capitalize line-clamp-2')}>
-              {event.title}
+              {event.name}
             </h3>
 
-            <p className={classNames(`mt-4 text-xs line-clamp-4 text-gray-400`)}>{limitWords(event.description, 10)}</p>
+            <p className={classNames(`mt-4 text-xs line-clamp-4 text-gray-400`)}>{limitWords(event.description, 9)}</p>
           </div>
         </div>
       </div>

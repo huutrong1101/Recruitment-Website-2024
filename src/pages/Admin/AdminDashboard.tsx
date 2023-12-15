@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Typography, Card, CardHeader, CardBody, CardFooter } from '@material-tailwind/react'
 import PropTypes from 'prop-types'
-import { BanknotesIcon, UserPlusIcon, UserIcon, ChartBarIcon } from '@heroicons/react/24/solid'
+import { BanknotesIcon, UserPlusIcon, UserIcon, ChartBarIcon, BriefcaseIcon } from '@heroicons/react/24/solid'
 import StatisticsCard from '../../components/Card/StatisticsCard'
 import chartsConfig from '../../configs/charts-config'
-import { ClockIcon } from '@heroicons/react/24/outline'
+import { ClockIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
 import StatisticsChart from '../../components/Card/StatisticsChart'
+import axiosInstance from '../../utils/AxiosInstance'
 
 const statisticsCardsData = [
   {
@@ -138,12 +139,60 @@ export const statisticsChartsData = [
   }
 ]
 
+interface StatisticsData {
+  jobCount: number
+  eventCount: number
+  blackListCount: number
+  candidatePassCount: number
+}
+
 export default function AdminDashboard() {
+  const [statistics, setStatistics] = useState<StatisticsData>()
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance('/admin/statistics')
+        setStatistics(response.data.result)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const statisticsCardsData = [
+    {
+      color: 'bg-blue-500',
+      icon: <BriefcaseIcon className='w-6 h-6 text-white' />,
+      title: 'Total Jobs',
+      value: `${statistics?.jobCount}`
+    },
+    {
+      color: 'bg-pink-500',
+      icon: <EnvelopeIcon className='w-6 h-6 text-white' />,
+      title: 'Total events',
+      value: `${statistics?.eventCount}`
+    },
+    {
+      color: 'bg-green-500',
+      icon: <UserPlusIcon className='w-6 h-6 text-white' />,
+      title: 'Total blacklist',
+      value: `${statistics?.blackListCount}`
+    },
+    {
+      color: 'bg-orange-500',
+      icon: <ChartBarIcon className='w-6 h-6 text-white' />,
+      title: 'Total candidates pass',
+      value: `${statistics?.candidatePassCount}`
+    }
+  ]
+
   return (
     <div className='mt-12'>
       <div className='grid mb-12 gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4'>
-        {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard key={title} {...rest} title={title} icon={icon} footer={footer} />
+        {statisticsCardsData.map(({ icon, title, ...rest }) => (
+          <StatisticsCard key={title} {...rest} title={title} icon={icon} />
         ))}
       </div>
       <div className='grid grid-cols-1 mb-6 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3'>

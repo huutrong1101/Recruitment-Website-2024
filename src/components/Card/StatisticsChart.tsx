@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Typography, Card, CardHeader, CardBody, CardFooter } from '@material-tailwind/react'
 import Chart from 'react-apexcharts'
 
-const StatisticsChart = ({ color, chart, title, description, footer }: any) => {
+const StatisticsChart = ({ color, chart, title, description }: any) => {
   return (
     <Card>
       <CardHeader variant='gradient' className={color}>
@@ -17,7 +17,6 @@ const StatisticsChart = ({ color, chart, title, description, footer }: any) => {
           {description}
         </Typography>
       </CardBody>
-      {footer && <CardFooter className='px-6 py-5 border-t border-blue-gray-50'>{footer}</CardFooter>}
     </Card>
   )
 }

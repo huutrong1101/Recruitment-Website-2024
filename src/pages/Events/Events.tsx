@@ -135,7 +135,7 @@ export default function Events() {
                   <img src={event.image.url || blog_image} alt='' className={classNames('object-cover aspect-video')} />
                 </div>
                 <div className={classNames('px-4 py-2')}>
-                  <h3 className='text-xs font-medium text-black capitalize line-clamp-3'>{event.title}</h3>
+                  <h3 className='text-xs font-medium text-black capitalize line-clamp-3'>{event.name}</h3>
                   {/* <p className="text-gray-500"></p> */}
                 </div>
               </Link>
