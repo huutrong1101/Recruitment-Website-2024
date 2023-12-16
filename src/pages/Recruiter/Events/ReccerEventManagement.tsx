@@ -31,7 +31,8 @@ export default function ReccerEventManagement() {
       page: queryParams.page || '1',
       limit: queryParams.limit || 4,
       type: queryParams.type || true,
-      name: queryParams.name || ''
+      name: queryParams.name || '',
+      active: queryParams.active
     },
     isUndefined
   )
@@ -53,9 +54,7 @@ export default function ReccerEventManagement() {
   }
 
   const fetchEventWithQuery = async (query: string) => {
-    return await axiosInstance(`/events?${query}`, {
-      headers: { Authorization: null }
-    })
+    return await axiosInstance(`/recruiter/events?${query}`)
   }
 
   useEffect(() => {

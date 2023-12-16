@@ -9,7 +9,6 @@ interface CandidateStatusBadge extends React.HTMLProps<HTMLDivElement> {
 }
 
 export default function CandidateStatusBadge({ className, status }: CandidateStatusBadge) {
-  console.log(status)
   return (
     <Badge
       className={classnames(

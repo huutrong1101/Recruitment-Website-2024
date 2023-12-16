@@ -54,7 +54,7 @@ export default function EventDetail() {
                   <p>{formattedDate}</p>
                 </div>
                 <div className={classnames('flex items-center gap-1')}>
-                  <p>By Google</p>
+                  <p>By FPT</p>
                 </div>
                 <div className={classnames('flex items-center gap-1')}>
                   <ClockIcon className={classnames(`w-[20px]`)} />
@@ -69,7 +69,7 @@ export default function EventDetail() {
                   {event?.title}
                 </h3>
                 <div className={classnames('mt-2 text-justify text-base text-gray-700 leading-6')}>
-                  <p>{event?.description}</p>
+                  <p className='whitespace-pre-line'>{event?.description}</p>
                 </div>
               </div>
 

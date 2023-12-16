@@ -11,11 +11,9 @@ import { Card, Typography, Button, CardBody, CardFooter, IconButton, Tooltip } f
 import { fetchINTCandidatesData } from '../../../redux/reducer/INTCandidatesSlice'
 
 // Status
-import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
-import { ADMIN_APPLICANTS_STATUS } from '../../../utils/Localization'
-import { STATUS } from '../../../utils/contanst'
-import { data } from '../../../data/fetchData'
 import CandidateStatusBadge from './CandidateStatusBadge'
+
+import NOT_AVATAR from '../../../../images/not_avatar.jpg'
 
 export const formatDDMMYY = (date: any) => {
   if (!(date instanceof Date)) {
@@ -71,6 +69,7 @@ const CandidateRecent = () => {
 
   console.log(INTCandidates)
 
+  console.log(rowsPerPage)
   return (
     <div className='CandidateRecent'>
       <div className='px-6 py-6 mt-8 border-2 shadow-xl rounded-xl'>
@@ -100,8 +99,13 @@ const CandidateRecent = () => {
                           <div className='flex items-center gap-3'>
                             <Typography variant='small' color='blue-gray' className='font-bold'>
                               <div className='flex items-center'>
-                                <img src={candidate?.avatar} className='w-10 h-10 mr-4 rounded-full' />
-                                <div>{candidate?.candidateName}</div>
+                                {!candidate?.avatar || candidate?.avatar === null ? (
+                                  <img src={NOT_AVATAR} className='w-10 h-10 mr-4 rounded-full' />
+                                ) : (
+                                  <img src={candidate?.avatar} className='w-10 h-10 mr-4 rounded-full' />
+                                )}
+
+                                <div>{candidate?.candidateFullName}</div>
                               </div>
                             </Typography>
                           </div>

@@ -19,7 +19,7 @@ export default function CompleteConfirmEmail() {
   }, [])
 
   const handleSeekingJobs = () => {
-    navigate(`/`)
+    navigate(`/auth/login`)
   }
 
   return (
@@ -66,7 +66,7 @@ export default function CompleteConfirmEmail() {
         enterTo='opacity-100'
       >
         <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-          <PrimaryButton text='Learning now' onClick={handleSeekingJobs} />
+          <PrimaryButton text="Let's login to enjoy using the website" onClick={handleSeekingJobs} />
         </div>
       </Transition>
     </div>

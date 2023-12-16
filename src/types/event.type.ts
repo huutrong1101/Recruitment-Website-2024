@@ -26,4 +26,5 @@ export interface EventListConfig {
   limit?: number | string
   name?: string
   type?: string
+  active?: boolean
 }

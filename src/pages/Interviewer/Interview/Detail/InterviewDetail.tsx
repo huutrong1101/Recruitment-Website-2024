@@ -440,17 +440,12 @@ const InterviewDetail = () => {
           >
             Show More Candidate Information
           </button>
-          {!checkCompleteMarkScore(assignedQuestions) && (
+          {!checkCompleteMarkScore(assignedQuestions) && assignedQuestionsStatus === STATUS.IDLE && (
             <Link to={`/interviewer/interview-recent/${id}/score-page`}>
               <button className='px-4 py-2 font-bold text-white bg-orange-600 rounded hover:bg-orange-800'>
                 Start Interview
               </button>
             </Link>
-          )}
-          {checkCompleteMarkScore(assignedQuestions) && (
-            <button className='px-4 py-2 font-bold text-white bg-blue-600 rounded hover:bg-blue-800'>
-              Not Arrived Yet
-            </button>
           )}
         </div>
       )}

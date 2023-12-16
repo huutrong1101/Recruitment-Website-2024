@@ -20,8 +20,7 @@ import Modal from '../../../components/Modal/Modal'
 import { toast } from 'react-toastify'
 import classNames from 'classnames'
 import moment from 'moment'
-
-function AddQuestionModal({ visible, onAccept, onCancel }: any) {}
+import NOT_AVATAR from '../../../../images/not_avatar.jpg'
 
 export default function ScorePage() {
   const { id } = useParams()
@@ -56,6 +55,7 @@ export default function ScorePage() {
   }
 
   const handleSubmitQ = async () => {
+    // Proceed to dispatch the addQuestionToRepo action
     await dispatch(addQuestionToRepo({ ID, contentQ, noteQ, typeQ, skillQ }))
     dispatch(fetchINTAssignedQuestions(id))
     handleCloseModal()
@@ -98,17 +98,21 @@ export default function ScorePage() {
 
   const handleMarkScore = async () => {
     try {
+      // Proceed to dispatch the markScore action
       await dispatch(markScore({ ID, assignedQuestions }))
         .unwrap()
         .then(async () => {
-          await dispatch(updateMarkScore({ ID })).then(() => {
-            toast.success(`Successfully.`)
-            navigate('/interviewer/interview-recent')
-          })
+          await dispatch(updateMarkScore({ ID }))
+            .unwrap()
+            .then(() => {
+              toast.success(`Successfully.`)
+              navigate('/interviewer/interview-recent')
+            })
+            .catch((error) => toast.error('Points have not been filled in completely'))
         })
         .catch((data) => {
           console.log(data)
-          toast.error('Điểm không hợp lê')
+          toast.error('Invalid score')
         })
     } catch (err: any) {
       toast.error(`${err.message}`)
@@ -149,13 +153,17 @@ export default function ScorePage() {
             <div className='flex items-center'>
               <div className=''>
                 <div className=''>
-                  <img
-                    src={INTSingleCandidate?.avatar}
-                    className=' w-[80px] h-[80px] border-4 rounded-full border-green'
-                  />
+                  {!INTSingleCandidate?.avatar || INTSingleCandidate?.avatar === null ? (
+                    <img src={NOT_AVATAR} className='w-10 h-10 mr-4 rounded-full' />
+                  ) : (
+                    <img
+                      src={INTSingleCandidate?.avatar}
+                      className=' w-[80px] h-[80px] border-4 rounded-full border-green'
+                    />
+                  )}
                 </div>
               </div>
-              <div className='ml-6 text-xl font-medium'>{INTSingleCandidate?.candidateName}</div>
+              <div className='ml-6 text-xl font-medium'>{INTSingleCandidate?.candidateFullName}</div>
             </div>
             <hr className='my-5' />
             <div className=''>

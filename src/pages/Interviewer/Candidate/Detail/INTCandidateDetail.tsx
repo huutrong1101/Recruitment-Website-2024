@@ -12,6 +12,7 @@ import { fetchINTCandidatesByID } from '../../../../redux/reducer/INTCandidatesS
 import LoadSpinner from '../../../../components/LoadSpinner/LoadSpinner'
 import { STATUS } from '../../../../utils/contanst'
 import moment from 'moment'
+import NOT_AVATAR from '../../../../../images/not_avatar.jpg'
 
 export const formatDDMMYY = (date: any) => {
   if (!(date instanceof Date)) {
@@ -34,6 +35,8 @@ const INTCandidateDetail = () => {
     dispatch(fetchINTCandidatesByID(id))
   }, [])
 
+  console.log(INTSingleCandidate)
+
   if (INTSingleCandidateStatus === STATUS.LOADING) {
     return (
       <div className='flex justify-center'>
@@ -48,7 +51,11 @@ const INTCandidateDetail = () => {
           <div className='flex'>
             <div className='w-5/12'>
               <div className='flex items-center pl-[1.5rem]'>
-                <img src={INTSingleCandidate?.avatar} className=' w-[180px] h-[180px] border-4 ' />
+                {!INTSingleCandidate?.avatar || INTSingleCandidate?.avatar === null ? (
+                  <img src={NOT_AVATAR} className=' w-[180px] h-[180px] border-4 ' />
+                ) : (
+                  <img src={INTSingleCandidate?.avatar} className=' w-[180px] h-[180px] border-4 ' />
+                )}
               </div>
             </div>
             <div className='w-7/12'>
@@ -105,11 +112,11 @@ const INTCandidateDetail = () => {
 
               <div className='mt-3 mb-2 text-gray-400'>Skills</div>
               <div className='flex'>
-                {/* {candidateData.jobSkills?.map((item: any) => (
+                {INTSingleCandidate?.information?.skills?.map((item: any) => (
                   <div className='px-2 py-1 mr-2 text-sm text-white bg-green-600 hover:bg-green-800 rounded-xl'>
-                    {item.name}
+                    {item.label}
                   </div>
-                ))} */}
+                ))}
               </div>
             </div>
             <div className='w-7/12'>
@@ -119,7 +126,15 @@ const INTCandidateDetail = () => {
               </div>
               <div className='mt-2 text-gray-400'>Projects</div>
               {INTSingleCandidate?.information &&
-                INTSingleCandidate?.information?.project?.map((item: any) => <div className='ml-4'></div>)}
+                INTSingleCandidate?.information?.project?.map((item: any) => (
+                  <div className='ml-4'>
+                    <div className='flex mt-2 text-sm'>
+                      <BriefcaseIcon className='w-[15px] h-[15px] mt-[3px] mr-1' />
+                      {item.name}
+                    </div>
+                    <div className='text-gray-500 text-xs flex ml-[19px]'>{item.description}</div>
+                  </div>
+                ))}
             </div>
           </div>
         </div>

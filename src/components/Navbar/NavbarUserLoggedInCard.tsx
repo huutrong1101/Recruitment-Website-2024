@@ -74,12 +74,12 @@ export default function NavbarUserLoggedInCard() {
             >
               {user?.fullName}
             </span>
-            {user?.avatar === null ? (
+            {!user?.avatar || user?.avatar === null ? (
               <DummyAvatar iconClassName='text-xl' />
             ) : (
               <img
                 className='inline-block rounded-full w-9 h-9 ring-2 ring-white'
-                src={user?.avatar}
+                src={user?.avatar || ''}
                 alt={`${user?.fullName}'s avatar`}
               />
             )}

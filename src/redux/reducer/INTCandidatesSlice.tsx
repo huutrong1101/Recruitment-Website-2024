@@ -74,6 +74,7 @@ export default INTCandidatesSlice.reducer
 export const fetchINTCandidatesData = createAsyncThunk(
   'INTcandidates/fetchINTCandidatesData',
   async (query: string, thunkAPI) => {
+    console.log(query)
     const response = await axiosInstance.get(`/interviewers/candidates${query}`)
     return response.data.result
   }
@@ -91,8 +92,8 @@ export const fetchINTCandidatesByInterviewId = createAsyncThunk(
   'INTcandidates/fetchINTCandidatesByInterviewId',
   async (interviewID: any, thunkAPI) => {
     const responseInterview = await axiosInstance.get(`/interviewers/interviews/${interviewID}`)
-    const candidateId = responseInterview.data.result.candidate.candidateId
-    const response = await axiosInstance.get(`/interviewers/candidates/${candidateId}`)
-    return response.data.result
+    // const candidateId = responseInterview.data.result.candidate.candidateId
+    // const response = await axiosInstance.get(`/interviewers/candidates/${candidateId}`)
+    return responseInterview.data.result.candidate
   }
 )

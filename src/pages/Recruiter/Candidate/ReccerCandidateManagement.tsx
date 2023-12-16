@@ -11,7 +11,6 @@ import classNames from 'classnames'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import LoadSpinner from '../../../components/LoadSpinner/LoadSpinner'
 import RecCandidateCard from '../../../components/RecCandidateManageCard/RecCandidateManageCard'
-import { data } from '../../../data/fetchData'
 import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton'
 import Pagination from '../../../components/Pagination/Pagination'
 
@@ -47,7 +46,7 @@ const ReccerCandidateManagement = () => {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const [showCandidates, setshowCandidates] = useState([])
+  const [showCandidates, setshowCandidates] = useState(candidates)
 
   const [dataSearch, setDataSearch] = useState({
     key: '',
@@ -131,6 +130,8 @@ const ReccerCandidateManagement = () => {
       setIsLoading(false)
     }
   }
+
+  console.log(showCandidates)
 
   return (
     <>
