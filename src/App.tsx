@@ -114,7 +114,7 @@ function App() {
               <Route path='incomplete' element={<IncompleteConfirmEmail />} />
               <Route path='complete' element={<CompleteConfirmEmail />} />
             </Route>
-            <Route path='otp' element={<OneTimePasswordVerify />} />
+            <Route path='/otp' element={<OneTimePasswordVerify />} />
             <Route path='/forget-password' element={<ForgetPasswordLayout />}>
               <Route index element={<ForgetPassword />} />
               <Route path='confirm-password' element={<ConfirmPassword />} />
