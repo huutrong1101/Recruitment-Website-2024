@@ -22,8 +22,8 @@ export default function AddJobCard({
   setDeadline
 }: any) {
   const location = useAppSelector((state) => state.Job.location)
-  const employeeType = useAppSelector((state) => state.Job.postion)
-  const jobType = useAppSelector((state) => state.Job.type)
+  const employeeType = useAppSelector((state) => state.Job.type)
+  const jobType = useAppSelector((state) => state.Job.postion)
   const listData = cardData.map((data: any) => data.value)
 
   setpositionId(listData[0])

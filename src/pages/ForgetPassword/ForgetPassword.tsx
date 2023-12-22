@@ -28,7 +28,6 @@ export default function ForgetPassword() {
   }, [])
 
   const handleSend = (data: any) => {
-    // console.log(data)
     toast
       .promise(AuthService.forgetPassword(data), {
         pending: `Sending mail to your email`,

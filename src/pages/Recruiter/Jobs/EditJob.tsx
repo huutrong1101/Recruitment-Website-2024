@@ -33,7 +33,7 @@ export default function EditJob() {
         {
           icon: <UserIcon />,
           name: 'Employee Type',
-          value: job.position
+          value: job.jobType
         },
         {
           icon: <MapPinIcon />,
@@ -43,7 +43,7 @@ export default function EditJob() {
         {
           icon: <ComputerDesktopIcon />,
           name: 'Position',
-          value: job.jobType
+          value: job.position
         }
       ])
       setName(job?.name || '')

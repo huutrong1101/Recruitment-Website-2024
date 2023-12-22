@@ -158,6 +158,8 @@ export default function Applied(num: any) {
     }
   }
 
+  console.log(applyCandidate)
+
   return (
     <div className={classNames(`border bg-white shadow-sm rounded-xl`, `px-8 py-8`, `text-justify`)}>
       <div className='flex flex-row items-center'>
