@@ -133,7 +133,7 @@ export default function EditJob() {
 
     const data = {
       name: name,
-      jobType: jobType,
+      jobType: positionName,
       quantity: quantity,
       benefit: benefit,
       salaryRange: salaryRange,
@@ -141,20 +141,8 @@ export default function EditJob() {
       location: location,
       description: description,
       deadline: moment(deadline).format('YYYY-MM-DD'),
-      position: positionName,
+      position: jobType,
       skillRequired: dataSkill
-      // name,
-      // jobType,
-      // position,
-      // quantity,
-      // benefit,
-      // salaryRange,
-      // requirement,
-      // location,
-      // description,
-      // isActive,
-      // deadline: job?.deadline,
-      // skillRequired: dataSkill
     }
 
     console.log(data)

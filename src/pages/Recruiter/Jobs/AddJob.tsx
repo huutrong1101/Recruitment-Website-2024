@@ -107,7 +107,7 @@ export default function AddJob() {
     } else {
       const data = {
         name: name,
-        jobType: jobType,
+        jobType: positionName,
         quantity: quantity,
         benefit: benefit,
         salaryRange: salaryRange,
@@ -115,7 +115,7 @@ export default function AddJob() {
         location: location,
         description: description,
         deadline: deadline?.format('YYYY-MM-DD'),
-        position: positionName,
+        position: jobType,
         skillRequired: selectedValues
       }
 

@@ -26,6 +26,8 @@ export default function AddJobCard({
   const jobType = useAppSelector((state) => state.Job.postion)
   const listData = cardData.map((data: any) => data.value)
 
+  console.log(cardData)
+
   setpositionId(listData[0])
   setLocation(listData[1])
   setjobType(listData[2])
