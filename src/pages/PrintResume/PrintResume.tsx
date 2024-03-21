@@ -45,7 +45,7 @@ function ResumeRenderSection<T>({
   }
 
   return (
-    <div className={classNames(`mb-4`)}>
+    <div className={classNames(`mb-4 flex items-center gap-3`)}>
       {parseSchemaFromId(keyId).map(({ id, display }) => {
         const dateFields = ['graduatedYear', 'dateFrom', 'dateTo', 'receivedDate']
         const isDateField = dateFields.includes(id)

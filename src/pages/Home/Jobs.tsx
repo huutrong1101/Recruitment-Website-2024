@@ -33,7 +33,7 @@ export default function Jobs() {
 
       <div className={classNames('flex items-center justify-center')}>
         <Link to='/jobs' className={classNames('bg-emerald-700 text-white p-3 rounded-md flex')}>
-          See more jobs
+          See More Jobs
         </Link>
       </div>
     </div>

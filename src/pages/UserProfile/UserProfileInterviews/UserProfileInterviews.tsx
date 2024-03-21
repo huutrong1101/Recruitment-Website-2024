@@ -72,24 +72,26 @@ function UserProfileInterviewCalendarView<T>({ rows, data }: TableProps<T>) {
 
   return (
     <>
-      <div className='w-full mt-2'>
-        <FullCalendar
-          height='70vh'
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-          headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-          }}
-          initialView='dayGridMonth'
-          editable={true}
-          selectable={true}
-          selectMirror={true}
-          dayMaxEvents={true}
-          // select={handleDateClick}
-          eventClick={handleEventClick}
-          initialEvents={newData}
-        />
+      <div className='w-full mt-2 overflow-hidden'>
+        <div className='max-w-full overflow-auto'>
+          <FullCalendar
+            height='70vh'
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+            }}
+            initialView='dayGridMonth'
+            editable={true}
+            selectable={true}
+            selectMirror={true}
+            dayMaxEvents={true}
+            // select={handleDateClick}
+            eventClick={handleEventClick}
+            initialEvents={newData}
+          />
+        </div>
       </div>
       <Modal
         isOpen={isOpen}

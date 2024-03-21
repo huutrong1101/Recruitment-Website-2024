@@ -8,6 +8,7 @@ import { useAppSelector } from '../../hooks/hooks'
 
 export default function Events() {
   const events: EventInterface[] = useAppSelector((state) => state.Home.events)
+
   return (
     <div className='mt-[80px]'>
       <div className={classNames('text-center')}>

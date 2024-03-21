@@ -38,8 +38,8 @@ export default function EventDetail() {
     <div className={classnames(`event-detail`)}>
       {event && (
         <>
-          <div className={classnames('flex gap-5')}>
-            <div className={classnames('bg-white rounded-lg shadow-lg w-[70%] border')}>
+          <div className={classnames('flex flex-col lg:flex-row gap-5')}>
+            <div className={classnames('bg-white rounded-lg shadow-lg border w-full lg:w-[70%]')}>
               <div>
                 <img
                   src={event?.image?.url || blog_image}
@@ -85,7 +85,9 @@ export default function EventDetail() {
             </div>
 
             {/* Author  */}
-            <div className={classnames('bg-white rounded-lg shadow-lg w-[30%] h-fit sticky top-4')}>
+            <div
+              className={classnames('bg-white rounded-lg shadow-lg h-fit sticky top-4 w-full lg:max-w-xs lg:w-[30%]')}
+            >
               <div
                 className={classnames('flex items-center justify-center p-2 bg-gray-300 rounded-tl-lg rounded-tr-lg')}
               >

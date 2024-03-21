@@ -12,6 +12,7 @@ export default function RecInterviewRecent() {
     let path = `../jobdetail/${jobId}`
     navigate(path)
   }
+
   useEffect(() => {
     const getInterviewHistory = async () => {
       try {

@@ -10,6 +10,7 @@ import { JobDataInterface, JobInterface } from '../../../types/job.type'
 import axiosInstance from '../../../utils/AxiosInstance'
 import { JOB_POSITION } from '../../../utils/Localization'
 import DatePicker from '../../../components/DatePicker/DatePicker'
+import dayjs, { Dayjs } from 'dayjs'
 
 export default function EditJobCard({
   cardData,
@@ -22,6 +23,7 @@ export default function EditJobCard({
   deadline,
   setDeadline
 }: any) {
+  const deadlineDayjs = dayjs(deadline)
   const location = useAppSelector((state) => state.Job?.location)
   const employeeType = useAppSelector((state) => state.Job?.type)
   const jobType = useAppSelector((state) => state.Job?.postion)
@@ -62,6 +64,7 @@ export default function EditJobCard({
   }))
 
   const currentDate = new Date()
+
   const JobData: JobDataInterface = {
     listJobInfoSearch: {
       'Employee Type': formattedEmployeeType,
@@ -175,7 +178,7 @@ export default function EditJobCard({
           <ClockIcon />
         </div>
         <div className={classNames(`flex flex-col flex-1 gap-2`)}>
-          <DatePicker value={deadline} onChange={handleDateChange} type='day' />
+          <DatePicker value={deadlineDayjs} onChange={handleDateChange} type='day' />
         </div>
       </div>
     </div>

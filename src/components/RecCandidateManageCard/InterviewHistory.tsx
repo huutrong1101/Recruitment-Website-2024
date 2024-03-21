@@ -17,6 +17,7 @@ export default function InterviewHistory() {
     let path = `../jobdetail/${jobId}`
     navigate(path)
   }
+
   useEffect(() => {
     const getInterviewHistory = async () => {
       try {

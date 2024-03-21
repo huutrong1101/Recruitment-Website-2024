@@ -33,6 +33,7 @@ const CandidateRecent = () => {
   const { INTCandidates, INTCandidatesStatus, INTTotalCandidates, INTTotalPages } = useAppSelector(
     (state: any) => state.INTCandidates
   )
+
   const dispatch = useAppDispatch()
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -48,6 +49,7 @@ const CandidateRecent = () => {
       setQuery(`?limit=${rowsPerPage}&page=${newPage + 1}`)
     }
   }
+
   const handleDecreasePage = () => {
     if (page > 0) {
       const newPage = page - 1

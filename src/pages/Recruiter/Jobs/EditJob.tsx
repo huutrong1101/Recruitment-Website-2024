@@ -13,12 +13,14 @@ import { JobInterface } from '../../../types/job.type'
 import EditJobWidget from './EditJobWidget'
 import EditJobCard from './EditJobCard'
 import moment from 'moment'
+import dayjs from 'dayjs'
 
 export default function EditJob() {
   const [jobInformation, setJobInformation] = useState([{ icon: <UserIcon />, name: '', value: '' }])
   //############## Handle Get ##############
   const { jobId } = useParams()
   const [job, setJob] = useState<JobInterface | null>(null)
+
   useEffect(() => {
     const getJobDetail = async () => {
       const response = await axiosInstance.get(`recruiter/jobs/${jobId}`)
@@ -140,7 +142,8 @@ export default function EditJob() {
       requirement: requirement,
       location: location,
       description: description,
-      deadline: moment(deadline).format('YYYY-MM-DD'),
+      deadline: dayjs(deadline).format('YYYY-MM-DD'),
+      // deadline: deadline,
       position: jobType,
       skillRequired: dataSkill
     }
@@ -244,6 +247,8 @@ export default function EditJob() {
             setjobType={setjobType}
             salary={salaryRange}
             setSalary={setSalaryRange}
+            deadline={deadline}
+            setDeadline={setDeadline}
           />
         </div>
       </div>

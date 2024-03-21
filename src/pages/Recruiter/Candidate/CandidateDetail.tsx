@@ -10,6 +10,7 @@ export default function CandidateDetail() {
   const [candidate, setCandidate] = useState<RecCandidateInterface | null>(null)
 
   const [isLoading, setIsLoading] = useState(false)
+
   useEffect(() => {
     const getCandidateDetail = async () => {
       setIsLoading(true)

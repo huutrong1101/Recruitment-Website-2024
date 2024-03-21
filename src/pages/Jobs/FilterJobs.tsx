@@ -38,7 +38,7 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
   return (
     <div
       className={classNames(
-        'p-6 bg-white rounded-lg shadow-sm w-1/3 h-fit sticky top-[25px] flex flex-col gap-3 border'
+        'p-6 bg-white rounded-lg shadow-sm w-full lg:max-w-xs lg:w-1/3 lg:h-fit lg:sticky top-[25px] flex flex-col gap-3 border'
       )}
     >
       <form onSubmit={handleSearch}>

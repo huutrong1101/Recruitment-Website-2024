@@ -305,29 +305,6 @@ const ReccerJobManagement = () => {
 
           <PrimaryButton text='Reset' className='bg-red-600 hover:bg-red-700' onClick={() => handleReset()} />
         </div>
-
-        {/* <div className={classNames('gap-2 ml-10 items-center justify-center')}>
-          <button
-            className={classNames(
-              'bg-[#05966A] hover:bg-emerald-700 text-white p-3 rounded-md flex w-full text-center items-center justify-center'
-            )}
-            onClick={() => performSearch()}
-          >
-            Search
-          </button>
-        </div>
-
-        <div className='items-center justify-center gap-2'>
-          <div className='sm:w-[100px] h-[50px] relative'>
-            <button
-              className='w-[70%] h-full left-5 top-0 absolute bg-red-500 hover:bg-red-700 text-white rounded-lg'
-              type='submit'
-              onClick={() => handleReset()}
-            >
-              Reset
-            </button>
-          </div>
-        </div> */}
       </div>
 
       <div className='flex justify-center items-center 2 mt-[10px] '>

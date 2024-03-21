@@ -13,9 +13,10 @@ export interface TableProps<T> {
   rows: TableRow[]
   data: T[]
   isModal: boolean
+  responsiveColumns?: string[]
 }
 
-export default function Table<T>({ rows, data, isModal }: TableProps<T>) {
+export default function Table<T>({ rows, data, isModal, responsiveColumns }: TableProps<T>) {
   let [isOpen, setIsOpen] = useState(false)
 
   const [itemClick, setItemClick] = useState({
@@ -58,12 +59,14 @@ export default function Table<T>({ rows, data, isModal }: TableProps<T>) {
         <thead className={classNames(`rounded uppercase`)}>
           <tr>
             {rows.map((row, _rowIdx) => {
+              const shouldHide = responsiveColumns && !responsiveColumns.includes(row.id)
+              console.log(shouldHide)
               return (
                 <th
                   key={`thead-${row.id}-${_rowIdx}`}
                   className={classNames(
-                    `font-semibold text-zinc-400 text-left py-2 px-4 text-xs  rounded-xl`,
-                    ` hover:text-emerald-600 transition-color duration-75`
+                    `font-semibold text-zinc-400 text-left py-2 px-4 text-xs  rounded-xl hover:text-emerald-600 transition-color duration-75`,
+                    { 'hidden sm:table-cell': shouldHide } // Ẩn các cột không muốn hiển thị trên màn hình nhỏ
                   )}
                 >
                   {row.value}
@@ -81,6 +84,7 @@ export default function Table<T>({ rows, data, isModal }: TableProps<T>) {
               )}
             >
               {rows.map((_row, _index) => {
+                const shouldHide = responsiveColumns && !responsiveColumns.includes(_row.id)
                 const key: string = _row.id
                 let value: any = item[key]
                 if (_row.format === 'join') {
@@ -92,10 +96,12 @@ export default function Table<T>({ rows, data, isModal }: TableProps<T>) {
                 return (
                   <td
                     key={`tbody-tr-td-${key}-${index}-${_index}`}
-                    className={classNames(`font-normal text-left py-4 px-4 text-sm`)}
+                    className={classNames(
+                      `font-normal text-left py-4 px-4 text-sm`,
+                      { 'hidden sm:table-cell': shouldHide } // Ẩn các cột không muốn hiển thị trên màn hình nhỏ
+                    )}
                     onClick={() => handleClick(item)}
                   >
-                    {/* {item[key]} */}
                     {value === item.link ? 'Link' : value}
                   </td>
                 )

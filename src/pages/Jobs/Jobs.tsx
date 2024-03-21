@@ -157,7 +157,7 @@ export default function Jobs() {
 
   return (
     <>
-      <div className={classNames('flex gap-5 mb-12')}>
+      <div className={classNames('flex flex-col lg:flex-row gap-5 mb-12')}>
         {/* Sidebar Search  */}
         <FilterJobs
           dataSearch={dataSearch}
@@ -171,7 +171,7 @@ export default function Jobs() {
 
         {/* List Jobs  */}
 
-        <div className={classNames('w-[70%]')}>
+        <div className={classNames('w-full lg:max-w-full lg:w-2/3')}>
           {isLoading ? (
             <div className='flex justify-center my-4 min-h-[70vh] flex-col items-center'>
               <LoadSpinner className='text-3xl text-emerald-500' />

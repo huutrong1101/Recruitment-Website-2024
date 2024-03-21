@@ -31,12 +31,12 @@ export default function JobCard({ job }: JobCardProps) {
         className={classNames(
           `p-6 bg-white rounded-lg shadow-sm border hover:border-emerald-700`,
           `ease-in-out duration-75 hover:shadow-md`,
-          `flex flex-row md:flex-col`,
+          `flex flex-col md:flex-col`,
           `transition-all ease-in-out duration-75`,
           `cursor-pointer`
         )}
       >
-        <div className={classnames('w-8/12 md:w-full')}>
+        <div className={classnames('w-full')}>
           <h3
             className={classnames(
               'text-black text-md font-bold leading-5 min-h-12 break-normal line-clamp-1 hover:line-clamp-none',
@@ -69,7 +69,7 @@ export default function JobCard({ job }: JobCardProps) {
           </div>
         </div>
 
-        <hr className='hidden my-2 sm:block opacity-30' />
+        <hr className='my-2 opacity-30 sm:block' />
 
         <div className={classnames('flex flex-col md:flex-row items-center justify-center md:gap-4')}>
           <img src={logo_FPT} alt='' className='w-2/12 md:w-3/12' />

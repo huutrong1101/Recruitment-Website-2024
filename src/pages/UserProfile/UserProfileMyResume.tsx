@@ -49,13 +49,15 @@ export default function UserProfileMyResume() {
     getCandidateResume()
       .then((response) => {
         const { result } = response.data
-        setResumeList([...result.content].sort((a: any, b: any) => b.createdAt - a.createdAt))
+        setResumeList([...result.content].sort((a: any, b: any) => b.createdDay - a.createdDay))
       })
       .catch(() => toast.error(`There was an error when fetching resume`))
       .finally(() => {
         setIsLoadingUpload(false)
       })
   }, [])
+
+  console.log(resumeList)
 
   const handleDelete = (resumeId: string) => {
     setResumeDeleteID(resumeId)
@@ -169,7 +171,7 @@ export default function UserProfileMyResume() {
                   <>
                     {resumeList.map((resume: any) => {
                       const truncatedName = limitFileName(resume.name, 25)
-                      const date = moment(resume.createdDate).format('Do MMM, YYYY')
+                      const date = moment(resume.createdDay).format('Do MMM, YYYY')
                       return (
                         <UserResume
                           key={resume.resumeId}

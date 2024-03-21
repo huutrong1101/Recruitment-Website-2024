@@ -95,6 +95,7 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
 
     setPagination({ ...pagination, loading: true })
   }
+
   const handlePreviousPage = () => {
     setSearchParams((prev) => {
       const page = prev.get('page') || '1'
@@ -228,7 +229,12 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
 
       {/* Body */}
       <div>
-        <UserProfileInterviewListViewTable rows={rows} data={interviews} isModal={true} />
+        <UserProfileInterviewListViewTable
+          rows={rows}
+          data={interviews}
+          isModal={true}
+          responsiveColumns={['jobName', 'link']}
+        />
       </div>
 
       {/* Footer */}

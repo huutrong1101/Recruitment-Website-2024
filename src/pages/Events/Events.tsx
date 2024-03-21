@@ -80,9 +80,9 @@ export default function Events() {
   }, [queryConfig, prevQueryConfig])
 
   return (
-    <div className={classNames('flex gap-5 mb-12')}>
+    <div className={classNames('flex flex-col lg:flex-row gap-5 mb-12')}>
       {/* List Blog  */}
-      <div className={classNames('w-[70%]')}>
+      <div className={classNames('w-full lg:w-[70%]')}>
         {isLoading ? (
           <div className='flex justify-center items-center my-4 min-h-[50vh]'>
             <LoadSpinner className='text-3xl text-emerald-700' />
@@ -113,7 +113,11 @@ export default function Events() {
       </div>
 
       {/* Most Popular  */}
-      <div className={classNames('w-[30%] p-6 bg-white rounded-lg shadow-lg h-fit sticky top-1 border')}>
+      <div
+        className={classNames(
+          'w-full lg:max-w-xs lg:w-[30%] p-6 bg-white rounded-lg shadow-lg h-fit sticky top-1 border'
+        )}
+      >
         <h3
           className={classNames(
             'text-black text-base font-semibold leading-7 tracking-wider capitalize flex items-center justify-center'

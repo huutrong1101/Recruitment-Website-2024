@@ -16,18 +16,21 @@ export default function RecruiterJobCard({ job }: any) {
   const currentDateMoment = moment(currentDate, 'Do MMMM, YYYY')
   const targetDateMoment = moment(targetDate, 'Do MMMM, YYYY')
 
-  const temp = { ...job, isActive: false }
   // Compare dates
-  if (currentDateMoment.isBefore(targetDateMoment)) {
-    console.log('Current date is before the target date.')
-  } else if (currentDateMoment.isSame(targetDateMoment)) {
-    console.log('Current date is the same as the target date.')
-  } else {
-    JobService.editJob(temp, job?.jobId)
-  }
-  const handleActive = (data: boolean) => {
+
+  // const handleActive = (data: boolean) => {
+  //   var temp = ''
+  //   if (data === true) {
+  //     temp = 'On Going'
+  //   } else {
+  //     temp = 'Expired'
+  //   }
+  //   return temp
+  // }
+
+  const handleActive = () => {
     var temp = ''
-    if (data === true) {
+    if (currentDateMoment.isBefore(targetDateMoment)) {
       temp = 'On Going'
     } else {
       temp = 'Expired'
@@ -64,7 +67,8 @@ export default function RecruiterJobCard({ job }: any) {
               <span
                 className={`ml-3 text-sm font-semibold ${job?.isActive === true ? 'text-green-700' : 'text-red-600'} `}
               >
-                {handleActive(job?.isActive)}
+                {/* {handleActive(job?.isActive)} */}
+                {handleActive()}
               </span>
             </div>
           </div>

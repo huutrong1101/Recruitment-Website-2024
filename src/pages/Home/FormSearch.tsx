@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useCallback, useState } from 'react'
 import classNames from 'classnames'
 import { Menu, Transition } from '@headlessui/react'
 import { CakeIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
@@ -30,6 +30,16 @@ export default function FormSearch() {
     isUndefined
   )
 
+  const handleSearch = useCallback(
+    (params: QueryConfig) => {
+      navigate({
+        pathname: '/jobs',
+        search: createSearchParams(params).toString()
+      })
+    },
+    [navigate]
+  )
+
   const handleSubmit = async (e: any) => {
     try {
       e.preventDefault()
@@ -44,10 +54,7 @@ export default function FormSearch() {
 
       const filteredSearchParams = omitBy(searchParams, isEmpty)
 
-      navigate({
-        pathname: '/jobs',
-        search: createSearchParams(filteredSearchParams).toString()
-      })
+      handleSearch(filteredSearchParams)
     } catch (error) {
       console.error(error)
     }

@@ -203,6 +203,7 @@ export default function UserProfileSubmittedJob() {
           ]}
           data={applicants}
           isModal={false}
+          responsiveColumns={['jobTitle', 'status']}
         />
       </div>
 

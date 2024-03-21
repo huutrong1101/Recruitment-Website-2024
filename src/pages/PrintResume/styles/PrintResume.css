@@ -1,5 +1,14 @@
 @media print {
-  .print-action-bar {
-    display: none;
+  body * {
+    visibility: hidden;
+  }
+  .print-resume,
+  .print-resume * {
+    visibility: visible;
+  }
+  .print-resume {
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 }
