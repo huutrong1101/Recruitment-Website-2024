@@ -117,7 +117,7 @@ export default function UserProfileSubmittedJob() {
     <div className={`px-4 py-2 bg-zinc-100 mt-2 rounded-xl flex flex-col gap-2 flex-1`}>
       {/* Header */}
       <div className={classnames(`flex flex-col gap-4`)}>
-        <h1 className={classnames(`font-semibold text-2xl pt-2`)}>Submitted Jobs</h1>
+        <h1 className={classnames(`font-semibold text-2xl pt-2`)}>Danh sách ứng tuyển</h1>
 
         {/* Filter groups */}
         <div className={classnames(`flex flex-row items-center gap-4`)}>
@@ -145,7 +145,7 @@ export default function UserProfileSubmittedJob() {
                   <span>
                     <HiListBullet />
                   </span>
-                  <span>{searchParams.get('limit') || 5} applicants</span>
+                  <span>{searchParams.get('limit') || 5} dữ liệu</span>
                 </Listbox.Button>
                 <Transition
                   as={Fragment}
@@ -190,15 +190,15 @@ export default function UserProfileSubmittedJob() {
           rows={[
             {
               id: 'jobTitle',
-              value: 'Job Title'
+              value: 'Tên'
             },
             {
               id: 'date',
-              value: 'Date'
+              value: 'Ngày ứng tuyển'
             },
             {
               id: 'status',
-              value: 'Status'
+              value: 'Trạng thái'
             }
           ]}
           data={applicants}

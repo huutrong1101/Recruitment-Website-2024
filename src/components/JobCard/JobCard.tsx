@@ -29,7 +29,7 @@ export default function JobCard({ job }: JobCardProps) {
     <Link to={`/jobs/${job.jobId}`}>
       <div
         className={classNames(
-          `p-6 bg-white rounded-lg shadow-sm border hover:border-emerald-700`,
+          `p-6 bg-white rounded-lg shadow-sm border hover:border-orange`,
           `ease-in-out duration-75 hover:shadow-md`,
           `flex flex-col md:flex-col`,
           `transition-all ease-in-out duration-75`,

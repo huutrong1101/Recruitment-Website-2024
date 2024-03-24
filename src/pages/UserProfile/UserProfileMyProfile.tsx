@@ -70,7 +70,7 @@ function UserProfileInformation() {
 
   return (
     <div className='p-4 border rounded-xl border-zinc-100'>
-      <h1 className={classNames(`text-2xl font-semibold flex-1 md:mb-4`)}>Information</h1>
+      <h1 className={classNames(`text-2xl font-semibold flex-1 md:mb-4`)}>Thông tin cá nhân</h1>
       {/* Whether is loading */}
       {loading === 'pending' ? (
         <LoadSpinner />
@@ -82,11 +82,6 @@ function UserProfileInformation() {
           {/* Avatar edit block */}
           <div className={classNames(`flex-row w-full md:w-3/12 flex md:flex-col gap-4 px-4 items-center`)}>
             <div className={classNames(`w-3/12 md:w-auto`)}>
-              {/* <img
-              src={Avatar}
-              alt={"Hi"}
-              className={classNames(`rounded-full`)}
-            /> */}
               {user.avatar === undefined || user.avatar === null ? (
                 <DummyAvatar iconClassName='text-6xl flex items-center justify-center' wrapperClassName='h-32 w-32' />
               ) : (
@@ -101,7 +96,7 @@ function UserProfileInformation() {
               {/* <InputIcon icon={<HiUserCircle />} type="file" /> */}
               {/* <PrimaryButton text={`Change`} /> */}
               <PrimaryInputFile
-                text={`Change`}
+                text={`Đổi avatar`}
                 onSelectedFile={handleUploadAvatar}
                 accept='image/png, image/jpeg'
                 isLoading={isUploading}
@@ -183,7 +178,7 @@ function UserProfileInformation() {
 
             {/* Submit button */}
             <div className='flex flex-row-reverse'>
-              <PrimaryButton type='submit' text={`Save`} size={'sm'} className={`md:!w-3/12`} />
+              <PrimaryButton type='submit' text={`Lưu`} size={'sm'} className={`md:!w-3/12`} />
             </div>
           </form>
         </div>
@@ -212,7 +207,7 @@ function UserProfilePassword() {
 
   return (
     <div className='p-4 border rounded-xl border-zinc-100'>
-      <h1 className={classNames(`text-2xl font-semibold flex-1 md:mb-4`)}>Password</h1>
+      <h1 className={classNames(`text-2xl font-semibold flex-1 md:mb-4`)}>Mật khẩu</h1>
       <div className={classNames(`flex flex-col md:flex-row gap-6`)}>
         {/* Avatar edit block */}
         <div className={classNames(`w-full md:w-3/12 flex flex-col gap-4 px-4`)}></div>
@@ -222,7 +217,7 @@ function UserProfilePassword() {
           <input type='hidden' name='email' value={user?.email} />
           <InputIcon
             icon={<HiKey />}
-            placeholder={`Current password`}
+            placeholder={`Mật khẩu hiện tại`}
             type='password'
             register={register}
             label={`currentPassword`}
@@ -230,7 +225,7 @@ function UserProfilePassword() {
           />
           <InputIcon
             icon={<HiKey />}
-            placeholder={`New password`}
+            placeholder={`Mật khẩu mới`}
             type={`password`}
             register={register}
             label={`newPassword`}
@@ -238,7 +233,7 @@ function UserProfilePassword() {
           />
           <InputIcon
             icon={<HiKey />}
-            placeholder={`Confirm new password`}
+            placeholder={`Nhập lại mật khẩu mới`}
             type={`password`}
             register={register}
             label={`confirmNewPassword`}
@@ -247,7 +242,7 @@ function UserProfilePassword() {
 
           {/* Submit button */}
           <div className='flex flex-row-reverse'>
-            <PrimaryButton text={`Change password`} size={'sm'} className={`md:!w-5/12`} />
+            <PrimaryButton text={`Đổi mật khẩu`} size={'sm'} className={`md:!w-5/12`} />
           </div>
         </form>
       </div>

@@ -12,6 +12,7 @@ import axiosInstance from '../../utils/AxiosInstance'
 import { EventInterface, EventListConfig } from '../../types/event.type'
 import EventCard from '../../components/EventCard/EventCard'
 import { AiOutlineBlock } from 'react-icons/ai'
+import Container from '../../components/Container/Container'
 
 export type QueryConfig = {
   [key in keyof EventListConfig]: string
@@ -80,73 +81,79 @@ export default function Events() {
   }, [queryConfig, prevQueryConfig])
 
   return (
-    <div className={classNames('flex flex-col lg:flex-row gap-5 mb-12')}>
-      {/* List Blog  */}
-      <div className={classNames('w-full lg:w-[70%]')}>
-        {isLoading ? (
-          <div className='flex justify-center items-center my-4 min-h-[50vh]'>
-            <LoadSpinner className='text-3xl text-emerald-700' />
-          </div>
-        ) : (
-          <>
-            <div className='flex flex-wrap -mx-4'>
-              {/* <!-- Card --> */}
-              {showEvents.length > 0 ? (
-                showEvents.map((event) => (
-                  <div key={event.eventId} className='w-full px-4 mb-8 md:w-1/2'>
-                    <EventCard event={event} />
-                  </div>
-                ))
-              ) : (
-                <div className='flex flex-col justify-center w-full mb-10 min-h-[70vh] items-center text-3xl gap-4'>
-                  <span>
-                    <AiOutlineBlock />
-                  </span>
-                  <span>There is no event available.</span>
-                </div>
-              )}
+    <Container>
+      <div className={classNames('flex flex-col lg:flex-row gap-5 mb-12')}>
+        {/* List Blog  */}
+        <div className={classNames('w-full lg:w-[70%]')}>
+          {isLoading ? (
+            <div className='flex justify-center items-center my-4 min-h-[50vh]'>
+              <LoadSpinner className='text-3xl text-emerald-700' />
             </div>
-            {/* Pagination  */}
-            <Pagination queryConfig={queryConfig} pageSize={pageSize} url='/events' />
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <div className='flex flex-wrap -mx-4'>
+                {/* <!-- Card --> */}
+                {showEvents.length > 0 ? (
+                  showEvents.map((event) => (
+                    <div key={event.eventId} className='w-full px-4 mb-8 md:w-1/2'>
+                      <EventCard event={event} />
+                    </div>
+                  ))
+                ) : (
+                  <div className='flex flex-col justify-center w-full mb-10 min-h-[70vh] items-center text-3xl gap-4'>
+                    <span>
+                      <AiOutlineBlock />
+                    </span>
+                    <span>There is no event available.</span>
+                  </div>
+                )}
+              </div>
+              {/* Pagination  */}
+              <Pagination queryConfig={queryConfig} pageSize={pageSize} url='/events' />
+            </>
+          )}
+        </div>
 
-      {/* Most Popular  */}
-      <div
-        className={classNames(
-          'w-full lg:max-w-xs lg:w-[30%] p-6 bg-white rounded-lg shadow-lg h-fit sticky top-1 border'
-        )}
-      >
-        <h3
+        {/* Most Popular  */}
+        <div
           className={classNames(
-            'text-black text-base font-semibold leading-7 tracking-wider capitalize flex items-center justify-center'
+            'w-full lg:max-w-xs lg:w-[30%] p-6 bg-white rounded-lg shadow-lg h-fit sticky top-1 border'
           )}
         >
-          Most popular
-        </h3>
-        <div className={classNames('flex flex-col gap-4 mt-2 pt-2 border-t-2')}>
-          {events.slice(0, 3).map((event) => {
-            return (
-              <Link
-                to={`/events/${event.eventId}`}
-                className={classNames(
-                  'flex flex-col w-full bg-gray-50 rounded-lg overflow-hidden cursor-pointer',
-                  `border hover:border-emerald-700`
-                )}
-              >
-                <div className={classNames('')}>
-                  <img src={event.image.url || blog_image} alt='' className={classNames('object-cover aspect-video')} />
-                </div>
-                <div className={classNames('px-4 py-2')}>
-                  <h3 className='text-xs font-medium text-black capitalize line-clamp-3'>{event.name}</h3>
-                  {/* <p className="text-gray-500"></p> */}
-                </div>
-              </Link>
-            )
-          })}
+          <h3
+            className={classNames(
+              'text-black text-base font-semibold leading-7 tracking-wider capitalize flex items-center justify-center'
+            )}
+          >
+            Most popular
+          </h3>
+          <div className={classNames('flex flex-col gap-4 mt-2 pt-2 border-t-2')}>
+            {events.slice(0, 3).map((event) => {
+              return (
+                <Link
+                  to={`/events/${event.eventId}`}
+                  className={classNames(
+                    'flex flex-col w-full bg-gray-50 rounded-lg overflow-hidden cursor-pointer',
+                    `border hover:border-emerald-700`
+                  )}
+                >
+                  <div className={classNames('')}>
+                    <img
+                      src={event.image.url || blog_image}
+                      alt=''
+                      className={classNames('object-cover aspect-video')}
+                    />
+                  </div>
+                  <div className={classNames('px-4 py-2')}>
+                    <h3 className='text-xs font-medium text-black capitalize line-clamp-3'>{event.name}</h3>
+                    {/* <p className="text-gray-500"></p> */}
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </div>
-    </div>
+    </Container>
   )
 }

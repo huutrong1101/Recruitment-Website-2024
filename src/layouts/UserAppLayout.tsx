@@ -9,9 +9,7 @@ export default function UserAppLayout() {
       <Navbar />
 
       <div className='flex-grow'>
-        <Container>
-          <Outlet />
-        </Container>
+        <Outlet />
       </div>
 
       <Footer />

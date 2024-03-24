@@ -14,15 +14,15 @@ function ResumeDeleteModal({ visible, onAccept, onCancel }: any) {
     <Modal
       isOpen={visible}
       onClose={onCancel}
-      title=' Do you want to delete this resume ?'
-      cancelTitle='No'
-      successClass='text-red-900 bg-red-100 hover:bg-red-200 focus-visible:ring-red-500'
-      successTitle='Yes'
+      title='Bạn có muốn xóa hồ sơ này ?'
+      cancelTitle='Không'
+      successClass='text-green-900 bg-green-100 hover:bg-green-200 focus-visible:ring-green-500'
+      successTitle='Có'
       handleSucces={onAccept}
       titleClass=''
       size=''
     >
-      <p className='text-sm text-gray-500'>If you agree, the resume will be removed from your resume list</p>
+      <p className='text-sm text-gray-500'>Nếu bạn đồng ý, hồ sơ này sẽ được xóa khỏi danh sách. </p>
     </Modal>
   )
 }
@@ -67,9 +67,9 @@ export default function UserProfileMyResume() {
   const handleDeleteSuccess = () => {
     toast
       .promise(UserService.deleteResume(resumeDeleteID), {
-        pending: `Deleting your resume`,
-        success: `Your resume was deleted`,
-        error: `Failed to delete your resume`
+        pending: `Hồ sơ đang được xóa`,
+        success: `Hồ sơ được xóa thành công`,
+        error: `Có lỗi trong quá trình xóa hồ sơ`
       })
       .then(() => {
         // Clean up
@@ -135,7 +135,7 @@ export default function UserProfileMyResume() {
       {/* Resume */}
       <div className='p-4 border rounded-xl border-zinc-100'>
         <div className='flex items-center justify-between mb-5 border-b-zinc-500'>
-          <h1 className={classNames(`text-2xl font-semibold flex-1 md:mb-4`)}>My Resume</h1>
+          <h1 className={classNames(`text-2xl font-semibold flex-1 md:mb-4`)}>Danh sách hồ sơ</h1>
           <div className='flex flex-row-reverse gap-2'>
             <label
               htmlFor='file-input'
@@ -191,7 +191,7 @@ export default function UserProfileMyResume() {
                     })}
                   </>
                 ) : (
-                  <div className='flex items-center justify-center w-full'>You don't have a resume</div>
+                  <div className='flex items-center justify-center w-full'>Bạn chưa có hồ sơ nào</div>
                 )}
               </>
             )}

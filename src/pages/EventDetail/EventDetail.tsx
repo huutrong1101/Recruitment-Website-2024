@@ -10,6 +10,7 @@ import EventCard from '../../components/EventCard/EventCard'
 import { EventInterface } from '../../types/event.type'
 import { useAppSelector } from '../../hooks/hooks'
 import axiosInstance from '../../utils/AxiosInstance'
+import Container from '../../components/Container/Container'
 
 export default function EventDetail() {
   const { eventId } = useParams()
@@ -37,7 +38,7 @@ export default function EventDetail() {
   return (
     <div className={classnames(`event-detail`)}>
       {event && (
-        <>
+        <Container>
           <div className={classnames('flex flex-col lg:flex-row gap-5')}>
             <div className={classnames('bg-white rounded-lg shadow-lg border w-full lg:w-[70%]')}>
               <div>
@@ -96,7 +97,7 @@ export default function EventDetail() {
                     'text-center text-black text-lg font-medium tracking-wider leading-7 capitalize'
                   )}
                 >
-                  Author
+                  Tác giả
                 </h3>
               </div>
               <div className={classnames('flex flex-col gap-1 items-center justify-center my-4')}>
@@ -148,18 +149,13 @@ export default function EventDetail() {
               </div>
             </div>
           </div>
+
           <div className='mt-[80px]'>
             <div className={classnames('text-center')}>
-              <h3 className={classnames('text-black text-2xl font-medium leading-7 tracking-wider capitalize')}>
-                Related Blogs
-              </h3>
-              <p className={classnames('text-gray-400 text-center text-lg font-medium capitalize')}>
-                Search all the open positions on the web. Get your own personalized salary estimate. Read reviews on
-                over 30000+ companies worldwide.
-              </p>
+              <h1 className={classnames(`text-3xl font-semibold capitalize`)}>Tin tức liên quan</h1>
             </div>
 
-            <div className='flex flex-wrap -mx-4 mt-[50px]'>
+            <div className='flex flex-wrap mt-3 -mx-4'>
               {/* <!-- Card --> */}
               {events &&
                 events.slice(0, 3).map((event) => (
@@ -169,7 +165,7 @@ export default function EventDetail() {
                 ))}
             </div>
           </div>
-        </>
+        </Container>
       )}
     </div>
   )

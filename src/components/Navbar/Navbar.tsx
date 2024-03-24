@@ -43,11 +43,11 @@ export default function Navbar() {
 
       <Container>
         {/* Desktop */}
-        <div className={classNames(`navbar-container hidden`, `py-6`, `sm:flex flex-row items-center`)}>
+        <div className={classNames(`navbar-container hidden`, `py-4`, `sm:flex flex-row items-center`)}>
           {/* Icons */}
           <div className={classNames(`flex flex-row items-center gap-12 flex-1`)}>
             <Link to='/' className={classNames(`font-bold text-3xl`, `text-zinc-900`)}>
-              JobPort
+              <img src='https://fptjobs.com/public/img/1531190552-Logo-Career-Black.png' alt='' />
             </Link>
             <ul className='hidden md:block'>
               <li className={classNames(`flex flex-row gap-12`, `font-semibold`)}>
@@ -80,23 +80,18 @@ export default function Navbar() {
                   to={`/auth/login?${compiledQuerySearch}`}
                   className={classNames(
                     `px-3 py-2`,
-                    `bg-emerald-600 text-white hover:bg-emerald-700`,
+                    `bg-orange text-white hover:bg-orange-hover`,
                     `font-semibold`,
                     `rounded-xl`
                   )}
                 >
-                  Login
+                  Đăng nhập
                 </Link>
                 <Link
                   to='/auth/signup'
-                  className={classNames(
-                    `px-3 py-2`,
-                    `border-emerald-600 border text-emerald-600`,
-                    `font-semibold`,
-                    `rounded-xl`
-                  )}
+                  className={classNames(`px-3 py-2`, `border-orange border text-orange`, `font-semibold`, `rounded-xl`)}
                 >
-                  Sign Up
+                  Đăng ký
                 </Link>
               </div>
             ) : (
@@ -109,23 +104,18 @@ export default function Navbar() {
                 to='/auth/login'
                 className={classNames(
                   `px-3 py-2`,
-                  `bg-emerald-600 text-white hover:bg-emerald-700`,
+                  `bg-[#f27024] text-white hover:bg-orange-hover`,
                   `font-semibold`,
                   `rounded-xl`
                 )}
               >
-                Login
+                Đăng nhập
               </Link>
               <Link
                 to='/auth/signup'
-                className={classNames(
-                  `px-3 py-2`,
-                  `border-emerald-600 border text-emerald-600`,
-                  `font-semibold`,
-                  `rounded-xl`
-                )}
+                className={classNames(`px-3 py-2`, `border-orange border text-orange`, `font-semibold`, `rounded-xl`)}
               >
-                Sign Up
+                Đăng ký
               </Link>
             </div>
           )}

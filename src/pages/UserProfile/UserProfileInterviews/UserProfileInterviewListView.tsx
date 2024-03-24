@@ -145,7 +145,7 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
     <div className={`px-4 py-2 bg-zinc-100 mt-2 rounded-xl flex flex-col gap-2`}>
       {/* Header */}
       <div className={classnames(`flex flex-col gap-4`)}>
-        <h1 className={classnames(`font-semibold text-2xl pt-2`)}>Interview Recent</h1>
+        <h1 className={classnames(`font-semibold text-2xl pt-2`)}>Danh sách phỏng vấn</h1>
 
         {/* Filter groups */}
         <div className={classnames(`flex flex-row items-center gap-4`)}>
@@ -163,7 +163,7 @@ export default function UserProfileInterviewListView<T>({ rows, data }: TablePro
                   <span>
                     <HiListBullet />
                   </span>
-                  <span>{searchParams.get('limit') || 5} applicants</span>
+                  <span>{searchParams.get('limit') || 5} dữ liệu</span>
                 </Listbox.Button>
                 <Transition
                   as={Fragment}

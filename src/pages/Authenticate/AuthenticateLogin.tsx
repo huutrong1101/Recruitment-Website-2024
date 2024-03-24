@@ -24,7 +24,7 @@ export default function AuthenticateLogin() {
       await dispatch(authLogin(data))
         .unwrap()
         .then(() => {
-          toast.success(`Successfully signed in.`)
+          toast.success(`Đăng nhập thành công`)
         })
 
       const token = getLocalToken()
@@ -61,30 +61,24 @@ export default function AuthenticateLogin() {
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className='flex flex-col items-center w-full gap-4 mx-6'>
-        <h1 className='text-xl font-semibold'>Login</h1>
+        <h1 className='text-xl font-semibold capitalize'>Đăng nhập</h1>
 
         <InputIcon
           icon={<EnvelopeIcon />}
           type='text'
-          placeholder='email address or phone number'
+          placeholder='Địa chỉ email hoặc SĐT'
           register={register}
           label={`credentialId`}
         />
 
         <InputIcon
           icon={<LockClosedIcon />}
-          placeholder='password'
+          placeholder='Mật khẩu'
           type='password'
           register={register}
           label={`password`}
           autoComplete='current-password'
         />
-
-        {/* Remember Me */}
-        {/* <div className="flex flex-row w-full gap-4 px-1 text-zinc-600">
-          <input type="checkbox" id="remember" />
-          <label htmlFor="remember">Remember me</label>
-        </div> */}
 
         {/* Forgot password */}
         <button className='inline-flex flex-col items-center justify-center h-10 text-sm bg-white bg-opacity-0 rounded-lg Button w-44'>
@@ -94,14 +88,14 @@ export default function AuthenticateLogin() {
                 to='/forget-password'
                 className='font-semibold leading-7 tracking-wide capitalize Button text-emerald-800'
               >
-                Forget Password?
+                Quên mật khẩu ?
               </Link>
             </div>
           </div>
         </button>
 
         <PrimaryButton
-          text='Sign in'
+          text='Đăng nhập'
           isLoading={signInLoadingState === 'pending'}
           disabled={signInLoadingState === 'pending'}
         />

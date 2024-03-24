@@ -56,8 +56,6 @@ const InterviewRecent = () => {
     dispatch(fetchINTInterviewsData(query))
   }, [query])
 
-  console.log(INTInterviews)
-
   // if (INTInterviewsStatus === STATUS.IDLE || INTInterviewsStatus === STATUS.LOADING) {
   return (
     <div className='InterviewRecent'>

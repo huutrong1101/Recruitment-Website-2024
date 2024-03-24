@@ -12,6 +12,7 @@ import useQueryParams from '../../hooks/useQueryParams'
 import axiosInstance from '../../utils/AxiosInstance'
 import { JobInterface, JobListConfig } from '../../types/job.type'
 import FilterJobs from './FilterJobs'
+import Container from '../../components/Container/Container'
 
 export type QueryConfig = {
   [key in keyof JobListConfig]: string
@@ -156,7 +157,7 @@ export default function Jobs() {
   }
 
   return (
-    <>
+    <Container>
       <div className={classNames('flex flex-col lg:flex-row gap-5 mb-12')}>
         {/* Sidebar Search  */}
         <FilterJobs
@@ -189,10 +190,15 @@ export default function Jobs() {
                 </>
               ) : (
                 <div className='flex flex-col justify-center w-full mb-10 min-h-[70vh] items-center text-3xl gap-4'>
-                  <span>
+                  {/* <span>
                     <AiOutlineBlock />
-                  </span>
-                  <span>There is no job available.</span>
+                  </span> */}
+                  <img
+                    src='https://cdni.iconscout.com/illustration/premium/thumb/error-404-4344461-3613889.png'
+                    alt=''
+                    className='h-[300px]'
+                  />
+                  <span>Không tìm thấy công việc phù hợp.</span>
                 </div>
               )}
             </div>
@@ -201,6 +207,6 @@ export default function Jobs() {
           <Pagination queryConfig={queryConfig} pageSize={pageSize} url='/jobs' />
         </div>
       </div>
-    </>
+    </Container>
   )
 }

@@ -38,7 +38,7 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
   const handleApply = () => {
     // Prevent user from submit when the resume list is loading
     if (resumeListLoadingState) {
-      return toast.warn(`The resume list is loading, please wait`)
+      return toast.warn(`Hồ sơ đang được tải lên`)
     }
     setSubmitLoadingState('pending')
     const { resumeId } = resumeList[resumeSelectedIndex]
@@ -49,10 +49,10 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
       .then(() => {
         onApplySucceeded()
         setSubmitLoadingState('fulfill')
-        toast.success(`You applicant is submit and will be reviewed.`)
+        toast.success(`Hồ sơ của bạn đã được nộp và chờ được xem xét`)
       })
       .catch(() => {
-        toast.error(`Cannot apply to the job`)
+        toast.error(`Không thể ứng tuyển công việc này`)
         setSubmitLoadingState('failed')
       })
       .finally()
@@ -75,7 +75,7 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
       // handleSucces={handleApply}
       buttons={[
         <button onClick={onClose} className={`bg-red-200 px-4 py-2 rounded-xl text-red-900`}>
-          Cancel
+          Hủy
         </button>,
         <button
           onClick={handleApply}
@@ -89,7 +89,7 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
           disabled={submitLoadingState === 'pending' || resumeListLoadingState || resumeList.length === 0}
         >
           {submitLoadingState === 'pending' && <LoadSpinner />}
-          Submit
+          Nộp
         </button>
       ]}
     >
@@ -115,7 +115,7 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
           </div>
           <div className='mt-6'>
             <Link to={`/profile`} className={classNames(`text-blue-600 hover:text-blue-500`)}>
-              Edit my profile
+              Chỉnh sửa thông tin
             </Link>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
         <div className={``}>
           {/* Header */}
           <div className={`flex flex-row items-center`}>
-            <h1 className={classNames(`font-light text-gray-500 flex-1`)}>Select your resume</h1>
+            <h1 className={classNames(`font-light text-gray-500 flex-1`)}>Chọn hồ sơ</h1>
             <Link
               className={classNames(
                 `text-sm hover:underline text-blue-600`,
@@ -132,7 +132,7 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
               )}
               to={`/profile/resume`}
             >
-              Manage resume
+              Quản lí hồ sơ
             </Link>
           </div>
 
@@ -152,7 +152,7 @@ export default function JobInformationApplyModal({ visible, onClose, onApplySucc
                       )}
                     >
                       <GrDocumentPdf className={classNames(`text-3xl`)} />
-                      <span>You have not uploaded any resume.</span>
+                      <span>Bạn chưa có hồ sơ nào để ứng tuyển</span>
                     </div>
                   ) : (
                     resumeList.map((resumeItem, _index) => (

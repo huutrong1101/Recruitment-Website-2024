@@ -30,8 +30,8 @@ export default function ForgetPassword() {
   const handleSend = (data: any) => {
     toast
       .promise(AuthService.forgetPassword(data), {
-        pending: `Sending mail to your email`,
-        success: `Check your email to reset your password`
+        pending: `Mail xác nhận đang được gửi`,
+        success: `Kiểm tra email để đổi mật khẩu mới`
       })
       .catch((error) => toast.error(error.response.data.message))
   }
@@ -51,9 +51,7 @@ export default function ForgetPassword() {
               enterFrom='transform-gpu opacity-0  scale-50 rotate-180'
               enterTo='transform-gpu opacity-100 scale-100 rotate-0'
             >
-              <h1 className={classNames(`text-white text-3xl font-semibold leading-10 my-4`)}>
-                Forget your password ?
-              </h1>
+              <h1 className={classNames(`text-white text-3xl font-semibold leading-10 my-4`)}>Quên mật khẩu</h1>
             </Transition.Child>
           </Transition>
         </div>
@@ -69,7 +67,7 @@ export default function ForgetPassword() {
           <InputIcon
             icon={<HiEnvelope />}
             type={`text`}
-            placeholder={`Your email address`}
+            placeholder={`Nhập địa chỉ email của tài khoản`}
             register={register}
             label={`email`}
             required
@@ -85,7 +83,7 @@ export default function ForgetPassword() {
           enterTo='opacity-100'
         >
           <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-            <PrimaryButton text='Send' type='submit' />
+            <PrimaryButton text='Gửi' type='submit' />
           </div>
         </Transition>
       </Transition>

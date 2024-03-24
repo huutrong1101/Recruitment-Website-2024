@@ -12,7 +12,6 @@ export default function JobInformationCard({ cardData, jobId }: any) {
   const { isLoggedIn, user } = useAppSelector((app) => app.Auth)
   const { isApplied } = useAppSelector((state) => state.JobDetail.response)
 
-  console.log(isApplied)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -43,7 +42,7 @@ export default function JobInformationCard({ cardData, jobId }: any) {
         `flex flex-col gap-4`
       )}
     >
-      <h1 className={classNames(`font-semibold text-xl`)}>Job Information</h1>
+      <h1 className={classNames(`font-semibold text-xl`)}>Thông tin bổ sung</h1>
       <div className={classNames(`flex flex-col gap-3`)}>
         {cardData &&
           cardData.map((item: any) => {
@@ -52,17 +51,17 @@ export default function JobInformationCard({ cardData, jobId }: any) {
       </div>
       <div>
         {!isLoggedIn ? (
-          <PrimaryButton text={`Sign in to apply`} onClick={handleNavigateToSignIn} />
+          <PrimaryButton text={`Đăng nhập để ứng tuyển`} onClick={handleNavigateToSignIn} />
         ) : user && user.role === 'CANDIDATE' ? (
           <>
             {!isApplied ? (
-              <PrimaryButton text={`Apply`} onClick={toggleVisibleApplyModal} />
+              <PrimaryButton text={`Nộp hồ sơ`} onClick={toggleVisibleApplyModal} />
             ) : (
               <button
-                className={classNames(`px-4 bg-emerald-700 py-2 text-emerald-100 rounded-xl w-full`)}
+                className={classNames(`px-4 bg-orange py-2 text-emerald-100 rounded-xl w-full`)}
                 onClick={handleNavigateToApplicants}
               >
-                See your applicant
+                Bạn đã ứng tuyển
               </button>
             )}
             <JobInformationApplyModal
@@ -91,7 +90,7 @@ function JobInformationCardItem({ icon, name, value }: JobInformationCardItemPro
       <div className={classNames(`w-1/12 mx-2`)}>{icon}</div>
       <div className={classNames(`flex flex-col flex-1`)}>
         <span>{name}</span>
-        <span className={classNames(`text-teal-700`)}>{value}</span>
+        <span className={classNames(`text-orange`)}>{value}</span>
       </div>
     </div>
   )

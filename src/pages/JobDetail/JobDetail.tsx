@@ -23,6 +23,7 @@ import JobInformationCard from './JobInformationCard'
 import { JobInterface } from '../../types/job.type'
 import { checkApplyJob, fetchJobDetail } from '../../redux/reducer/JobDetailSlice'
 import axiosInstance from '../../utils/AxiosInstance'
+import Container from '../../components/Container/Container'
 
 export default function JobDetail() {
   const { jobId } = useParams()
@@ -35,11 +36,11 @@ export default function JobDetail() {
   const { user } = useAppSelector((state) => state.Auth)
 
   const [jobInformation, setJobInformation] = useState([
-    { icon: <UserIcon />, name: 'Employee Type', value: '' },
-    { icon: <MapPinIcon />, name: 'Location', value: '' },
+    { icon: <UserIcon />, name: 'Loại hình công việc', value: '' },
+    { icon: <MapPinIcon />, name: 'Địa điểm', value: '' },
     {
       icon: <ComputerDesktopIcon />,
-      name: 'Position Type',
+      name: 'Vị trí',
       value: 'Back-end Developer'
     },
     { icon: <BriefcaseIcon />, name: 'Experience', value: '2+ years' },
@@ -85,28 +86,28 @@ export default function JobDetail() {
       setJobInformation([
         {
           icon: <UserIcon />,
-          name: 'Employee Type',
+          name: 'Loại hình công việc',
           value: JOB_POSITION[job.jobType]
         },
         {
           icon: <MapPinIcon />,
-          name: 'Location',
+          name: 'Địa điểm',
           value: JOB_POSITION[job.location]
         },
         {
           icon: <ComputerDesktopIcon />,
-          name: 'Position',
+          name: 'Vị trí',
           value: JOB_POSITION[job.position]
         },
         {
           icon: <CurrencyDollarIcon />,
-          name: 'Salary',
+          name: 'Mức lương',
           value: job.salaryRange
         },
         {
           icon: <ClockIcon />,
-          name: 'End At',
-          value: moment(job.deadline).format('Do MMM, YYYY')
+          name: 'Hạn nộp hồ sợ',
+          value: moment(job.deadline).format('DD-MM-YYYY').toString()
         }
       ])
     }
@@ -130,7 +131,7 @@ export default function JobDetail() {
   const suggestedJobs = shuffledJobs.slice(0, 3)
 
   return (
-    <>
+    <Container>
       <div className={classNames(`job-detail`)}>
         {status.jobStatus === 'fulfill' ? (
           job ? (
@@ -144,7 +145,7 @@ export default function JobDetail() {
                     companyName='FPT Software'
                     jobRole={job.name}
                     quantity={job.quantity}
-                    publishDate={moment(job.createdAt).format('Do MMM, YYYY').toString()}
+                    publishDate={moment(job.createdAt).format('DD-MM-YYYY').toString()}
                     logo={{ src: Logo, alt: 'image' }}
                   />
                   {/* Details */}
@@ -156,19 +157,19 @@ export default function JobDetail() {
                     )}
                   >
                     <div>
-                      <h1 className='text-2xl font-semibold'>Job description</h1>
+                      <h1 className='text-2xl font-semibold capitalize'>Chi tiết công việc</h1>
                       <p className='mt-2 whitespace-pre-line'>{job?.description}</p>
                     </div>
                     <div>
-                      <h1 className='text-2xl font-semibold '>Requirement</h1>
+                      <h1 className='text-2xl font-semibold capitalize'>Yêu cầu công việc</h1>
                       <p className='mt-2 whitespace-pre-line'>{job?.requirement}</p>
                     </div>
                     <div>
-                      <h1 className='text-2xl font-semibold '>Benefit</h1>
+                      <h1 className='text-2xl font-semibold capitalize'>Quyền lợi</h1>
                       <p className='mt-2 whitespace-pre-line'>{job?.benefit}</p>
                     </div>
                     <div>
-                      <h1 className='text-2xl font-semibold'>Skills Require</h1>
+                      <h1 className='text-2xl font-semibold capitalize'>Kĩ năng yêu cầu</h1>
                       <div className='flex flex-wrap px-2 py-4'>
                         {job?.skills.map((item, index) => (
                           <div key={index}>
@@ -192,11 +193,8 @@ export default function JobDetail() {
               </div>
               {/* Footer */}
               <div className={classNames(`flex flex-col gap-2 items-center justify-center my-12`)}>
-                <h1 className={classNames(`text-3xl font-semibold`)}>Related Vacancies</h1>
-                <h2 className={classNames(`text-lg text-zinc-500`)}>
-                  Search all the open positions on the web. Get your own personalized salary estimate. Read reviews on
-                  over 30000+ companies worldwide.
-                </h2>
+                <h1 className={classNames(`text-3xl font-semibold capitalize`)}>Công việc liên quan</h1>
+
                 <div className={classNames(`flex flex-col md:flex-row gap-6`)}>
                   {/* TODO: add job fetch data */}
                   {suggestedJobs.map((data) => {
@@ -214,6 +212,6 @@ export default function JobDetail() {
           </div>
         )}
       </div>
-    </>
+    </Container>
   )
 }

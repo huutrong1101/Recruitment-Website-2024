@@ -152,11 +152,11 @@ export default function AuthenticateSignUp() {
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className='flex flex-col items-center w-full gap-4 mx-6'>
-        <h1 className='text-xl font-semibold'>Sign up</h1>
+        <h1 className='text-xl font-semibold'>Đăng Ký</h1>
 
         <InputIcon
           icon={<UserIcon />}
-          placeholder='full name'
+          placeholder='Tên'
           register={register}
           label='fullName'
           required
@@ -167,7 +167,7 @@ export default function AuthenticateSignUp() {
 
         <InputIcon
           icon={<EnvelopeIcon />}
-          placeholder='email address'
+          placeholder='Email'
           register={register}
           label='email'
           type='email'
@@ -180,7 +180,7 @@ export default function AuthenticateSignUp() {
 
         <InputIcon
           icon={<LockClosedIcon />}
-          placeholder='password'
+          placeholder='Mật khẩu'
           type={`password`}
           register={register}
           label='password'
@@ -193,7 +193,7 @@ export default function AuthenticateSignUp() {
 
         <InputIcon
           icon={<LockClosedIcon />}
-          placeholder='confirmPassword'
+          placeholder='Nhập lại mật khẩu'
           type={`password`}
           register={register}
           label='confirmPassword'
@@ -209,7 +209,7 @@ export default function AuthenticateSignUp() {
           register={register}
           label='phone'
           required
-          placeholder='phone number'
+          placeholder='Số điện thoại'
           type='tel'
           maxLength={12}
           pattern='([0-9]{8,12})'
@@ -222,16 +222,16 @@ export default function AuthenticateSignUp() {
         <div className='flex flex-row w-full gap-4 text-zinc-600'>
           <label>
             <input type='checkbox' {...register('agreeTerms')} required className='mr-3' />
-            I'm agree with the{' '}
-            <b className={`cursor-pointer hover:underline`} onClick={handleOpenTermOfServceDialog}>
-              Term and conditions
+            Tôi đồng ý với
+            <b className={`cursor-pointer hover:underline ml-1`} onClick={handleOpenTermOfServceDialog}>
+              điều khoản trên
             </b>
           </label>
         </div>
 
         <PrimaryButton
           type={'submit'}
-          text='Sign up'
+          text='Đăng Ký'
           disabled={registerLoadingState === 'pending'}
           isLoading={registerLoadingState === 'pending'}
           // className={classnames({

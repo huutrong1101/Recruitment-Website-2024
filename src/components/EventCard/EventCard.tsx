@@ -34,7 +34,7 @@ export default function EventCard({ event }: EventCardProps) {
 
   return (
     <Link to={`/events/${event.eventId}`}>
-      <div className='bg-white border rounded-lg shadow-lg hover:border-emerald-700'>
+      <div className='bg-white border rounded-lg shadow-lg hover:border-orange'>
         <div className={classNames('w-full shadow')}>
           <img
             src={event.image.url || blog_image}

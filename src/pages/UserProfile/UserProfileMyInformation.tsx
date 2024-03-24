@@ -47,6 +47,7 @@ export default function UserProfileMyInformation() {
     UserService.getUserInformation()
       .then(async (response) => {
         const fetchContainerItem = await response.data.result
+
         const skillsFormat = convertSkillsFormat(fetchContainerItem.skills)
         const dataFormatSkills = { ...fetchContainerItem, skills: skillsFormat }
 
@@ -54,6 +55,7 @@ export default function UserProfileMyInformation() {
           // setContainerItem({ ...JSON.parse(fetchContainerItem) })
           setContainerItem(dataFormatSkills)
         }
+        console.log(dataFormatSkills)
       })
       .then(() => setLoadingState('fulfill'))
       .catch(() => setLoadingState('failed'))
@@ -92,9 +94,9 @@ export default function UserProfileMyInformation() {
     e !== null && e.preventDefault()
 
     toast.promise(UserService.updateUserInformation(updatedItem), {
-      pending: `Updating your information`,
-      success: `Successfully update the information`,
-      error: `There was an error when updated the information`
+      pending: `Thông tin đang được cập nhật`,
+      success: `Cập nhật thông tin thành công`,
+      error: `Có lỗi xảy ra khi cập nhật thông tin`
     })
   }
 
@@ -126,7 +128,7 @@ export default function UserProfileMyInformation() {
           ) : (
             <div className='grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-6'>
               <FieldContainer
-                label='Education'
+                label='Quá trình học tập'
                 // values={educationItems}
                 // onChange={setEducation}
                 initialValues={containerItem.education}
@@ -136,7 +138,7 @@ export default function UserProfileMyInformation() {
               />
 
               <FieldContainer
-                label='Experience'
+                label='Kinh nghiệm làm việc'
                 initialValues={containerItem.experience}
                 fieldListSchema={ExperienceSchema}
                 primaryLabel={`companyName`}
@@ -144,7 +146,7 @@ export default function UserProfileMyInformation() {
               />
 
               <FieldContainer
-                label='Certificate'
+                label='Chứng chỉ'
                 initialValues={containerItem.certificate}
                 fieldListSchema={CertificateSchema}
                 primaryLabel={`name`}
@@ -152,7 +154,7 @@ export default function UserProfileMyInformation() {
               />
 
               <FieldContainer
-                label='Project'
+                label='Dự án'
                 initialValues={containerItem.project}
                 fieldListSchema={ProjectSchema}
                 primaryLabel={`name`}
@@ -162,9 +164,9 @@ export default function UserProfileMyInformation() {
               <div className='pb-8 mb-3 border-b col-span-full border-gray-900/10'>
                 <label
                   htmlFor='street-address'
-                  className='text-xl font-bold leading-7 text-center text-green-600 font-Outfit'
+                  className='text-xl font-bold leading-7 text-center text-orange font-Outfit'
                 >
-                  Skill
+                  Kĩ năng
                 </label>
                 <div className='flex flex-wrap items-center justify-start mt-3 '>
                   <Select
@@ -186,9 +188,6 @@ export default function UserProfileMyInformation() {
                     }}
                   />
                 </div>
-                {/* <small className={classNames(`mx-4 text-gray-400`)}>
-                  Please save your skill after changes.
-                </small> */}
               </div>
             </div>
           )}
@@ -201,13 +200,13 @@ export default function UserProfileMyInformation() {
             }}
             className='px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-emerald-600 hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600'
           >
-            Export to pdf
+            Xuất file PDF
           </button>
           <button
             type='submit'
             className='px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-emerald-600 hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600'
           >
-            Save
+            Lưu
           </button>
         </div>
       </form>

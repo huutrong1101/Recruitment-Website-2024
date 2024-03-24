@@ -33,13 +33,13 @@ export const prepareMenuItem = (data: any) => [
   {
     url: '/profile',
     icon: <HiUserCircle />,
-    text: 'My Profile'
+    text: 'Thông tin cá nhân'
   },
   ...data,
   {
     url: '/logout',
     icon: <HiArrowLeftOnRectangle />,
-    text: 'Log out'
+    text: 'Đăng xuất'
   }
 ]
 
@@ -47,18 +47,18 @@ const candidateProvider = [
   {
     url: '/profile/resume',
     icon: <HiEnvelope />,
-    text: 'My Resume'
+    text: 'Hồ sơ'
   },
 
   {
     url: '/profile/interviews',
     icon: <HiCog6Tooth />,
-    text: 'Interview'
+    text: 'Danh sách phỏng vấn'
   },
   {
     url: '/profile/submitted-jobs',
     icon: <HiQuestionMarkCircle />,
-    text: 'Submitted Jobs'
+    text: 'Danh sách ứng tuyển'
   }
 ]
 
@@ -66,7 +66,7 @@ const informationProvider = [
   {
     url: '/profile/information',
     icon: <HiInformationCircle />,
-    text: 'My Information'
+    text: 'Thông tin bổ sung'
   }
 ]
 

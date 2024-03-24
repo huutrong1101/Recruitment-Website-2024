@@ -80,13 +80,13 @@ export default function FieldContainer<T>({
   return (
     <div className='mt-2 col-span-full'>
       <label htmlFor='street-address' className='flex items-center text-sm font-medium leading-6 text-gray-900'>
-        <span className='text-xl font-bold leading-7 text-center text-green-600 font-Outfit'>{label}</span>
+        <span className='text-xl font-bold leading-7 text-center text-orange font-Outfit'>{label}</span>
       </label>
 
       {/* Field items */}
       <div className={classNames(`flex flex-col gap-2`)}>
         {values.length === 0 ? (
-          <div className={classNames(`text-zinc-400`)}>There are no item, please try to add a new one.</div>
+          <div className={classNames(`text-zinc-400`)}>Không có dữ liệu.</div>
         ) : (
           values.map((value, index) => {
             return (
@@ -118,7 +118,7 @@ export default function FieldContainer<T>({
           type='button'
         >
           <PlusIcon className='w-5 h-5 cursor-pointer' onClick={handleAddItem} />
-          <span className={classNames(`text-sm`)}>Add new </span>
+          <span className={classNames(`text-sm`)}>Thêm mới </span>
         </button>
       </div>
     </div>

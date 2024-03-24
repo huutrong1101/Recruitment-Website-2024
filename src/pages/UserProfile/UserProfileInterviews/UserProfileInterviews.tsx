@@ -96,8 +96,8 @@ function UserProfileInterviewCalendarView<T>({ rows, data }: TableProps<T>) {
       <Modal
         isOpen={isOpen}
         onClose={closeModal}
-        title='Interview Detail'
-        titleClass='text-xl font-bold leading-7 text-center text-green-600'
+        title='Chi tiết buổi phỏng vấn'
+        titleClass='text-xl font-bold leading-7 text-center text-orange'
         cancelTitle='Cancel'
         successClass='text-green-900 bg-green-100 hover:bg-green-200 focus-visible:ring-green-500'
         successTitle='OK'
@@ -168,11 +168,11 @@ function UserProfileInterviewCalendarView<T>({ rows, data }: TableProps<T>) {
 
 const viewModeItems = [
   {
-    name: 'List view',
+    name: 'Dạng bảng',
     icon: <HiListBullet />
   },
   {
-    name: 'Calendar View',
+    name: 'Dạng lịch',
     icon: <HiCalendarDays />
   }
 ]
@@ -180,16 +180,16 @@ const viewModeItems = [
 const rows = [
   {
     id: 'jobName',
-    value: 'Job title'
+    value: 'Tên'
   },
   {
     id: 'time',
-    value: 'Date',
+    value: 'Ngày phỏng vấn  ',
     format: 'DD/MM/YYYY HH:mm:ss'
   },
   {
     id: 'interviewerNames',
-    value: 'Interviewer',
+    value: 'Người phỏng vấn',
     format: 'join'
   },
   {
@@ -228,8 +228,8 @@ export default function UserProfileInterviews() {
                 className={({ selected }) =>
                   classnames(
                     `px-3 py-2 rounded-xl transition-all duration-100 ease-in-out`,
-                    `hover:bg-zinc-300 flex flex-row items-center gap-2`,
-                    selected ? `bg-emerald-600 text-emerald-300 hover:!bg-emerald-800` : ``
+                    `hover:bg-orange-hover flex flex-row items-center gap-2 hover:text-white`,
+                    selected ? `bg-orange hover:bg-orange-hover text-white` : ``
                   )
                 }
                 key={_.name}

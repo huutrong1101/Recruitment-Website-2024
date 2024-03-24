@@ -115,8 +115,8 @@ export default function Table<T>({ rows, data, isModal, responsiveColumns }: Tab
         <Modal
           isOpen={isOpen}
           onClose={closeModal}
-          title='Interview Detail'
-          titleClass='text-xl font-bold leading-7 text-center text-green-600'
+          title='Chi tiết buổi phỏng vấn'
+          titleClass='text-xl font-bold leading-7 text-center text-orange'
           cancelTitle='Cancel'
           successClass='text-green-900 bg-green-100 hover:bg-green-200 focus-visible:ring-green-500'
           successTitle='OK'
@@ -174,7 +174,7 @@ export default function Table<T>({ rows, data, isModal, responsiveColumns }: Tab
                       ` hover:text-emerald-600 transition-color duration-75`
                     )}
                   >
-                    Click here to get interview
+                    Bấm vào đây để đến link phỏng vấn
                   </a>
                 </div>
               </div>

@@ -11,27 +11,23 @@ export default function Footer() {
           className={classNames('flex flex-col md:flex-row md:items-center justify-between py-5 border-b border-white')}
         >
           <div>
-            <h3
-              className={classNames(
-                'text-white py-2 md:px-0 text-xl font-semibold leading-28 tracking-wide capitalize'
-              )}
-            >
-              JobPort
-            </h3>
+            <Link to='/' className={classNames(`font-bold text-3xl`, `text-zinc-900`)}>
+              <img src='https://fptjobs.com/public/img/fpt-telecom.png' alt='' className='w-56 h-14' />
+            </Link>
           </div>
           <div className={classNames('text-zinc-300 text-base leading-6')}>
             <ul className={classNames('flex flex-col md:flex-row-reverse gap-6')}>
               <li>
-                <Link to='/'>Home</Link>
+                <Link to='/'>Trang chủ</Link>
               </li>
               <li>
-                <Link to='/jobs'>Jobs</Link>
+                <Link to='/jobs'>Tuyển dụng</Link>
               </li>
               <li>
-                <Link to='/about-us'>About Us</Link>
+                <Link to='/about-us'>Giới thiệu</Link>
               </li>
               <li>
-                <Link to='/contact'>Contact Us</Link>
+                <Link to='/contact'>Tin tức</Link>
               </li>
             </ul>
           </div>

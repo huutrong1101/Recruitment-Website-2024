@@ -55,7 +55,7 @@ export default function Logout() {
         show={showing}
         className={classNames(
           `px-10 py-8 rounded-[35px] w-full md:w-7/12 lg:w-6/12 xl:w-5/12 2xl:w-4/12`,
-          `bg-[#176A4B]`,
+          `bg-orange-hover`,
           `flex flex-col shadow-lg`
         )}
       >
@@ -82,7 +82,7 @@ export default function Logout() {
           enterTo='transform-gpu opacity-100 translate-y-0'
         >
           <h1 className={classNames(`text-white text-3xl font-light leading-10 my-4`)}>
-            Hope to see you again. You will be redirect after {redirectCount} seconds.
+            Đăng xuất thành công. Bạn sẽ được chuyển về trang chủ trong {redirectCount} giây.
           </h1>
         </Transition>
 
@@ -95,7 +95,7 @@ export default function Logout() {
           enterTo='opacity-100'
         >
           <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-            <PrimaryButton onClick={handleReturnHome} text='Return to home' />
+            <PrimaryButton onClick={handleReturnHome} text='Về trang chủ' />
           </div>
         </Transition>
       </Transition>

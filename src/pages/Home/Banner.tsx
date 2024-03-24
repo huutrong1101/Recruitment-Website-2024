@@ -1,24 +1,43 @@
-import classNames from 'classnames'
-import home_page from '../../../images/home_page.png'
+import React, { useRef, useState } from 'react'
+// Import Swiper React components
+import { Swiper, SwiperSlide } from 'swiper/react'
+
+import 'swiper/css'
+import 'swiper/css/pagination'
+
+import '../../index.css'
+
+// import required modules
+import { Pagination, Autoplay } from 'swiper/modules'
 
 export default function Banner() {
+  const listBanner = [
+    { id: 1, img: 'https://fptjobs.com/Media/Images/BannerImages/352024120000AM1350293051920x503@100x.png' },
+    { id: 2, img: 'https://fptjobs.com/Media/Images/BannerImages/9222023120000AM744207061920x503.png' },
+    { id: 3, img: 'https://fptjobs.com/Media/Images/BannerImages/872023120000AM15651189banner%201920x503.png' },
+    { id: 4, img: 'https://fptjobs.com/Media/Images/BannerImages/5102023120000AM148543911920x503.png' }
+  ]
   return (
-    <div className={classNames('flex justify-center flex-row items-center gap-12 md:gap-24 md:min-h-[50vh]')}>
-      <div className={classNames('w-4/12')}>
-        <img src={home_page} alt='home_page' className={classNames('w-full')} />
-      </div>
-
-      <div className={classNames('w-[45%] relative')}>
-        <div className={classNames('absolute top-[50%] translate-y-[-50%] text-center')}>
-          <h3 className={classNames('text-[18px] md:text-[25px] lg:text-[48px] font-semibold')}>
-            Join Us & <span className={classNames('text-emerald-700')}>Explore Thousands</span> of Jobs
-          </h3>
-          <p className={classNames('text-[12px] md:text-[18px] font-semibold text-gray-500')}>
-            Find Jobs, Employment & Career Opportunities. Some of the companies we've helped recruit excellent
-            applicants over the years.
-          </p>
-        </div>
-      </div>
-    </div>
+    <Swiper
+      modules={[Pagination, Autoplay]} // Thêm module Autoplay
+      loop={true} // Dùng vòng lặp
+      autoplay={{
+        // Cần có {}
+        delay: 2500,
+        disableOnInteraction: false // Khi tương tác sẽ không dừng lại
+      }}
+      pagination={{
+        clickable: true
+      }}
+      className='mySwiper'
+    >
+      {listBanner.map((banner) => (
+        <SwiperSlide key={banner.id}>
+          <div className='w-full h-full md:h-[400px] xl:h-[500px]'>
+            <img src={banner.img} alt={`Banner ${banner.id}`} className='object-cover w-full h-full' />
+          </div>
+        </SwiperSlide>
+      ))}
+    </Swiper>
   )
 }

@@ -114,13 +114,13 @@ export default function NavbarUserLoggedInCard() {
                     )}
                   >
                     <span
-                      className={classNames(`group-hover:text-[#059669]`, `transition-colors ease-in-out duration-100`)}
+                      className={classNames(`group-hover:text-orange`, `transition-colors ease-in-out duration-100`)}
                     >
                       {item.icon}
                     </span>
                     <span
                       className={classNames(
-                        `group-hover:text-[#059669] font-semibold`,
+                        `group-hover:text-orange font-semibold`,
                         `transition-colors ease-in-out duration-100`
                       )}
                     >

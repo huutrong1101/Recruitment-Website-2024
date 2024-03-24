@@ -43,11 +43,11 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
     >
       <form onSubmit={handleSearch}>
         <div>
-          <h3 className={classNames('text-base font-semibold')}>Search for</h3>
+          <h3 className={classNames('text-base font-semibold')}>Nội dung tìm kiếm</h3>
           <div
             className={classNames(
               'flex items-center flex-shrink-0 w-full p-2 border rounded-xl mt-2',
-              'focus-within:border-emerald-600 text-base'
+              'focus-within:border-orange text-base'
             )}
           >
             <MagnifyingGlassIcon className={classNames(`w-[20px]`)} />
@@ -55,21 +55,19 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
               value={dataSearch.key}
               onChange={(e) => setDataSearch({ ...dataSearch, key: e.target.value })}
               type='text'
-              placeholder='Search your Keywords'
+              placeholder='Tìm kiếm công việc'
               className={classNames('w-[85%] h-full text-[12px] ml-3 focus:outline-none text-base text-zinc-400')}
             />
           </div>
         </div>
         {/* Category  */}
         <div className={classNames('mt-4')}>
-          <h3 className={classNames('text-base font-semibold capitalize')}>Position</h3>
+          <h3 className={classNames('text-base font-semibold capitalize')}>Vị trí công việc</h3>
           <Menu as='div' className={classNames('relative mt-2')}>
             <Menu.Button
               className={classNames('cursor-pointer flex items-center justify-between w-full p-2 border rounded-xl')}
             >
-              <span className={classNames('ml-2 text-zinc-400')}>
-                {JOB_POSITION[dataSearch.position] || 'Position'}
-              </span>
+              <span className={classNames('ml-2 text-zinc-400')}>{JOB_POSITION[dataSearch.position] || 'Vị trí'}</span>
               <ChevronDownIcon className={classNames('w-[20px] ml-4')} />
               {/* Drop down  */}
             </Menu.Button>
@@ -112,13 +110,13 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
         </div>
         {/* Location  */}
         <div className={classNames('mt-4')}>
-          <h3 className={classNames('text-base font-semibold  capitalize')}>Location</h3>
+          <h3 className={classNames('text-base font-semibold  capitalize')}>Địa điểm</h3>
           <Menu as='div' className={classNames('relative mt-2')}>
             <Menu.Button
               className={classNames('cursor-pointer flex items-center justify-between w-full p-2 border rounded-xl')}
             >
               <span className={classNames('ml-2 text-zinc-400')}>
-                {JOB_POSITION[dataSearch.location] || 'Location'}
+                {JOB_POSITION[dataSearch.location] || 'Địa điểm'}
               </span>
               <ChevronDownIcon className={classNames('w-[20px] ml-4')} />
               {/* Drop down  */}
@@ -162,12 +160,12 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
         </div>
         {/* Jobs Type  */}
         <div className={classNames('mt-4')}>
-          <h3 className={classNames('text-base font-semibold')}>Jobs Type</h3>
+          <h3 className={classNames('text-base font-semibold')}>Loại hình công việc</h3>
           <Menu as='div' className={classNames('relative mt-2')}>
             <Menu.Button
               className={classNames('cursor-pointer flex items-center justify-between w-full p-2 border rounded-xl')}
             >
-              <span className={classNames('ml-2 text-zinc-400')}>{JOB_POSITION[dataSearch.type] || 'Jobs Type'}</span>
+              <span className={classNames('ml-2 text-zinc-400')}>{JOB_POSITION[dataSearch.type] || 'Loại'}</span>
               <ChevronDownIcon className={classNames('w-[20px] ml-4')} />
               {/* Drop down  */}
             </Menu.Button>
@@ -213,10 +211,10 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
           <button
             type='submit'
             className={classNames(
-              'bg-emerald-700 hover:bg-emerald-900 text-white p-3 rounded-md flex w-full text-center items-center justify-center'
+              'bg-[#4eb848] hover:bg-[#368132] text-white p-3 rounded-md flex w-full text-center items-center justify-center'
             )}
           >
-            Search
+            Tìm kiếm
           </button>
         </div>
       </form>
@@ -226,7 +224,7 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
         )}
         onClick={handleReset}
       >
-        Reset
+        Xóa nội dung
       </button>
     </div>
   )

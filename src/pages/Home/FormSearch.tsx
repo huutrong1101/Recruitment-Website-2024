@@ -69,7 +69,7 @@ export default function FormSearch() {
         <MagnifyingGlassIcon className={classNames(`w-[20px] ml-1 md:ml-4`)} />
         <input
           type='text'
-          placeholder='Search your Keywords'
+          placeholder='Công việc bạn muốn tìm kiếm'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className={classNames('w-[85%] h-full text-[10px] md:text-[17px] ml-3 focus:outline-none')}
@@ -84,7 +84,7 @@ export default function FormSearch() {
               className={classNames('text-[13px] cursor-pointer flex items-center justify-between')}
               onClick={() => setShowType(!showType)}
             >
-              {JOB_POSITION[type] || 'TYPE OF JOB'}
+              {JOB_POSITION[type] || 'Loại công việc'}
               {showType && <ChevronUpIcon className={classNames('w-[20px] mr-4')} />}
               {!showType && <ChevronDownIcon className={classNames('w-[20px] mr-4')} />}
             </div>
@@ -127,8 +127,8 @@ export default function FormSearch() {
       </div>
 
       <div className={classNames('w-full md:w-[24%] flex items-center justify-center')}>
-        <button className='w-[50%] md:w-[80%] md:h-[56px] border rounded-md bg-emerald-700 shadow-md text-white'>
-          Search
+        <button className='w-[50%] md:w-[80%] md:h-[56px] border rounded-md bg-orange shadow-md text-white'>
+          Tìm kiếm
         </button>
       </div>
     </form>

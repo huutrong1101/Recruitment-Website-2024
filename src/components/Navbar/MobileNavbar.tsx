@@ -78,9 +78,6 @@ export default function MobileNavbar() {
             })}
 
             {/* Account options */}
-            <Link to={'/profile'} onClick={handleCloseDrawer} className={classNames(`px-6 py-4 text-lg`)}>
-              Profiles
-            </Link>
           </Transition.Child>
         </Transition>
       </div>

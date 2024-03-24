@@ -5,24 +5,21 @@ import Banner from './Banner'
 import Jobs from './Jobs'
 import Events from './Events'
 import Advertise from '../../components/Advertise/Advertise'
+import Container from '../../components/Container/Container'
 
 export default function Home() {
   return (
     <div className={classNames('h-full')}>
-      {/* Hero */}
+      {/* Banner không bị bao bởi Container khi hiển thị */}
       <Banner />
 
-      {/* SEARCH  */}
-      <FormSearch />
-
-      {/* Jobs  */}
-      <Jobs />
-
-      {/* Events  */}
-      <Events />
-
-      {/* Explore jobs now  */}
-      <Advertise />
+      {/* Các phần còn lại được bao bởi Container */}
+      <Container>
+        <FormSearch />
+        <Jobs />
+        <Events />
+        <Advertise />
+      </Container>
     </div>
   )
 }

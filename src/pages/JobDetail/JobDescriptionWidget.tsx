@@ -31,9 +31,8 @@ export default function JobDescriptionWidget({
         {/* Information */}
         <div className={classNames(`flex flex-row flex-1 `)}>
           <div className={classNames(`flex flex-col flex-1 font-semibold gap-1`)}>
-            <span>{companyName}</span>
-            <span>{jobRole}</span>
-            <span className={classNames(`text-sm text-zinc-400`)}>{quantity} members</span>
+            <span className='text-lg font-semibold text-orange'>{jobRole}</span>
+            <span className={classNames(`text-base`)}>Số lương cần tuyển: {quantity}</span>
           </div>
           {/* Right */}
 

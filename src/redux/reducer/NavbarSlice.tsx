@@ -4,15 +4,19 @@ const initialState = {
   drawerVisible: false,
   items: [
     {
-      name: 'Home',
+      name: 'Trang chủ',
       url: '/'
     },
     {
-      name: 'Jobs',
+      name: 'Giới thiệu',
+      url: '/about-us'
+    },
+    {
+      name: 'Tuyển dụng',
       url: '/jobs'
     },
     {
-      name: 'Events',
+      name: 'Tin tức',
       url: '/events'
     }
   ],
