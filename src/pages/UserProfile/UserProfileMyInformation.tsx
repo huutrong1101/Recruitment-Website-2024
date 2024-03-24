@@ -117,6 +117,14 @@ export default function UserProfileMyInformation() {
     // );
   }
 
+  const customStyles = {
+    menu: (base: any) => ({
+      ...base,
+      width: '96.5%'
+      // Đảm bảo chỉ bao gồm thuộc tính CSS hợp lệ và loại bỏ các thuộc tính không hợp lệ như "accentColor"
+    })
+  }
+
   return (
     <div className='flex flex-col flex-1 gap-4'>
       <form onSubmit={(e) => handleSubmit(e, containerItem)}>
@@ -180,12 +188,7 @@ export default function UserProfileMyInformation() {
                     components={animatedComponents}
                     value={containerItem.skills}
                     onChange={handleSelectChange}
-                    styles={{
-                      menu: (provided) => ({
-                        ...provided,
-                        width: '96.5%'
-                      })
-                    }}
+                    styles={customStyles as any}
                   />
                 </div>
               </div>

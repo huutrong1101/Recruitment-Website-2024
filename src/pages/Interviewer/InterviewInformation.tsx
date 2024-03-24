@@ -113,6 +113,14 @@ export default function InterviewInformation() {
     // );
   }
 
+  const customStyles = {
+    menu: (base: any) => ({
+      ...base,
+      width: '96.5%'
+      // Đảm bảo chỉ bao gồm thuộc tính CSS hợp lệ và loại bỏ các thuộc tính không hợp lệ như "accentColor"
+    })
+  }
+
   return (
     <div className={classNames(`flex items-center justify-center w-full my-4`)}>
       <div className={classNames(`flex flex-col gap-4 w-[80%]`)}>
@@ -178,12 +186,7 @@ export default function InterviewInformation() {
                         components={animatedComponents}
                         value={containerItem.skills}
                         onChange={handleSelectChange}
-                        styles={{
-                          menu: (provided) => ({
-                            ...provided,
-                            width: '96.5%'
-                          })
-                        }}
+                        styles={customStyles as any}
                       />
                     </div>
                     {/* <small className={classNames(`mx-4 text-gray-400`)}>
