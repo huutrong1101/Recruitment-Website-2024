@@ -9,6 +9,8 @@ import '../../index.css'
 
 // import required modules
 import { Pagination, Autoplay } from 'swiper/modules'
+import FormSearch from './FormSearch'
+import Container from '../../components/Container/Container'
 
 export default function Banner() {
   const listBanner = [
@@ -19,25 +21,30 @@ export default function Banner() {
   ]
   return (
     <Swiper
-      modules={[Pagination, Autoplay]} // Thêm module Autoplay
-      loop={true} // Dùng vòng lặp
+      modules={[Pagination, Autoplay]}
+      loop={true}
       autoplay={{
-        // Cần có {}
         delay: 2500,
-        disableOnInteraction: false // Khi tương tác sẽ không dừng lại
+        disableOnInteraction: false
       }}
       pagination={{
         clickable: true
       }}
-      className='mySwiper'
+      className='relative mySwiper'
     >
       {listBanner.map((banner) => (
         <SwiperSlide key={banner.id}>
-          <div className='w-full h-full md:h-[400px] xl:h-[500px]'>
+          <div className='w-full h-full md:h-[400px] xl:h-[525px]'>
             <img src={banner.img} alt={`Banner ${banner.id}`} className='object-cover w-full h-full' />
           </div>
         </SwiperSlide>
       ))}
+
+      <div className='absolute inset-x-0 z-10 w-full mx-auto bottom-10'>
+        <Container>
+          <FormSearch />
+        </Container>
+      </div>
     </Swiper>
   )
 }

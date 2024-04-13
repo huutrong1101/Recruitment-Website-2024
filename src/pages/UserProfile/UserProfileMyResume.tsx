@@ -57,8 +57,6 @@ export default function UserProfileMyResume() {
       })
   }, [])
 
-  console.log(resumeList)
-
   const handleDelete = (resumeId: string) => {
     setResumeDeleteID(resumeId)
     openModal()

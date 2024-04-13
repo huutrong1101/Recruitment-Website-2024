@@ -6,7 +6,6 @@ import Authenticate from './pages/Authenticate/Authenticate'
 import AuthenticateLogin from './pages/Authenticate/AuthenticateLogin'
 import AuthenticateSignUp from './pages/Authenticate/AuthenticateSignUp'
 import Contact from './pages/Contact/Contact'
-import AboutUs from './pages/AboutUs/AboutUs'
 import EmailConfirmationLayout from './pages/EmailConfirmation/EmailConfirmationLayout'
 import IncompleteConfirmEmail from './pages/EmailConfirmation/IncompleteConfirmEmail'
 import CompleteConfirmEmail from './pages/EmailConfirmation/CompleteConfirmEmail'
@@ -65,6 +64,11 @@ import InterviewDetail from './pages/Interviewer/Interview/Detail/InterviewDetai
 import InterviewSched from './pages/Recruiter/Jobs/CreateInterview/InterviewSched'
 import UserProfileInterviews from './pages/UserProfile/UserProfileInterviews/UserProfileInterviews'
 import ScorePage from './pages/Interviewer/Interview/ScorePage'
+import Recruiters from './pages/Recruiters/Recruiters'
+import RecuiterDetail from './pages/RecuiterDetail/RecuiterDetail'
+import AuthenticateRecSignUp from './pages/Authenticate/AuthenticateRecSignUp'
+import UserInterestJob from './pages/UserProfile/UserInterestJob'
+import ConfirmRec from './pages/ConfirmRec/ConfirmRec'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -101,15 +105,18 @@ function App() {
           <Route path='events' element={<Events />} />
           <Route path='/events/:eventId' element={<EventDetail />} />
           <Route path='contact' element={<Contact />} />
-          <Route path='about-us' element={<AboutUs />} />
+          <Route path='recruiters' element={<Recruiters />} />
+          <Route path='recruiters/:recruiterId' element={<RecuiterDetail />} />
           <Route path='auth' element={<Authenticate />}>
             <Route path='login' element={<AuthenticateLogin />} />
             <Route path='signup' element={<AuthenticateSignUp />} />
+            <Route path='rec-signup' element={<AuthenticateRecSignUp />} />
             <Route element={<AuthenticateLogin />} />
           </Route>
 
           {/* This route is accepted when user is not logged in */}
           <Route element={<FilterNonLogin />}>
+            <Route path='/confirm-rec' element={<ConfirmRec />} />
             <Route path='/email' element={<EmailConfirmationLayout />}>
               <Route path='incomplete' element={<IncompleteConfirmEmail />} />
               <Route path='complete' element={<CompleteConfirmEmail />} />
@@ -122,17 +129,17 @@ function App() {
           </Route>
 
           {/* This route is only accepted when user is logged in and/or token is not broken  */}
-          <Route element={<FilterCandidate />}>
-            <Route path='/profile' element={<UserProfileLayout />}>
-              <Route index element={<UserProfileMyProfile />} />
-              <Route path='information' element={<UserProfileMyInformation />} />
-              <Route path='resume' element={<UserProfileMyResume />} />
-              <Route path='submitted-jobs' element={<UserProfileSubmittedJob />} />
-              <Route path='interviews' element={<UserProfileInterviews />} />
-            </Route>
-            <Route path='/print-resume' element={<PrintResume />} />
+          {/* <Route element={<FilterCandidate />}> */}
+          <Route path='/profile' element={<UserProfileLayout />}>
+            <Route index element={<UserProfileMyProfile />} />
+            <Route path='information' element={<UserProfileMyInformation />} />
+            <Route path='resume' element={<UserProfileMyResume />} />
+            <Route path='submitted-jobs' element={<UserProfileSubmittedJob />} />
+            <Route path='interest-jobs' element={<UserInterestJob />} />
           </Route>
+          <Route path='/print-resume' element={<PrintResume />} />
         </Route>
+        {/* </Route> */}
 
         {/* ADMIN  */}
         <Route element={<FilterAdmin />}>

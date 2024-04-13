@@ -51,14 +51,14 @@ const candidateProvider = [
   },
 
   {
-    url: '/profile/interviews',
+    url: '/profile/interest-jobs',
     icon: <HiCog6Tooth />,
-    text: 'Danh sách phỏng vấn'
+    text: 'Công việc quan tâm'
   },
   {
     url: '/profile/submitted-jobs',
     icon: <HiQuestionMarkCircle />,
-    text: 'Danh sách ứng tuyển'
+    text: 'Công việc ứng tuyển'
   }
 ]
 

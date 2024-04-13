@@ -29,11 +29,14 @@ export default function Jobs() {
 
   const totalJobs = useAppSelector((state) => state.Job.totalJobs)
 
+  const [resetToken, setResetToken] = useState(Date.now())
+
   const [dataSearch, setDataSearch] = useState({
     key: '',
     position: '',
     location: '',
-    type: ''
+    type: '',
+    selectedType: ''
   })
 
   const navigate = useNavigate()
@@ -117,22 +120,23 @@ export default function Jobs() {
     try {
       setIsLoading(true)
 
-      const searchParams = {
-        ...queryConfig,
-        page: '1',
-        limit: '10',
-        name: dataSearch.key,
-        position: dataSearch.position,
-        location: dataSearch.location,
-        type: dataSearch.type
-      }
+      // const searchParams = {
+      //   ...queryConfig,
+      //   page: '1',
+      //   limit: '10',
+      //   name: dataSearch.key,
+      //   position: dataSearch.position,
+      //   location: dataSearch.location,
+      //   type: dataSearch.type
+      // }
 
-      const filteredSearchParams = omitBy(searchParams, isEmpty)
+      // const filteredSearchParams = omitBy(searchParams, isEmpty)
 
-      navigate({
-        pathname: '/jobs',
-        search: createSearchParams(filteredSearchParams).toString()
-      })
+      // navigate({
+      //   pathname: '/jobs',
+      //   search: createSearchParams(filteredSearchParams).toString()
+      // })
+      console.log(dataSearch)
     } catch (error) {
       console.error(error)
     } finally {
@@ -145,8 +149,12 @@ export default function Jobs() {
       key: '',
       position: '',
       location: '',
-      type: ''
+      type: '',
+      selectedType: ''
     })
+
+    // Đặt resetToken mới để force "remount" các component Select
+    setResetToken(Date.now())
 
     navigate({
       pathname: '/jobs',
@@ -158,7 +166,7 @@ export default function Jobs() {
 
   return (
     <Container>
-      <div className={classNames('flex flex-col lg:flex-row gap-5 mb-12')}>
+      <div className={classNames('flex flex-col gap-5 mb-12')}>
         {/* Sidebar Search  */}
         <FilterJobs
           dataSearch={dataSearch}
@@ -168,31 +176,28 @@ export default function Jobs() {
           handleSearch={handleSearch}
           handleReset={handleReset}
           setDataSearch={setDataSearch}
+          resetToken={resetToken}
         />
 
         {/* List Jobs  */}
 
-        <div className={classNames('w-full lg:max-w-full lg:w-2/3')}>
+        <div className={classNames('w-full')}>
           {isLoading ? (
             <div className='flex justify-center my-4 min-h-[70vh] flex-col items-center'>
               <LoadSpinner className='text-3xl text-emerald-500' />
             </div>
           ) : (
             <div className='flex flex-wrap -mx-4'>
-              {/* <!-- Card --> */}
               {showJobs.length > 0 ? (
                 <>
                   {showJobs.map((job) => (
                     <div className='w-full px-4 mb-8 md:w-1/2' key={job.jobId}>
-                      <JobCard job={job} />
+                      <JobCard job={job} isShow={true} />
                     </div>
                   ))}
                 </>
               ) : (
                 <div className='flex flex-col justify-center w-full mb-10 min-h-[70vh] items-center text-3xl gap-4'>
-                  {/* <span>
-                    <AiOutlineBlock />
-                  </span> */}
                   <img
                     src='https://cdni.iconscout.com/illustration/premium/thumb/error-404-4344461-3613889.png'
                     alt=''
@@ -203,7 +208,7 @@ export default function Jobs() {
               )}
             </div>
           )}
-          {/* Pagination  */}
+
           <Pagination queryConfig={queryConfig} pageSize={pageSize} url='/jobs' />
         </div>
       </div>

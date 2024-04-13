@@ -41,3 +41,15 @@ body {
   /* Đường kẻ dọc của timeline */
   background: #000; /* Đặt màu của bạn ở đây, ví dụ #000 là màu đen */
 }
+
+.ant-btn{
+  background-color: #10b981;
+}
+
+.ant-btn:hover{
+  background-color: #047857;
+}
+
+.ck.ck-editor__main .ck-content {
+  height: 250px;
+}

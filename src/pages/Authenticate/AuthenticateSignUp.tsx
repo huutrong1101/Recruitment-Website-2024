@@ -39,64 +39,27 @@ function TermAndConditionsDialog({ visible, onClose, onOkay }: any) {
             >
               <Dialog.Panel className='w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl'>
                 <Dialog.Title as='h3' className='text-lg font-medium leading-6 text-gray-900'>
-                  Term of services
+                  ĐIỀU KHOẢN SỬ DỤNG DỊCH VỤ VỚI ỨNG VIÊN
                 </Dialog.Title>
 
                 <div className='max-h-[70vh] mt-2 overflow-y-auto'>
                   <p className='text-sm text-gray-500'>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Laborum, omnis quas? Cumque deserunt,
-                    repudiandae repellendus reprehenderit quisquam dolorem excepturi voluptas consequatur impedit labore
-                    eaque necessitatibus facere ratione quo architecto molestiae.
+                    Điều khoản sử dụng yêu cầu bạn đồng ý và tuân thủ khi truy cập trang web hoặc sử dụng dịch vụ của
+                    chúng tôi. Bạn phải tạo tài khoản và cung cấp thông tin chính xác. Mật khẩu của bạn phải được bảo
+                    mật và không được tiết lộ cho người khác. Chúng tôi có thể thu thập thông tin cá nhân của bạn và
+                    chia sẻ với các nhà tuyển dụng theo ý bạn đồng ý. Bạn cũng hiểu rằng thông tin cá nhân của bạn có
+                    thể được xóa sau một thời gian không hoạt động dài.
                   </p>
                   <br />
-                  <p className='text-sm text-gray-500'>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Laborum, omnis quas? Cumque deserunt,
-                    repudiandae repellendus reprehenderit quisquam dolorem excepturi voluptas consequatur impedit labore
-                    eaque necessitatibus facere ratione quo architecto molestiae.
-                  </p>
-                  <br />
-                  <p className='text-sm text-gray-500'>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Laborum, omnis quas? Cumque deserunt,
-                    repudiandae repellendus reprehenderit quisquam dolorem excepturi voluptas consequatur impedit labore
-                    eaque necessitatibus facere ratione quo architecto molestiae.
-                  </p>
-
-                  <br />
-                  <p className='text-sm text-gray-500'>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Laborum, omnis quas? Cumque deserunt,
-                    repudiandae repellendus reprehenderit quisquam dolorem excepturi voluptas consequatur impedit labore
-                    eaque necessitatibus facere ratione quo architecto molestiae.
-                  </p>
-
-                  <br />
-                  <p className='text-sm text-gray-500'>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Laborum, omnis quas? Cumque deserunt,
-                    repudiandae repellendus reprehenderit quisquam dolorem excepturi voluptas consequatur impedit labore
-                    eaque necessitatibus facere ratione quo architecto molestiae.
-                  </p>
-
-                  <br />
-                  <p className='text-sm text-gray-500'>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Laborum, omnis quas? Cumque deserunt,
-                    repudiandae repellendus reprehenderit quisquam dolorem excepturi voluptas consequatur impedit labore
-                    eaque necessitatibus facere ratione quo architecto molestiae.
-                  </p>
-
-                  <br />
-                  <p className='text-sm text-gray-500'>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Laborum, omnis quas? Cumque deserunt,
-                    repudiandae repellendus reprehenderit quisquam dolorem excepturi voluptas consequatur impedit labore
-                    eaque necessitatibus facere ratione quo architecto molestiae.
-                  </p>
                 </div>
 
                 <div className='flex flex-row-reverse mt-4'>
                   <button
                     type='button'
-                    className='inline-flex justify-center px-4 py-2 text-sm font-medium border border-transparent rounded-md bg-emerald-600 text-emerald-300 hover:bg-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2'
+                    className='inline-flex justify-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md bg-orange hover:bg-orange-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2'
                     onClick={onOkay}
                   >
-                    Ok
+                    OK
                   </button>
                 </div>
               </Dialog.Panel>
@@ -145,14 +108,17 @@ export default function AuthenticateSignUp() {
   return (
     <form
       className={classnames(
-        `py-8 gap-4 items-center justify-center flex flex-col h-[600px]`,
+        `py-8 gap-4 items-center justify-center flex flex-col h-[500px] mb-8`,
         `bg-zinc-100 shadow-md`,
         `rounded-xl px-4 md:px-5 lg:px-6`
       )}
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className='flex flex-col items-center w-full gap-4 mx-6'>
-        <h1 className='text-xl font-semibold'>Đăng Ký</h1>
+        <h1 className='text-xl font-semibold capitalize text-emerald-500'>Chào mừng bạn đã quay trở lại</h1>
+        <p className='mb-0 text-sm font-normal leading-5 text-left text-gray-600'>
+          Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
+        </p>
 
         <InputIcon
           icon={<UserIcon />}
@@ -222,9 +188,9 @@ export default function AuthenticateSignUp() {
         <div className='flex flex-row w-full gap-4 text-zinc-600'>
           <label>
             <input type='checkbox' {...register('agreeTerms')} required className='mr-3' />
-            Tôi đồng ý với
+            Tôi đã đọc và đồng ý với
             <b className={`cursor-pointer hover:underline ml-1`} onClick={handleOpenTermOfServceDialog}>
-              điều khoản trên
+              Điều khoản dịch vụ và Chính sách bảo mật
             </b>
           </label>
         </div>

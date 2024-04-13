@@ -8,7 +8,11 @@ import Container from '../Container/Container'
 import LoadSpinner from '../LoadSpinner/LoadSpinner'
 import MobileNavbar from './MobileNavbar'
 import NavbarUserLoggedInCard from './NavbarUserLoggedInCard'
+import { DownOutlined } from '@ant-design/icons'
+import type { MenuProps } from 'antd'
+import { Dropdown, Space } from 'antd'
 import './styles/Navbar.css'
+import { AcademicCapIcon, UserIcon } from '@heroicons/react/24/outline'
 
 export default function Navbar() {
   useTokenAuthorize()
@@ -22,6 +26,27 @@ export default function Navbar() {
   const { pathname: currentPathname } = useLocation()
 
   const [compiledQuerySearch, setCompiledQuerySearch] = useState(qs.stringify({}))
+
+  const itemsSignUp = [
+    {
+      label: (
+        <Link to={'/auth/rec-signup'} className='flex items-center gap-2'>
+          <UserIcon className='w-4 h-4' />
+          <p>Nhà tuyển dụng</p>
+        </Link>
+      ),
+      key: '0'
+    },
+    {
+      label: (
+        <Link to={'/auth/signup'} className='flex items-center gap-2'>
+          <AcademicCapIcon className='w-4 h-4' />
+          <p>Người tìm việc</p>
+        </Link>
+      ),
+      key: '1'
+    }
+  ]
 
   useEffect(() => {
     setCompiledQuerySearch(
@@ -80,19 +105,27 @@ export default function Navbar() {
                   to={`/auth/login?${compiledQuerySearch}`}
                   className={classNames(
                     `px-3 py-2`,
-                    `bg-orange text-white hover:bg-orange-hover`,
+                    `bg-emerald-500 text-white hover:bg-emerald-700`,
                     `font-semibold`,
                     `rounded-xl`
                   )}
                 >
                   Đăng nhập
                 </Link>
-                <Link
-                  to='/auth/signup'
-                  className={classNames(`px-3 py-2`, `border-orange border text-orange`, `font-semibold`, `rounded-xl`)}
-                >
-                  Đăng ký
-                </Link>
+                <Dropdown menu={{ items: itemsSignUp }} trigger={['click']}>
+                  <a onClick={(e) => e.preventDefault()}>
+                    <Space
+                      className={classNames(
+                        `px-3 py-2`,
+                        `border-emerald-500 border text-emerald-500`,
+                        `font-semibold`,
+                        `rounded-xl`
+                      )}
+                    >
+                      Đăng ký
+                    </Space>
+                  </a>
+                </Dropdown>
               </div>
             ) : (
               <NavbarUserLoggedInCard />
@@ -104,19 +137,27 @@ export default function Navbar() {
                 to='/auth/login'
                 className={classNames(
                   `px-3 py-2`,
-                  `bg-[#f27024] text-white hover:bg-orange-hover`,
+                  `bg-emerald-500 text-white hover:bg-emerald-700`,
                   `font-semibold`,
                   `rounded-xl`
                 )}
               >
                 Đăng nhập
               </Link>
-              <Link
-                to='/auth/signup'
-                className={classNames(`px-3 py-2`, `border-orange border text-orange`, `font-semibold`, `rounded-xl`)}
-              >
-                Đăng ký
-              </Link>
+              <Dropdown menu={{ items: itemsSignUp }} trigger={['click']}>
+                <a onClick={(e) => e.preventDefault()}>
+                  <Space
+                    className={classNames(
+                      `px-3 py-2`,
+                      `border-emerald-500 border text-emerald-500 cursor-pointer`,
+                      `font-semibold`,
+                      `rounded-xl`
+                    )}
+                  >
+                    Đăng ký
+                  </Space>
+                </a>
+              </Dropdown>
             </div>
           )}
         </div>

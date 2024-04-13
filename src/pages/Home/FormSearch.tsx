@@ -9,6 +9,7 @@ import useQueryParams from '../../hooks/useQueryParams'
 import { isEmpty, isUndefined, omitBy } from 'lodash'
 import { useAppSelector } from '../../hooks/hooks'
 import { JOB_POSITION } from '../../utils/Localization'
+import { Button, Select } from 'antd'
 
 export type QueryConfig = {
   [key in keyof JobListConfig]: string
@@ -62,14 +63,16 @@ export default function FormSearch() {
 
   return (
     <form
-      className={classNames('flex flex-col border rounded-md shadow-md md:shadow-lg md:flex-row p-3 gap-4 mt-[40px]')}
+      className={classNames(
+        'flex flex-col border rounded-md shadow-md md:shadow-lg md:flex-row py-4 gap-4 mt-[40px] bg-white'
+      )}
       onSubmit={(e) => handleSubmit(e)}
     >
       <div className={classNames('flex w-full items-center flex-shrink-0 md:w-[49%] border-r-2')}>
         <MagnifyingGlassIcon className={classNames(`w-[20px] ml-1 md:ml-4`)} />
         <input
           type='text'
-          placeholder='Công việc bạn muốn tìm kiếm'
+          placeholder='Tìm kiếm theo tên, lương khởi điểm, kĩ năng làm việc'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className={classNames('w-[85%] h-full text-[10px] md:text-[17px] ml-3 focus:outline-none')}
@@ -77,7 +80,44 @@ export default function FormSearch() {
       </div>
 
       <div className={classNames('flex items-center w-full gap-4 md:w-[27%] border-r-2')}>
-        <CakeIcon className={classNames(`w-[20px] md:ml-4`)} />
+        <Select
+          showSearch
+          size='large'
+          style={{ width: '100%', marginRight: '15px', color: 'black' }}
+          placeholder='Chọn lĩnh vực'
+          optionFilterProp='children'
+          filterOption={(input, option) => (option?.label ?? '').includes(input)}
+          filterSort={(optionA, optionB) =>
+            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+          }
+          options={[
+            {
+              value: '1',
+              label: 'Not Identified'
+            },
+            {
+              value: '2',
+              label: 'Closed'
+            },
+            {
+              value: '3',
+              label: 'Communicated'
+            },
+            {
+              value: '4',
+              label: 'Identified'
+            },
+            {
+              value: '5',
+              label: 'Resolved'
+            },
+            {
+              value: '6',
+              label: 'Cancelled'
+            }
+          ]}
+        />
+        {/* <CakeIcon className={classNames(`w-[20px] md:ml-4`)} />
         <Menu as='div' className={classNames('relative w-full')}>
           <Menu.Button className={classNames('w-full')}>
             <div
@@ -123,13 +163,16 @@ export default function FormSearch() {
               </div>
             </Menu.Items>
           </Transition>
-        </Menu>
+        </Menu> */}
       </div>
 
       <div className={classNames('w-full md:w-[24%] flex items-center justify-center')}>
-        <button className='w-[50%] md:w-[80%] md:h-[56px] border rounded-md bg-orange shadow-md text-white'>
+        {/* <button className='w-[50%] md:w-[80%] md:h-[56px] border rounded-md bg-emerald-500 shadow-md text-white'>
           Tìm kiếm
-        </button>
+        </button> */}
+        <Button type='primary' size='large' className={'w-full mr-4'}>
+          Tìm kiếm
+        </Button>
       </div>
     </form>
   )

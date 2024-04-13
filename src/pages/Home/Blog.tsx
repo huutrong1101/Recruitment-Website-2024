@@ -1,20 +1,17 @@
 import React from 'react'
-import classNames from 'classnames'
-import { Link } from 'react-router-dom'
-import { data } from '../../data/fetchData'
-import EventCard from '../../components/EventCard/EventCard'
 import { EventInterface } from '../../types/event.type'
 import { useAppSelector } from '../../hooks/hooks'
+import classNames from 'classnames'
+import EventCard from '../../components/EventCard/EventCard'
+import { Link } from 'react-router-dom'
 
-export default function Events() {
+function Blog() {
   const events: EventInterface[] = useAppSelector((state) => state.Home.events)
 
   return (
     <div className='mt-[80px]'>
       <div className={classNames('text-center')}>
-        <h3 className={classNames('text-black text-xl md:text-2xl font-medium leading-7 tracking-wider capitalize')}>
-          TIN TỨC VÀ SỰ KIỆN
-        </h3>
+        <h3 className={classNames('tracking-wider text-2xl font-bold text-center')}>TIN TỨC VÀ SỰ KIỆN</h3>
       </div>
 
       <div className='flex flex-wrap -mx-4 mt-[20px]'>
@@ -28,10 +25,12 @@ export default function Events() {
       </div>
 
       <div className={classNames('flex items-center justify-center')}>
-        <Link to='/events' className={classNames('bg-orange text-white p-3 rounded-md flex')}>
+        <Link to='/events' className={classNames('bg-emerald-500 text-white p-3 rounded-md flex')}>
           Xem thêm
         </Link>
       </div>
     </div>
   )
 }
+
+export default Blog

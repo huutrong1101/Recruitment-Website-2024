@@ -1,4 +1,4 @@
-export default function Advertise() {
+export default function FeaturedRecruiter() {
   const listImg = [
     {
       id: 1,
@@ -28,9 +28,7 @@ export default function Advertise() {
   return (
     <div className='mt-[40px] md:mt-[80px]'>
       <div className='text-center'>
-        <h3 className='text-xl font-medium leading-7 tracking-wider text-black capitalize md:text-2xl'>
-          NHÀ TUYỂN DỤNG NỔI BẬT
-        </h3>
+        <h3 className='text-2xl font-bold tracking-wider text-center'>NHÀ TUYỂN DỤNG NỔI BẬT</h3>
       </div>
       <div className='flex flex-wrap items-center justify-center -mx-4 mt-[10px]'>
         {listImg.slice(0, 6).map((item) => (

@@ -156,7 +156,6 @@ export default function EventDetail() {
             </div>
 
             <div className='flex flex-wrap mt-3 -mx-4'>
-              {/* <!-- Card --> */}
               {events &&
                 events.slice(0, 3).map((event) => (
                   <div key={event.eventId} className='w-full px-4 mb-8 md:w-1/3'>

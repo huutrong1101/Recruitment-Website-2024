@@ -24,6 +24,12 @@ import { JobInterface } from '../../types/job.type'
 import { checkApplyJob, fetchJobDetail } from '../../redux/reducer/JobDetailSlice'
 import axiosInstance from '../../utils/AxiosInstance'
 import Container from '../../components/Container/Container'
+import { Tabs } from 'antd'
+import JobDetailWidget from './JobTab/JobDetailWidget'
+import CompanyInfoWidget from './JobTab/CompanyInfoWidget '
+import OtherJobsWidget from './JobTab/OtherJobsWidget'
+
+const { TabPane } = Tabs
 
 export default function JobDetail() {
   const { jobId } = useParams()
@@ -136,70 +142,32 @@ export default function JobDetail() {
         {status.jobStatus === 'fulfill' ? (
           job ? (
             <>
-              {' '}
-              <div className={classNames(`flex flex-col md:flex-row gap-12`)}>
-                {/* Left side description */}
-                <div className={classNames(`w-full md:w-8/12`, `flex flex-col gap-6`)}>
-                  {/* Widgets */}
-                  <JobDescriptionWidget
-                    companyName='FPT Software'
-                    jobRole={job.name}
-                    quantity={job.quantity}
-                    publishDate={moment(job.createdAt).format('DD-MM-YYYY').toString()}
-                    logo={{ src: Logo, alt: 'image' }}
-                  />
-                  {/* Details */}
-                  <div
-                    className={classNames(
-                      `border bg-white shadow-sm rounded-xl flex flex-col gap-8`,
-                      `px-8 py-8`,
-                      `text-justify`
-                    )}
-                  >
-                    <div>
-                      <h1 className='text-2xl font-semibold capitalize'>Chi tiết công việc</h1>
-                      <p className='mt-2 whitespace-pre-line'>{job?.description}</p>
-                    </div>
-                    <div>
-                      <h1 className='text-2xl font-semibold capitalize'>Yêu cầu công việc</h1>
-                      <p className='mt-2 whitespace-pre-line'>{job?.requirement}</p>
-                    </div>
-                    <div>
-                      <h1 className='text-2xl font-semibold capitalize'>Quyền lợi</h1>
-                      <p className='mt-2 whitespace-pre-line'>{job?.benefit}</p>
-                    </div>
-                    <div>
-                      <h1 className='text-2xl font-semibold capitalize'>Kĩ năng yêu cầu</h1>
-                      <div className='flex flex-wrap px-2 py-4'>
-                        {job?.skills.map((item, index) => (
-                          <div key={index}>
-                            <span
-                              key={index}
-                              className='rounded-lg bg-[#78AF9A] bg-opacity-40 p-2 mx-2 my-1 text-[#218F6E]'
-                            >
-                              {item}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              {/* Widgets */}
+              <JobDescriptionWidget
+                companyName='FPT Software'
+                jobRole={job.name}
+                quantity={job.quantity}
+                publishDate={moment(job.createdAt).format('DD-MM-YYYY').toString()}
+                logo={{ src: Logo, alt: 'image' }}
+                jobId={jobId || ''}
+              />
 
-                {/* Right side description */}
-                <div className={classNames(`w-full md:w-3/12 flex-1 relative`)}>
-                  <JobInformationCard cardData={jobInformation} jobId={jobId} />
-                </div>
-              </div>
+              <JobDetailWidget job={job} jobInformation={jobInformation} />
+
               {/* Footer */}
-              <div className={classNames(`flex flex-col gap-2 items-center justify-center my-12`)}>
-                <h1 className={classNames(`text-3xl font-semibold capitalize`)}>Công việc liên quan</h1>
+              <div className={classNames(`my-8 w-full`)}>
+                <h1 className={classNames(`text-3xl font-semibold capitalize text-center mb-2`)}>
+                  Công việc liên quan
+                </h1>
 
-                <div className={classNames(`flex flex-col md:flex-row gap-6`)}>
-                  {/* TODO: add job fetch data */}
-                  {suggestedJobs.map((data) => {
-                    return <JobCard job={data} />
-                  })}
+                <div className='flex flex-wrap -mx-4 mt-[10px]'>
+                  {/* <!-- Card --> */}
+                  {suggestedJobs &&
+                    suggestedJobs.map((data) => (
+                      <div key={data.jobId} className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
+                        <JobCard job={data} isShow={false} />
+                      </div>
+                    ))}
                 </div>
               </div>
             </>

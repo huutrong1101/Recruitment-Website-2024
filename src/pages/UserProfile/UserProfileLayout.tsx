@@ -33,20 +33,17 @@ export default function UserProfileLayout() {
                   className={classNames(
                     `px-2 py-2 flex flex-row items-center gap-4 text-base group`,
                     `transition-colors ease-in-out duration-100 rounded-xl`,
-                    { 'bg-black/10 text-orange': item.url === pathname }
+                    { 'bg-black/10 text-emerald-500': item.url === pathname }
                   )}
                 >
                   <span
-                    className={classNames(
-                      `group-hover:text-orange-hover`,
-                      `transition-colors ease-in-out duration-100`
-                    )}
+                    className={classNames(`group-hover:text-emerald-700`, `transition-colors ease-in-out duration-100`)}
                   >
                     {item.icon}
                   </span>
                   <span
                     className={classNames(
-                      `group-hover:text-orange-hover font-semibold`,
+                      `group-hover:text-emerald-700 font-semibold`,
                       `transition-colors ease-in-out duration-100`
                     )}
                   >

@@ -1,11 +1,11 @@
-import { useState } from 'react'
 import classNames from 'classnames'
-import FormSearch from './FormSearch'
 import Banner from './Banner'
-import Jobs from './Jobs'
-import Events from './Events'
-import Advertise from '../../components/Advertise/Advertise'
 import Container from '../../components/Container/Container'
+import InterestJobs from './InterestJobs'
+import LatestJob from './LatestJob'
+import FeaturedRecruiter from './FeaturedRecruiter'
+import Blog from './Blog'
+import Select from './Select'
 
 export default function Home() {
   return (
@@ -14,12 +14,15 @@ export default function Home() {
       <Banner />
 
       {/* Các phần còn lại được bao bởi Container */}
-      <Container>
-        <FormSearch />
-        <Jobs />
-        <Events />
-        <Advertise />
-      </Container>
+      <div className='my-[25px] md:my-[50px]'>
+        <Container>
+          <Select />
+          <InterestJobs />
+          <LatestJob />
+          <FeaturedRecruiter />
+          <Blog />
+        </Container>
+      </div>
     </div>
   )
 }

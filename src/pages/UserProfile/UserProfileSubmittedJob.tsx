@@ -11,6 +11,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import JobStatusBadge from '../../components/Badge/JobStatusBadge'
 import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
 import { getCandidateSubmittedJobs } from '../../services/CandidateService'
+import Search, { SearchProps } from 'antd/es/input/Search'
 
 export default function UserProfileSubmittedJob() {
   const [filterType, setFilterType] = useState<number>(0)
@@ -111,7 +112,7 @@ export default function UserProfileSubmittedJob() {
     setPagination({ ...pagination, loading: true })
   }
 
-  console.log(applicants)
+  const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value)
 
   return (
     <div className={`px-4 py-2 bg-zinc-100 mt-2 rounded-xl flex flex-col gap-2 flex-1`}>
@@ -131,7 +132,7 @@ export default function UserProfileSubmittedJob() {
               label={`search`}
             />
           </div> */}
-          <div className='w-40'>
+          <div className='flex items-center justify-between w-full'>
             <Listbox value={searchParams.get('limit') || 5} onChange={handleChangeLimit} disabled={pagination.loading}>
               <div className={classnames(`relative`)}>
                 <Listbox.Button
@@ -180,6 +181,16 @@ export default function UserProfileSubmittedJob() {
                 </Transition>
               </div>
             </Listbox>
+            <Search
+              size='large'
+              placeholder='Tìm kiếm'
+              onSearch={onSearch}
+              enterButton
+              className='w-[35%]'
+              style={{
+                borderRadius: '4px' // Bo góc
+              }}
+            />
           </div>
         </div>
       </div>

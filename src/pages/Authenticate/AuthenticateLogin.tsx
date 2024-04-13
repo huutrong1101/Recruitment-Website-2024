@@ -61,7 +61,10 @@ export default function AuthenticateLogin() {
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className='flex flex-col items-center w-full gap-4 mx-6'>
-        <h1 className='text-xl font-semibold capitalize'>Đăng nhập</h1>
+        <h1 className='text-xl font-semibold capitalize text-emerald-500'>Chào mừng bạn đã quay trở lại</h1>
+        <p className='mb-0 text-sm font-normal leading-5 text-left text-gray-600'>
+          Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
+        </p>
 
         <InputIcon
           icon={<EnvelopeIcon />}
@@ -99,6 +102,12 @@ export default function AuthenticateLogin() {
           isLoading={signInLoadingState === 'pending'}
           disabled={signInLoadingState === 'pending'}
         />
+      </div>
+      <div className='text-base font-normal tracking-normal no-underline'>
+        Bạn chưa có tài khoản?{' '}
+        <Link to='/auth/signup' className='text-emerald-500'>
+          Đăng ký ngay
+        </Link>
       </div>
     </form>
   )
