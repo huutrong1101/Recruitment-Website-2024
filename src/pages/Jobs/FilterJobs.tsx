@@ -1,49 +1,61 @@
-import React, { Fragment } from 'react'
-import { Menu, Transition } from '@headlessui/react'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import React from 'react'
 import classNames from 'classnames'
-import { JOB_POSITION } from '../../utils/Localization'
-import { Input, Select } from 'antd'
+import { Button, Input, Select } from 'antd'
 import { UserCircleIcon } from '@heroicons/react/24/outline'
+import { SearchOutlined } from '@ant-design/icons'
 
 interface FilterJobsProps {
   dataSearch: {
     key: string
-    position: string
-    location: string
-    type: string
-    selectedType: string
+    selectedProvince: string
+    selectedExperiences: string
+    selectedActivity: string
+    selectedLevelRequirements: string
+    selectedGenderRequirements: string
+    selectedJobTypes: string
   }
-  posistion: string[]
-  location: string[]
-  type: string[]
+  // Update để chấp nhận các List mới thay vì chỉ vị trí và loại
+  provinces: string[]
+  experiences: string[]
+  jobTypes: string[]
+  levelRequirements: string[]
+  genderRequirements: string[]
+  activities: string[]
   resetToken: number
   handleSearch: (e: React.FormEvent) => void
   handleReset: () => void
   setDataSearch: React.Dispatch<
     React.SetStateAction<{
       key: string
-      position: string
-      location: string
-      type: string
-      selectedType: string
+      selectedProvince: string
+      selectedExperiences: string
+      selectedActivity: string
+      selectedLevelRequirements: string
+      selectedGenderRequirements: string
+      selectedJobTypes: string
     }>
   >
 }
 
 const FilterJobs: React.FC<FilterJobsProps> = ({
   dataSearch,
-  posistion,
-  location,
-  type,
+  provinces,
+  experiences,
+  jobTypes,
+  levelRequirements,
+  genderRequirements,
+  activities,
   handleSearch,
   handleReset,
   setDataSearch,
   resetToken
 }) => {
-  const optionsType = type.map((option) => ({ value: option, label: JOB_POSITION[option] }))
-  const optionsPosition = posistion.map((option) => ({ value: option, label: option }))
-  const optionsLocation = location.map((option) => ({ value: option, label: JOB_POSITION[option] }))
+  const optionsProvinces = provinces.map((option) => ({ value: option, label: option }))
+  const optionsExperiences = experiences.map((option) => ({ value: option, label: option }))
+  const optionsJobTypes = jobTypes.map((option) => ({ value: option, label: option }))
+  const optionsLevelRequirements = levelRequirements.map((option) => ({ value: option, label: option }))
+  const optionsGenderRequirements = genderRequirements.map((option) => ({ value: option, label: option }))
+  const optionsActivities = activities.map((option) => ({ value: option, label: option }))
 
   const lowercase = (str: any) => str.toLowerCase()
 
@@ -53,9 +65,8 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
         Tìm việc làm nhanh 24h, việc làm mới nhất trên toàn quốc.
       </h1>
       <form onSubmit={handleSearch}>
-        <div className='flex items-center gap-4 w-[97%]'>
+        <div className='flex items-center w-full gap-4'>
           <Input
-            size='large'
             placeholder='Tìm kiếm theo tên'
             prefix={<UserCircleIcon />}
             className='w-full'
@@ -66,21 +77,12 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
           />
 
           <div className='flex items-center gap-2'>
-            <button
-              type='submit'
-              className='flex items-center justify-center flex-shrink-0 px-4 py-2 text-white rounded-md bg-emerald-500 hover:bg-emerald-700'
-            >
+            <Button type='primary' onClick={handleSearch} icon={<SearchOutlined />}>
               Tìm kiếm
-            </button>
-            <button
-              type='submit'
-              className='flex items-center justify-center flex-shrink-0 px-4 py-2 text-white rounded-md bg-emerald-500 hover:bg-emerald-700'
-              onClick={() => {
-                handleReset()
-              }}
-            >
-              Xóa bộ lọc
-            </button>
+            </Button>
+            <Button danger onClick={handleReset} style={{ backgroundColor: 'transparent' }}>
+              Xóa bộ lọc
+            </Button>
           </div>
         </div>
 
@@ -90,19 +92,12 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
               key={resetToken.toString()}
               showSearch
               style={{ width: '100%' }}
-              placeholder='Vị trí'
-              optionFilterProp='children'
-              filterOption={(input, option) => lowercase(option?.label ?? '').includes(lowercase(input))}
-              filterSort={(optionA, optionB) =>
-                lowercase(optionA?.label ?? '').localeCompare(lowercase(optionB?.label ?? ''))
+              placeholder='Tỉnh/Thành phố'
+              filterOption={(input, option) =>
+                option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
-              options={optionsPosition}
-              onChange={(value) =>
-                setDataSearch({
-                  ...dataSearch,
-                  position: value
-                })
-              }
+              options={optionsProvinces}
+              onChange={(value) => setDataSearch({ ...dataSearch, selectedProvince: value })}
             />
           </div>
           <div className={classNames('w-1/4')}>
@@ -110,19 +105,12 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
               key={resetToken.toString()}
               showSearch
               style={{ width: '100%' }}
-              placeholder='Địa điểm'
-              optionFilterProp='children'
-              filterOption={(input, option) => lowercase(option?.label ?? '').includes(lowercase(input))}
-              filterSort={(optionA, optionB) =>
-                lowercase(optionA?.label ?? '').localeCompare(lowercase(optionB?.label ?? ''))
+              placeholder='Kinh nghiệm'
+              filterOption={(input, option) =>
+                option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
-              options={optionsLocation}
-              onChange={(value) =>
-                setDataSearch({
-                  ...dataSearch,
-                  location: value
-                })
-              }
+              options={optionsExperiences}
+              onChange={(value) => setDataSearch({ ...dataSearch, selectedExperiences: value })}
             />
           </div>
           <div className={classNames('w-1/4')}>
@@ -130,19 +118,12 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
               key={resetToken.toString()}
               showSearch
               style={{ width: '100%' }}
-              placeholder='Loại công việc'
-              optionFilterProp='children'
-              filterOption={(input, option) => lowercase(option?.label ?? '').includes(lowercase(input))}
-              filterSort={(optionA, optionB) =>
-                lowercase(optionA?.label ?? '').localeCompare(lowercase(optionB?.label ?? ''))
+              placeholder='Lĩnh vực'
+              filterOption={(input, option) =>
+                option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
-              options={optionsType}
-              onChange={(value) =>
-                setDataSearch({
-                  ...dataSearch,
-                  selectedType: value
-                })
-              }
+              options={optionsActivities}
+              onChange={(value) => setDataSearch({ ...dataSearch, selectedActivity: value })}
             />
           </div>
           <div className={classNames('w-1/4')}>
@@ -150,19 +131,12 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
               key={resetToken.toString()}
               showSearch
               style={{ width: '100%' }}
-              placeholder='Loại công việc'
-              optionFilterProp='children'
-              filterOption={(input, option) => lowercase(option?.label ?? '').includes(lowercase(input))}
-              filterSort={(optionA, optionB) =>
-                lowercase(optionA?.label ?? '').localeCompare(lowercase(optionB?.label ?? ''))
+              placeholder='Vị trí'
+              filterOption={(input, option) =>
+                option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
-              options={optionsType}
-              onChange={(value) =>
-                setDataSearch({
-                  ...dataSearch,
-                  selectedType: value
-                })
-              }
+              options={optionsLevelRequirements}
+              onChange={(value) => setDataSearch({ ...dataSearch, selectedLevelRequirements: value })}
             />
           </div>
           <div className={classNames('w-1/4')}>
@@ -170,19 +144,12 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
               key={resetToken.toString()}
               showSearch
               style={{ width: '100%' }}
-              placeholder='Loại công việc'
-              optionFilterProp='children'
-              filterOption={(input, option) => lowercase(option?.label ?? '').includes(lowercase(input))}
-              filterSort={(optionA, optionB) =>
-                lowercase(optionA?.label ?? '').localeCompare(lowercase(optionB?.label ?? ''))
+              placeholder='Yêu cầu giới tính'
+              filterOption={(input, option) =>
+                option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
-              options={optionsType}
-              onChange={(value) =>
-                setDataSearch({
-                  ...dataSearch,
-                  selectedType: value
-                })
-              }
+              options={optionsGenderRequirements}
+              onChange={(value) => setDataSearch({ ...dataSearch, selectedGenderRequirements: value })}
             />
           </div>
           <div className={classNames('w-1/4')}>
@@ -190,19 +157,12 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
               key={resetToken.toString()}
               showSearch
               style={{ width: '100%' }}
-              placeholder='Loại công việc'
-              optionFilterProp='children'
-              filterOption={(input, option) => lowercase(option?.label ?? '').includes(lowercase(input))}
-              filterSort={(optionA, optionB) =>
-                lowercase(optionA?.label ?? '').localeCompare(lowercase(optionB?.label ?? ''))
+              placeholder='Loại hình'
+              filterOption={(input, option) =>
+                option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
-              options={optionsType}
-              onChange={(value) =>
-                setDataSearch({
-                  ...dataSearch,
-                  selectedType: value
-                })
-              }
+              options={optionsJobTypes}
+              onChange={(value) => setDataSearch({ ...dataSearch, selectedJobTypes: value })}
             />
           </div>
         </div>

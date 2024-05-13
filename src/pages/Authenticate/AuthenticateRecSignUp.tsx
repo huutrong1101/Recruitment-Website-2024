@@ -7,6 +7,10 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState } from 'react'
+import { useAppDispatch } from '../../hooks/hooks'
+import { authRecRegister } from '../../redux/reducer/AuthSlice'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 function TermAndConditionsDialog({ visible, onClose, onOkay }: any) {
   return (
@@ -71,13 +75,13 @@ function TermAndConditionsDialog({ visible, onClose, onOkay }: any) {
 
 const signUpSchema = yup.object().shape({
   companyName: yup.string().required('Không được để trống.'),
-  fullName: yup.string().required('Không được để trống.'),
-  role: yup.string().required('Không được để trống.'),
+  name: yup.string().required('Không được để trống.'),
+  position: yup.string().required('Không được để trống.'),
   phone: yup
     .string()
     .matches(/^[0-9]{10,12}$/, 'Số điện thoại không hợp lệ')
     .required('Không được để trống.'),
-  companyEmail: yup.string().email('Email không hợp lệ.').required('Email người đại diện không được để trống.'),
+  contactEmail: yup.string().email('Email không hợp lệ.').required('Email người đại diện không được để trống.'),
   email: yup.string().email('Email không hợp lệ.').required('Email đăng nhập không được để trống.'),
   password: yup.string().min(8, 'Mật khẩu phải ít nhất 8 ký tự.').required('Mật khẩu không được để trống.'),
   confirmPassword: yup
@@ -89,6 +93,10 @@ const signUpSchema = yup.object().shape({
 
 function AuthenticateRecSignUp() {
   const [visibleTermAndCondition, setVisibleTermAndCondition] = useState<boolean>(false)
+
+  const dispatch = useAppDispatch()
+
+  const navigate = useNavigate()
 
   const handleCloseDialog = () => {
     setVisibleTermAndCondition(false)
@@ -108,8 +116,18 @@ function AuthenticateRecSignUp() {
   })
 
   const onSubmit = (data: any) => {
-    console.log(data)
+    const { agreeTerms, ...formData } = data
+
+    dispatch(authRecRegister(formData))
+      .unwrap()
+      .then(() => {
+        navigate(`/email/incomplete?email=${encodeURIComponent(data.email)}`)
+      })
+      .catch((errorData) => {
+        toast.error(errorData.message)
+      })
   }
+
   return (
     <form
       className={classnames(
@@ -131,7 +149,7 @@ function AuthenticateRecSignUp() {
               label='companyName'
               required
               wrapperClassName={classnames({
-                'border-red-300': errors && errors.fullName
+                'border-red-300': errors && errors.companyName
               })}
             />
 
@@ -141,10 +159,10 @@ function AuthenticateRecSignUp() {
                   icon={<UserIcon />}
                   placeholder='Họ và tên người đại diện'
                   register={register}
-                  label='fullName'
+                  label='name'
                   required
                   wrapperClassName={classnames({
-                    'border-red-300': errors && errors.fullName
+                    'border-red-300': errors && errors.name
                   })}
                 />
               </div>
@@ -153,10 +171,10 @@ function AuthenticateRecSignUp() {
                   icon={<UserIcon />}
                   placeholder='Chức vụ'
                   register={register}
-                  label='role'
+                  label='position'
                   required
                   wrapperClassName={classnames({
-                    'border-red-300': errors && errors.role
+                    'border-red-300': errors && errors.position
                   })}
                 />
               </div>
@@ -182,12 +200,12 @@ function AuthenticateRecSignUp() {
                   icon={<EnvelopeIcon />}
                   placeholder='Email người đại diện'
                   register={register}
-                  label='companyEmail'
+                  label='contactEmail'
                   type='email'
                   autoComplete='username email'
                   required
                   wrapperClassName={classnames({
-                    'border-red-300': errors && errors.email
+                    'border-red-300': errors && errors.contactEmail
                   })}
                 />
               </div>

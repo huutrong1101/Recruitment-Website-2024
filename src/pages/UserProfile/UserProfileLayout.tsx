@@ -1,18 +1,35 @@
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { prepareCandidateProvider } from '../../utils/NavigateMenu'
+import {
+  prepareCandidateProvider,
+  prepareOtherProvider,
+  prepareRecruiterProvider,
+  prepareRecruiterProviderConfirm
+} from '../../utils/NavigateMenu'
 import Container from '../../components/Container/Container'
+import { useAppSelector } from '../../hooks/hooks'
 
 export default function UserProfileLayout() {
+  const { recruiter, loading } = useAppSelector((app) => app.Auth)
   const [asideMenuItems, setAsideMenuItems] = useState<any[]>([])
   const { pathname } = useLocation()
 
   useEffect(() => {
-    const supplyMenuItems: any[] = prepareCandidateProvider()
+    if (loading === 'success' && recruiter) {
+      const supplyMenuItems =
+        recruiter.role === 'CANDIDATE'
+          ? prepareCandidateProvider()
+          : recruiter.role === 'RECRUITER'
+            ? recruiter.acceptanceStatus !== 'waiting'
+              ? prepareRecruiterProviderConfirm()
+              : prepareRecruiterProvider()
+            : prepareOtherProvider()
+      // const supplyMenuItems: any[] = prepareCandidateProvider()
 
-    setAsideMenuItems([...supplyMenuItems])
-  }, [])
+      setAsideMenuItems(supplyMenuItems)
+    }
+  }, [loading, recruiter])
 
   return (
     <Container>

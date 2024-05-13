@@ -1,33 +1,115 @@
 import { Steps, Button, Form, Input, Select } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Container from '../../components/Container/Container'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import { RcFile, UploadChangeParam, UploadFile } from 'antd/lib/upload/interface'
+import { Upload, message } from 'antd'
+import Step1Form from './Step1Form'
+import Step2Form from './Step2Form'
+import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
+import { toast } from 'react-toastify'
+import { UserService } from '../../services/UserService'
+import { JobService } from '../../services/JobService'
+import { useNavigate } from 'react-router-dom'
 
 const { Step } = Steps
 const { Option } = Select
 
 interface FormData {
-  companyName?: string
-  website?: string
-  field?: string
-  province?: string
-  district?: string
-  address?: string
-  emailLogin?: string
+  name?: string
   position?: string
-  emailCompany?: string
   phone?: string
-  representative?: string
-  companyDescription?: string
-  companyLogo?: UploadFile | null
+  contactEmail?: string
+  companyName?: string
+  companyWebsite?: string
+  companyAddress?: string
+  companyLogo?: UploadFile
+  companyCoverPhoto?: UploadFile
+  about?: string
+  employeeNumber?: string
+  fieldOfActivity?: string[]
+  emailLogin?: string
+  slug?: string
 }
 
 function ConfirmRec() {
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
+  const { recruiter, loading } = useAppSelector((app) => app.Auth)
+  const activities = useAppSelector((state) => state.Job.activities)
+
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<FormData>({})
   const [form] = Form.useForm() // Tạo instance của form
+  const [previewLogo, setPreviewLogo] = useState<string>('')
+  const [previewCover, setPreviewCover] = useState('')
+  const [isUploading, setUploading] = useState<boolean>(false)
+  // Lưu trữ danh sách file đã tải lên, bao gồm cả preview
+  const [coverList, setCoverList] = useState<UploadFile[]>([])
+  const [logoList, setLogoList] = useState<UploadFile[]>([])
+
+  useEffect(() => {
+    JobService.getActivity(dispatch)
+  }, [])
+
+  useEffect(() => {
+    if (recruiter) {
+      // Define nguyên mẩu giá trị mới cần thiết cho formData từ user
+      const newUserFormData = {
+        ...formData,
+        emailLogin: recruiter.email,
+        position: recruiter.position,
+        contactEmail: recruiter.contactEmail,
+        phone: recruiter.phone,
+        name: recruiter.name
+        // Tiếp tục với các trường khác từ user...
+      }
+
+      setFormData(newUserFormData)
+
+      // Cập nhật vào form fields
+      form.setFieldsValue(newUserFormData)
+    }
+  }, [recruiter, form])
+
+  // Hàm được gọi khi có thay đổi trên Upload component
+  const onUploadChange = (info: UploadChangeParam<UploadFile>, fileType: 'logo' | 'cover'): void => {
+    // Cập nhật danh sách file theo loại đang xử lý
+    if (fileType === 'logo') {
+      setLogoList(info.fileList)
+    } else if (fileType === 'cover') {
+      setCoverList(info.fileList)
+    }
+
+    // Tìm file mới nhất (nếu có) trong danh sách của loại file đang xử lý
+    const latestFile = info.fileList.slice(-1)[0]?.originFileObj
+    if (latestFile) {
+      getBase64(latestFile, (imageUrl: string) => {
+        // Cập nhật preview tương ứng với loại file
+        if (fileType === 'logo') {
+          setPreviewLogo(imageUrl)
+        } else if (fileType === 'cover') {
+          setPreviewCover(imageUrl)
+        }
+      })
+    }
+  }
+
+  // Hàm để chuyển Blob thành base64 để preview
+  const getBase64 = (file: Blob, callback: (imageUrl: string) => void) => {
+    const reader = new FileReader()
+    reader.addEventListener('load', () => callback(reader.result as string))
+    reader.readAsDataURL(file)
+  }
+
+  const handleLogoChange = (info: UploadChangeParam<UploadFile>) => {
+    onUploadChange(info, 'logo')
+  }
+
+  // Và như sau cho Cover:
+  const handleCoverChange = (info: UploadChangeParam<UploadFile>) => {
+    onUploadChange(info, 'cover')
+  }
 
   const nextStep = () => {
     form
@@ -46,12 +128,66 @@ function ConfirmRec() {
     setCurrentStep(currentStep - 1)
   }
 
+  const handleFieldOfActivityChange = (values: string[], option: { children: string; value: string }[]) => {
+    // Sử dụng 'map' để lấy ra mảng các 'label' từ mảng 'option'
+    const fieldOfActivityLabels = option.map((o) => o.children)
+    // Cập nhật 'fieldOfActivity' trong 'formData' với mảng các 'label' vừa lấy được
+    setFormData((prevFormData) => ({ ...prevFormData, fieldOfActivity: fieldOfActivityLabels }))
+  }
+
   const handleFormChange = (changedValues: any, allValues: any) => {
     setFormData({ ...formData, ...changedValues })
   }
 
   const onFinish = () => {
-    console.log('Received values of form:', formData)
+    // Tạo một instance mới của FormData cho việc gửi request.
+    const formDataObj = new FormData()
+
+    const formValues = form.getFieldsValue(true) // Lấy tất cả giá trị từ form, kể cả những trường không thay đổi
+    const mergedValues = { ...formData, ...formValues }
+
+    // Thêm các giá trị từ formData (không phải là files) vào formDataObj
+    Object.keys(mergedValues).forEach((key) => {
+      if (key === 'emailLogin') {
+        // Nếu là emailLogin thì bỏ qua và không thêm vào formDataObj
+        return
+      }
+
+      const value = mergedValues[key]
+
+      console.log({ key, value })
+
+      if (key === 'fieldOfActivity' && Array.isArray(value)) {
+        // Chuyển mảng fieldOfActivity thành chuỗi với các phần tử cách nhau bởi dấu phẩy
+        const fieldOfActivityText = value.join(', ')
+        formDataObj.append('fieldOfActivity', fieldOfActivityText)
+      } else if (key !== 'companyLogo' && key !== 'companyCoverPhoto') {
+        // Nếu không phải là fieldOfActivity, logo, hoặc ảnh bìa, thêm bình thường.
+        formDataObj.append(key, typeof value === 'string' ? value : JSON.stringify(value))
+      }
+    })
+
+    // Thêm file logo và cover photo vào formDataObj nếu có
+    if (mergedValues.companyLogo && mergedValues.companyLogo[0].originFileObj instanceof File) {
+      formDataObj.append('companyLogo', mergedValues.companyLogo[0].originFileObj)
+    }
+
+    if (mergedValues.companyCoverPhoto && mergedValues.companyCoverPhoto[0].originFileObj instanceof File) {
+      formDataObj.append('companyCoverPhoto', mergedValues.companyCoverPhoto[0].originFileObj)
+    }
+
+    // Gửi FormData đến server
+    // Replace 'yourApiEndpoint' với đường dẫn thực của bạn và xử lý ứng với API của bạn
+    toast
+      .promise(UserService.updateRecInformation(formDataObj), {
+        pending: `Thông tin của bạn đang được cập nhật`
+      })
+      .then((response) => {
+        navigate('/confirm-rec/complete')
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message)
+      })
   }
 
   return (
@@ -70,335 +206,24 @@ function ConfirmRec() {
             labelCol={{ span: 24 }}
           >
             {currentStep === 0 && (
-              <Container>
-                <Form.Item
-                  name='companyName'
-                  label='Tên công ty'
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Vui lòng nhập tên công ty!'
-                    }
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='website'
-                    label='Website'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng nhập website của công ty!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    name='field'
-                    label='Lĩnh vực'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng chọn lĩnh vực!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Select
-                      showSearch
-                      style={{ width: '100%' }}
-                      placeholder='Lĩnh vực'
-                      optionFilterProp='children'
-                      filterOption={(input, option) => (option?.label ?? '').includes(input)}
-                      filterSort={(optionA, optionB) =>
-                        (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                      }
-                      options={[
-                        {
-                          value: '1',
-                          label: 'Not Identified'
-                        },
-                        {
-                          value: '2',
-                          label: 'Closed'
-                        },
-                        {
-                          value: '3',
-                          label: 'Communicated'
-                        },
-                        {
-                          value: '4',
-                          label: 'Identified'
-                        },
-                        {
-                          value: '5',
-                          label: 'Resolved'
-                        },
-                        {
-                          value: '6',
-                          label: 'Cancelled'
-                        }
-                      ]}
-                    />
-                  </Form.Item>
-                </div>
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='province'
-                    label='Tình thành'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng chọn tỉnh thành!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Select
-                      showSearch
-                      style={{ width: '100%' }}
-                      placeholder='Chọn tỉnh thành'
-                      optionFilterProp='children'
-                      filterOption={(input, option) => (option?.label ?? '').includes(input)}
-                      filterSort={(optionA, optionB) =>
-                        (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                      }
-                      options={[
-                        {
-                          value: '1',
-                          label: 'Not Identified'
-                        },
-                        {
-                          value: '2',
-                          label: 'Closed'
-                        },
-                        {
-                          value: '3',
-                          label: 'Communicated'
-                        },
-                        {
-                          value: '4',
-                          label: 'Identified'
-                        },
-                        {
-                          value: '5',
-                          label: 'Resolved'
-                        },
-                        {
-                          value: '6',
-                          label: 'Cancelled'
-                        }
-                      ]}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name='district'
-                    label='Quận huyện'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng chọn quận huyện!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Select
-                      showSearch
-                      style={{ width: '100%' }}
-                      placeholder='Chọn quận huyện'
-                      optionFilterProp='children'
-                      filterOption={(input, option) => (option?.label ?? '').includes(input)}
-                      filterSort={(optionA, optionB) =>
-                        (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                      }
-                      options={[
-                        {
-                          value: '1',
-                          label: 'Not Identified'
-                        },
-                        {
-                          value: '2',
-                          label: 'Closed'
-                        },
-                        {
-                          value: '3',
-                          label: 'Communicated'
-                        },
-                        {
-                          value: '4',
-                          label: 'Identified'
-                        },
-                        {
-                          value: '5',
-                          label: 'Resolved'
-                        },
-                        {
-                          value: '6',
-                          label: 'Cancelled'
-                        }
-                      ]}
-                    />
-                  </Form.Item>
-                </div>
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='address'
-                    label='Địa chỉ'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng nhập địa chỉ của công ty!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    name='emailLogin'
-                    label='Email đăng nhập'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng nhập email đăng nhập!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Input />
-                  </Form.Item>
-                </div>
-
-                <Form.Item className='flex justify-end'>
-                  <Button type='primary' onClick={nextStep}>
-                    Tiếp theo
-                  </Button>
-                </Form.Item>
-              </Container>
+              <Step1Form
+                form={form}
+                onFormChange={handleFormChange}
+                nextStep={nextStep}
+                onFieldOfActivityChange={handleFieldOfActivityChange}
+                activities={activities}
+              />
             )}
             {currentStep === 1 && (
-              <Container>
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='position'
-                    label='Chức vụ'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng nhập chức vụ!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    name='emailCompany'
-                    label='Email liên hệ công ty'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng nhập email của công ty!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Input />
-                  </Form.Item>
-                </div>
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='phone'
-                    label='Điện thoại'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng nhập số điện thoại!'
-                      },
-                      {
-                        pattern: /^[0-9]*$/,
-                        message: 'Số điện thoại chỉ chứa các ký tự số!'
-                      },
-                      {
-                        len: 10,
-                        message: 'Số điện thoại phải có 10 số!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    name='representative'
-                    label='Người đại diện'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Vui lòng nhập tên người đại diện!'
-                      }
-                    ]}
-                    className='w-1/2'
-                  >
-                    <Input />
-                  </Form.Item>
-                </div>
-                <Form.Item
-                  name='companyDescription'
-                  label='Giới thiệu công ty'
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Vui lòng nhập giới thiệu về công ty!'
-                    }
-                  ]}
-                >
-                  <div style={{ minHeight: '200px', maxHeight: '600px' }}>
-                    <CKEditor
-                      editor={ClassicEditor}
-                      data={form.getFieldValue('companyDescription') || ''}
-                      onChange={(_: any, editor: any) => {
-                        const data = editor.getData()
-                        form.setFieldsValue({ companyDescription: data })
-                      }}
-                    />
-                  </div>
-                </Form.Item>
-
-                <Form.Item
-                  name='companyLogo'
-                  label='Chọn ảnh logo'
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Vui lòng upload logo của công ty'
-                    }
-                  ]}
-                >
-                  <div style={{ minHeight: '200px', maxHeight: '600px' }}>
-                    <CKEditor
-                      editor={ClassicEditor}
-                      data={form.getFieldValue('companyDescription') || ''}
-                      onChange={(_: any, editor: any) => {
-                        const data = editor.getData()
-                        form.setFieldsValue({ companyDescription: data })
-                      }}
-                    />
-                  </div>
-                </Form.Item>
-
-                <Form.Item className='flex items-center justify-end gap-2'>
-                  <Button onClick={prevStep} className='mr-2 text-white'>
-                    Quay lại
-                  </Button>
-                  <Button type='primary' htmlType='submit'>
-                    Hoàn thành
-                  </Button>
-                </Form.Item>
-              </Container>
+              <Step2Form
+                form={form}
+                onFormChange={handleFormChange}
+                prevStep={prevStep}
+                onLogoUploadChange={handleLogoChange} // thay vì onUploadChange
+                onCoverUploadChange={handleCoverChange}
+                previewLogo={previewLogo}
+                previewCover={previewCover}
+              />
             )}
           </Form>
         </div>

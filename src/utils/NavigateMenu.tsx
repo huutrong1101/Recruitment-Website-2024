@@ -1,7 +1,9 @@
 import {
   HiArrowLeftOnRectangle,
+  HiBriefcase,
   HiCog6Tooth,
   HiEnvelope,
+  HiHome,
   HiInformationCircle,
   HiOutlineCalendarDays,
   HiOutlineChartPie,
@@ -9,6 +11,7 @@ import {
   HiOutlineClipboardDocumentList,
   HiOutlineFolder,
   HiOutlineUser,
+  HiPlusCircle,
   HiQuestionMarkCircle,
   HiUserCircle
 } from 'react-icons/hi2'
@@ -70,6 +73,50 @@ const informationProvider = [
   }
 ]
 
+const recInformationProviderConfirm = [
+  {
+    url: '/recruiter/profile',
+    icon: <HiUserCircle />,
+    text: 'Thông tin tài khoản'
+  },
+  {
+    url: '/recruiter/profile/company',
+    icon: <HiHome />,
+    text: 'Thông tin công ty'
+  },
+  {
+    url: '/recruiter/profile/jobsPosted',
+    icon: <HiBriefcase />,
+    text: 'Việc làm đã đăng tuyển'
+  },
+  {
+    url: '/recruiter/profile/createJob',
+    icon: <HiPlusCircle />,
+    text: 'Đăng tin tuyển dụng'
+  },
+  {
+    url: '/logout',
+    icon: <HiArrowLeftOnRectangle />,
+    text: 'Đăng xuất'
+  }
+]
+
+const recInformationProvider = [
+  {
+    url: '/logout',
+    icon: <HiArrowLeftOnRectangle />,
+    text: 'Đăng xuất'
+  }
+]
+
+export const prepareRecruiterProviderConfirm = () => {
+  return recInformationProviderConfirm
+}
+
+export const prepareRecruiterProvider = () => {
+  return recInformationProvider
+}
+
 export const prepareCandidateProvider = () => {
   return prepareMenuItem([...informationProvider, ...candidateProvider])
 }
@@ -84,108 +131,13 @@ export const prepareOtherProvider = () => {
 
 export const linksAll = [
   {
-    title: 'ADMIN',
-    links: [
-      {
-        name: 'Dashboard',
-        icon: <HomeIcon />,
-        url: '/admin'
-      },
-      {
-        name: 'Profile',
-        icon: <UserIcon />,
-        url: '/admin/profile'
-      },
-      {
-        name: 'Manager Account',
-        icon: <UserIcon />,
-        url: '/admin/account'
-      },
-      {
-        name: 'Create Account',
-        icon: <PlusCircleIcon />,
-        url: '/admin/create_account'
-      },
-      {
-        name: 'Manager Jobs',
-        icon: <BriefcaseIcon />,
-        url: '/admin/jobs'
-      },
-      {
-        name: 'Manager Events',
-        icon: <EnvelopeIcon />,
-        url: '/admin/events'
-      }
-    ]
+    name: 'Dashboard',
+    icon: <HomeIcon />,
+    url: '/admin'
   },
   {
-    title: 'RECRUITER',
-    links: [
-      {
-        name: 'Overview',
-        icon: <ChartPieIcon />,
-        url: '/recruiter'
-      },
-      {
-        name: 'Profile',
-        icon: <UserIcon />,
-        url: '/recruiter/profile'
-      },
-      {
-        name: 'Interviewer',
-        icon: <UserGroupIcon />,
-        url: '/recruiter/interviewers'
-      },
-      {
-        name: 'Candidate',
-        icon: <UsersIcon />,
-        url: '/recruiter/candidates'
-      },
-      {
-        name: 'Job',
-        icon: <FolderIcon />,
-        url: '/recruiter/jobs'
-      },
-      {
-        name: 'Event',
-        icon: <EnvelopeIcon />,
-        url: '/recruiter/events'
-      }
-    ]
-  },
-  {
-    title: 'INTERVIEWER',
-    links: [
-      {
-        name: 'Overview',
-        icon: <ChartPieIcon />,
-        url: '/interviewer'
-      },
-      {
-        name: 'Profile',
-        icon: <UserIcon />,
-        url: '/interviewer/profile'
-      },
-      {
-        name: 'Information',
-        icon: <UserIcon />,
-        url: '/interviewer/information'
-      },
-      {
-        name: 'Interview Recent',
-        icon: <UserGroupIcon />,
-        url: '/interviewer/interview-recent'
-      },
-      {
-        name: 'Candidate Recent',
-        icon: <UsersIcon />,
-        url: '/interviewer/candidate-recent'
-      },
-      {
-        name: 'Questions',
-        icon: <QuestionMarkCircleIcon />,
-        url: '/interviewer/question'
-      }
-    ]
+    name: 'Manager Jobs',
+    icon: <BriefcaseIcon />,
+    url: '/admin/manage_jobs'
   }
 ]

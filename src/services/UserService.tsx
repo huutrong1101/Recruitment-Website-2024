@@ -6,7 +6,29 @@ const getUserFromToken = async () => {
   if (!hasLocalToken()) {
     throw new Error(`Unable to load the token`)
   }
-  return await axiosInstance.get(`/user/profile`, {
+  return await axiosInstance.get(`/recruiter/information`, {
+    headers: {
+      Authorization: `Bearer ${getLocalToken()}`
+    }
+  })
+}
+
+const getRecFromToken = async () => {
+  if (!hasLocalToken()) {
+    throw new Error(`Unable to load the token`)
+  }
+  return await axiosInstance.get(`/recruiter/information`, {
+    headers: {
+      Authorization: `Bearer ${getLocalToken()}`
+    }
+  })
+}
+
+const getAdminFromToken = async () => {
+  if (!hasLocalToken()) {
+    throw new Error(`Unable to load the token`)
+  }
+  return await axiosInstance.get(`/admin/information`, {
     headers: {
       Authorization: `Bearer ${getLocalToken()}`
     }
@@ -14,7 +36,7 @@ const getUserFromToken = async () => {
 }
 
 const changeUserAvatar = async (data: FormData) => {
-  return await axiosInstance.put(`/user/avatar`, data, {
+  return await axiosInstance.patch(`/recruiter/update_avatar`, data, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -37,8 +59,8 @@ const updateProfile = async (data: FormData) => {
   return await axiosInstance.put(`/user/update`, data)
 }
 
-const changePassword = async (data: FormData) => {
-  return await axiosInstance.put(`/user/change-password`, data)
+const changePassword = async (data: any) => {
+  return await axiosInstance.post(`/recruiter/change_password`, data)
 }
 
 /**
@@ -57,8 +79,22 @@ const updateUserInformation = async (values: any) => {
   return await axiosInstance.put(`/candidate/information`, values)
 }
 
+const updateRecInformation = async (values: FormData) => {
+  // No Content-Type header is manually set here
+  return await axiosInstance.patch(`/recruiter/update_information`, values)
+}
+
+const updateRecProfile = async (values: any) => {
+  return await axiosInstance.patch(`/recruiter/update_profile`, values)
+}
+
+const updateRecCompanyInfor = async (values: FormData) => {
+  return await axiosInstance.patch(`/recruiter/update_company_information`, values)
+}
+
 export const UserService = {
-  getUserFromToken,
+  getRecFromToken,
+  getAdminFromToken,
   changeUserAvatar,
   getUserInterviews,
   updateProfile,
@@ -66,5 +102,8 @@ export const UserService = {
   uploadResume,
   deleteResume,
   getUserInformation,
-  updateUserInformation
+  updateUserInformation,
+  updateRecInformation,
+  updateRecProfile,
+  updateRecCompanyInfor
 }

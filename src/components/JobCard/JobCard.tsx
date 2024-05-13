@@ -22,7 +22,7 @@ export default function JobCard({ job, isShow }: JobCardProps) {
 
   const maxCharacters = 25 // Số ký tự tối đa bạn muốn hiển thị
   // const title = job.name
-  const title = 'TRAINEE PHÁT TRIỂN PHẦN MỀM NHÚNG'
+  const title = job.name
 
   let shortenedTitle = title
 
@@ -42,8 +42,14 @@ export default function JobCard({ job, isShow }: JobCardProps) {
     console.log(job.name)
   }
 
+  function calculateDaysToDeadline(deadline: any) {
+    const deadlineDate = moment(deadline, 'DD/MM/YYYY')
+    const now = moment()
+    return deadlineDate.diff(now, 'days')
+  }
+
   return (
-    <>
+    <Link to={`/jobs/${job._id}`}>
       <div
         className={classNames(
           `px-4 py-2 bg-white rounded-lg shadow-sm border hover:border-emerald-500`,
@@ -55,17 +61,13 @@ export default function JobCard({ job, isShow }: JobCardProps) {
       >
         <div className='flex items-center gap-3'>
           <div className='w-1/4'>
-            <img
-              className='object-cover w-full h-full'
-              src='https://cdn-new.topcv.vn/unsafe/200x/https://static.topcv.vn/company_logos/cong-ty-co-phan-dana-139c6d216ab5b2c1f012449d3c30c0ec-65fb8d6f41f1c.jpg'
-              alt=''
-            />
+            <img className='object-cover w-full h-full' src={job.companyLogo} alt='' />
           </div>
           <div className='flex flex-col w-3/4 gap-1'>
             {isShow ? (
               <div className='flex flex-col text-xs font-medium text-gray-600 md:text-sm'>
                 <div className='flex items-center justify-between'>
-                  <Link to={`/jobs/${job.jobId}`}>
+                  <Link to={`/jobs/${job._id}`}>
                     <h3 className='text-xs font-semibold text-gray-700 md:text-sm hover:text-emerald-500'>
                       {isShow ? title : shortenedTitle}
                     </h3>
@@ -76,25 +78,30 @@ export default function JobCard({ job, isShow }: JobCardProps) {
                 </div>
                 <p className='text-xs font-medium text-gray-600 md:text-sm '>
                   <span className='font-bold'>Tên công ty:</span>{' '}
-                  <span className='hover:text-emerald-500'>CÔNG TY TNHH TUỆ LINH</span>
+                  <span className='hover:text-emerald-500'>{job.companyName}</span>
                 </p>
                 <p>
-                  <span className='font-bold'>Nơi làm việc: </span>Thành phố Hồ Chí Minh
+                  <span className='font-bold'>Nơi làm việc: </span>
+                  {job.province}
                 </p>
                 <p>
-                  <span className='font-bold'>Cập nhật: </span>3/29/2024 - Bạn còn{' '}
-                  <span className='font-semibold'>61</span> ngày để ứng truyển.
+                  <span className='font-bold'>Cập nhật: </span>
+                  {moment(job.updatedAt).format('MM/DD/YYYY')} - Bạn còn
+                  <span className='font-semibold'> {calculateDaysToDeadline(job.deadline)} </span>
+                  ngày để ứng tuyển.
                 </p>
                 <p>
-                  <span className='font-bold'>Vị trí: </span>Kỹ thuật - Toàn thời gian
+                  <span className='font-bold'>Vị trí: </span>
+                  {job.field} - {job.type}
                 </p>
                 <p>
-                  <span className='font-bold'>Mức lương: </span>Thỏa thuận
+                  <span className='font-bold'>Mức lương: </span>
+                  {job.salary}
                 </p>
               </div>
             ) : (
               <>
-                <Link to={`/jobs/${job.jobId}`}>
+                <Link to={`/jobs/${job._id}`}>
                   <h3 className='text-xs font-semibold text-gray-700 md:text-sm hover:text-emerald-500'>
                     {isShow ? title : shortenedTitle}
                   </h3>
@@ -119,6 +126,6 @@ export default function JobCard({ job, isShow }: JobCardProps) {
           </div>
         </div>
       </div>
-    </>
+    </Link>
   )
 }

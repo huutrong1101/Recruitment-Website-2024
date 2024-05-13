@@ -38,10 +38,11 @@ export default function OneTimePasswordVerify() {
   }, [searchParams])
 
   const handleVerifyOneTimePassword = (data: UserVerifySendParamsInterface) => {
+    console.log(data)
     dispatch(sendVerify(data))
       .unwrap()
       .then(() => {
-        toast.success(`Successfully verify your account, trying to signed in again.`)
+        toast.success(`Xác minh thành công. Bạn đã có thể đăng nhập vào hệ thống.`)
         navigate('/email/complete')
       })
       .catch((response) => {
@@ -85,7 +86,7 @@ export default function OneTimePasswordVerify() {
           enterTo='transform-gpu opacity-100 translate-y-0'
         >
           <h3 className={classNames(`text-[#87D3B7] text-xl font-light leading-tight my-4`)}>
-            Please enter the One-Time-Password that we sent to your email.
+            Vui lòng nhập mã OTP mà chúng tôi đã gửi tới email của bạn.
           </h3>
         </Transition>
         <input type='hidden' {...register('email')} value={''} />
@@ -110,7 +111,7 @@ export default function OneTimePasswordVerify() {
           enterTo='opacity-100'
         >
           <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-            <PrimaryButton text='Verify' type='submit' isLoading={loadingState === 'pending'} disabled={!isFilled} />
+            <PrimaryButton text='Xác nhận' type='submit' isLoading={loadingState === 'pending'} disabled={!isFilled} />
           </div>
         </Transition>
       </Transition>

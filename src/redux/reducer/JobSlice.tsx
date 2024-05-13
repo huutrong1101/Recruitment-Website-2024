@@ -3,9 +3,17 @@ import { STATUS } from '../../utils/contanst'
 
 const initialState = {
   jobs: [],
+  jobDetail: null,
   postion: [],
-  type: [],
   location: [],
+
+  activities: [],
+  type: [],
+  province: [],
+  experience: [],
+  levelRequirement: [],
+  genderRequirement: [],
+
   totalJobs: 0,
   jobsStatus: STATUS.IDLE
 }
@@ -31,10 +39,41 @@ const JobSlice = createSlice({
     },
     setLocation(state, action) {
       state.location = action.payload
+    },
+    setActivity(state, action) {
+      state.activities = action.payload
+    },
+    setProvince(state, action) {
+      state.province = action.payload
+    },
+    setExperience(state, action) {
+      state.experience = action.payload
+    },
+    setLevelRequirement(state, action) {
+      state.levelRequirement = action.payload
+    },
+    setGenderRequirement(state, action) {
+      state.genderRequirement = action.payload
+    },
+    setJobDetail(state, action) {
+      state.jobDetail = action.payload
     }
   }
 })
 
-export const { setJobs, setJobsStatus, setTotalJobs, setPosition, setType, setLocation } = JobSlice.actions
+export const {
+  setJobs,
+  setJobsStatus,
+  setTotalJobs,
+  setPosition,
+  setType,
+  setLocation,
+  setActivity,
+  setProvince,
+  setExperience,
+  setLevelRequirement,
+  setGenderRequirement,
+  setJobDetail
+} = JobSlice.actions
 
 export default JobSlice.reducer

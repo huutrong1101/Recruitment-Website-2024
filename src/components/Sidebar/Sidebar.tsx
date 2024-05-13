@@ -13,15 +13,6 @@ const SideBar = forwardRef<HTMLDivElement, SideBarProps>(({ showNav }, ref: Ref<
 
   const { user } = useAppSelector((state: any) => state.Auth)
 
-  let links = linksAll
-  if (user?.role == 'INTERVIEWER') {
-    links = [linksAll[2]]
-  } else if (user?.role == 'RECRUITER') {
-    links = [linksAll[1]]
-  } else if (user?.role == 'ADMIN') {
-    links = [linksAll[0]]
-  }
-
   // let links = [linksAll[0]]
 
   return (
@@ -31,37 +22,35 @@ const SideBar = forwardRef<HTMLDivElement, SideBarProps>(({ showNav }, ref: Ref<
       </div>
 
       <div className='flex flex-col'>
-        {links.map((item) => (
-          <div key={item.title}>
-            {item.links.map((link) => (
-              <Link
-                to={link.url}
-                key={link.url}
-                className={classNames(
-                  `pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center group`,
-                  `transition-colors ease-in-out duration-100 rounded-sm`,
-                  { 'bg-black/10 text-[#059669]': link.url === pathname }
-                )}
-              >
-                <div className='mr-2'>
-                  <div
-                    className={classNames(
-                      `group-hover:text-[#059669] w-5 h-5`,
-                      `transition-colors ease-in-out duration-100`
-                    )}
-                  >
-                    {link.icon}
-                  </div>
+        {linksAll.map((item: any, index) => (
+          <div key={index}>
+            <Link
+              to={item.url}
+              key={item.url}
+              className={classNames(
+                `pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center group`,
+                `transition-colors ease-in-out duration-100 rounded-sm`,
+                { 'bg-black/10 text-[#059669]': item.url === pathname }
+              )}
+            >
+              <div className='mr-2'>
+                <div
+                  className={classNames(
+                    `group-hover:text-[#059669] w-5 h-5`,
+                    `transition-colors ease-in-out duration-100`
+                  )}
+                >
+                  {item.icon}
                 </div>
-                <div>
-                  <span
-                    className={classNames(`group-hover:text-[#059669]`, `transition-colors ease-in-out duration-100`)}
-                  >
-                    {link.name}
-                  </span>
-                </div>
-              </Link>
-            ))}
+              </div>
+              <div>
+                <span
+                  className={classNames(`group-hover:text-[#059669]`, `transition-colors ease-in-out duration-100`)}
+                >
+                  {item.name}
+                </span>
+              </div>
+            </Link>
           </div>
         ))}
       </div>

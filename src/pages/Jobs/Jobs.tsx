@@ -7,136 +7,63 @@ import { createSearchParams, useNavigate } from 'react-router-dom'
 import JobCard from '../../components/JobCard/JobCard'
 import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
 import Pagination from '../../components/Pagination/Pagination'
-import { useAppSelector } from '../../hooks/hooks'
+import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import useQueryParams from '../../hooks/useQueryParams'
 import axiosInstance from '../../utils/AxiosInstance'
 import { JobInterface, JobListConfig } from '../../types/job.type'
 import FilterJobs from './FilterJobs'
 import Container from '../../components/Container/Container'
+import { JobService } from '../../services/JobService'
+import { data } from '../../data/fetchData'
 
 export type QueryConfig = {
   [key in keyof JobListConfig]: string
 }
 
 export default function Jobs() {
+  const dispatch = useAppDispatch()
   const jobs: JobInterface[] = useAppSelector((state) => state.Job.jobs)
 
-  const posistion = useAppSelector((state) => state.Job.postion)
-
-  const location = useAppSelector((state) => state.Job.location)
-
-  const type = useAppSelector((state) => state.Job.type)
-
-  const totalJobs = useAppSelector((state) => state.Job.totalJobs)
-
+  const provinces = useAppSelector((state) => state.Job.province)
+  const experiences = useAppSelector((state) => state.Job.experience)
+  const jobTypes = useAppSelector((state) => state.Job.type)
+  const levelRequirement = useAppSelector((state) => state.Job.levelRequirement)
+  const genderRequirement = useAppSelector((state) => state.Job.genderRequirement)
+  const activities = useAppSelector((state) => state.Job.activities)
   const [resetToken, setResetToken] = useState(Date.now())
-
-  const [dataSearch, setDataSearch] = useState({
-    key: '',
-    position: '',
-    location: '',
-    type: '',
-    selectedType: ''
-  })
-
-  const navigate = useNavigate()
-
-  const queryParams: QueryConfig = useQueryParams()
-
-  const queryConfig: QueryConfig = omitBy(
-    {
-      page: queryParams.page || '1',
-      limit: queryParams.limit || 10,
-      name: queryParams.name,
-      location: queryParams.location,
-      position: queryParams.position,
-      type: queryParams.type
-    },
-    isUndefined
-  )
-
-  const [prevQueryConfig, setPrevQueryConfig] = useState<QueryConfig>(queryConfig)
-
-  const [showJobs, setShowJobs] = useState(jobs)
-
-  const [pageSize, setPageSize] = useState(Math.ceil(totalJobs / Number(queryParams.limit || 10)))
 
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    const fetchPosition = async () => {
-      setIsLoading(true)
-      try {
-        if (queryConfig) {
-          const query = qs.stringify(queryConfig)
-          const response = await fetchJobWithQuery(query)
-          setShowJobs(response.data.result.content)
-          setPageSize(response.data.result.totalPages)
-
-          setDataSearch({
-            ...dataSearch,
-            key: queryConfig.name || '',
-            type: queryConfig.type || ''
-          })
-        }
-      } catch (error) {
-        console.log(error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    fetchPosition()
+    JobService.getJobs(dispatch)
   }, [])
 
-  useEffect(() => {
-    if (!isEqual(prevQueryConfig, queryConfig)) {
-      const fetchJobs = async () => {
-        setIsLoading(true)
-        try {
-          const query = qs.stringify(queryConfig)
-          const response = await fetchJobWithQuery(query)
-
-          setShowJobs(response.data.result.content)
-          setPageSize(response.data.result.totalPages)
-        } catch (error) {
-          console.log(error)
-        } finally {
-          setIsLoading(false)
-        }
-      }
-      fetchJobs()
-      setPrevQueryConfig(queryConfig)
-    }
-  }, [queryConfig, prevQueryConfig])
-
-  const fetchJobWithQuery = async (query: string) => {
-    return await axiosInstance(`/jobs?${query}`, {
-      headers: { Authorization: null }
-    })
-  }
+  const [dataSearch, setDataSearch] = useState({
+    key: '',
+    selectedProvince: '',
+    selectedExperiences: '',
+    selectedActivity: '',
+    selectedLevelRequirements: '',
+    selectedGenderRequirements: '',
+    selectedJobTypes: ''
+  })
 
   const handleSearch = async (e: any) => {
     e.preventDefault()
     try {
       setIsLoading(true)
 
-      // const searchParams = {
-      //   ...queryConfig,
-      //   page: '1',
-      //   limit: '10',
-      //   name: dataSearch.key,
-      //   position: dataSearch.position,
-      //   location: dataSearch.location,
-      //   type: dataSearch.type
-      // }
+      const params = {
+        name: dataSearch.key,
+        province: dataSearch.selectedProvince,
+        type: dataSearch.selectedJobTypes,
+        levelRequirement: dataSearch.selectedLevelRequirements,
+        experience: dataSearch.selectedExperiences,
+        field: dataSearch.selectedActivity,
+        genderRequirement: dataSearch.selectedGenderRequirements
+      }
 
-      // const filteredSearchParams = omitBy(searchParams, isEmpty)
-
-      // navigate({
-      //   pathname: '/jobs',
-      //   search: createSearchParams(filteredSearchParams).toString()
-      // })
-      console.log(dataSearch)
+      JobService.getJobs(dispatch, params)
     } catch (error) {
       console.error(error)
     } finally {
@@ -147,21 +74,22 @@ export default function Jobs() {
   const handleReset = () => {
     setDataSearch({
       key: '',
-      position: '',
-      location: '',
-      type: '',
-      selectedType: ''
+      selectedProvince: '',
+      selectedExperiences: '',
+      selectedActivity: '',
+      selectedLevelRequirements: '',
+      selectedGenderRequirements: '',
+      selectedJobTypes: ''
     })
 
-    // Đặt resetToken mới để force "remount" các component Select
     setResetToken(Date.now())
 
-    navigate({
-      pathname: '/jobs',
-      search: createSearchParams(
-        omit(queryConfig, ['name', 'position', 'size', 'location', 'type', 'page', 'limit'])
-      ).toString()
-    })
+    try {
+      JobService.getJobs(dispatch)
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      console.error('Error fetching jobs:', error)
+    }
   }
 
   return (
@@ -170,9 +98,12 @@ export default function Jobs() {
         {/* Sidebar Search  */}
         <FilterJobs
           dataSearch={dataSearch}
-          posistion={posistion}
-          location={location}
-          type={type}
+          provinces={provinces}
+          experiences={experiences}
+          jobTypes={jobTypes}
+          levelRequirements={levelRequirement}
+          genderRequirements={genderRequirement}
+          activities={activities}
           handleSearch={handleSearch}
           handleReset={handleReset}
           setDataSearch={setDataSearch}
@@ -188,10 +119,10 @@ export default function Jobs() {
             </div>
           ) : (
             <div className='flex flex-wrap -mx-4'>
-              {showJobs.length > 0 ? (
+              {jobs.length > 0 ? (
                 <>
-                  {showJobs.map((job) => (
-                    <div className='w-full px-4 mb-8 md:w-1/2' key={job.jobId}>
+                  {jobs.map((job) => (
+                    <div className='w-full px-4 mb-8 md:w-1/2' key={job._id}>
                       <JobCard job={job} isShow={true} />
                     </div>
                   ))}
@@ -208,8 +139,6 @@ export default function Jobs() {
               )}
             </div>
           )}
-
-          <Pagination queryConfig={queryConfig} pageSize={pageSize} url='/jobs' />
         </div>
       </div>
     </Container>

@@ -1,5 +1,6 @@
 const LOCAL_STORAGE_TOKEN_KEY = 'token'
 const LOCAL_STORAGE_REFRESH_TOKEN_KEY = 'refresh_token'
+const LOCAL_STORAGE_PERMISSION = 'permission'
 
 export function hasLocalToken(): boolean {
   return localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY) !== null
@@ -52,4 +53,26 @@ export function hasRefreshToken() {
 
 export function clearRefreshToken() {
   return localStorage.removeItem(LOCAL_STORAGE_REFRESH_TOKEN_KEY)
+}
+
+export function setPermission(permission: string) {
+  console.debug(`permission: ${permission}`)
+  localStorage.setItem(LOCAL_STORAGE_PERMISSION, JSON.stringify(permission))
+}
+
+export function getPermission() {
+  const storedPermission = localStorage.getItem(LOCAL_STORAGE_PERMISSION)
+  if (storedPermission === null) {
+    throw new Error(`The refresh token is not found.`)
+  }
+  const parsedToken = JSON.parse(storedPermission) as string
+  return parsedToken
+}
+
+export function hasPermission() {
+  return localStorage.getItem(LOCAL_STORAGE_PERMISSION) !== null
+}
+
+export function clearPermission() {
+  return localStorage.removeItem(LOCAL_STORAGE_PERMISSION)
 }

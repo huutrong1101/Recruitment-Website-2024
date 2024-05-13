@@ -1,9 +1,17 @@
 import classNames from 'classnames'
 import React from 'react'
+import { RecruiterResponseState } from '../../types/user.type'
+import parse from 'html-react-parser'
+import { Link } from 'react-router-dom'
 
-function RecuiterCard() {
+interface RecuiterCardProps {
+  recruiter: RecruiterResponseState
+}
+
+function RecuiterCard({ recruiter }: RecuiterCardProps) {
   return (
-    <div
+    <Link
+      to={recruiter.slug}
       className={classNames(
         ` bg-white rounded-lg shadow-sm border hover:border-emerald-500`,
         `ease-in-out duration-75 hover:shadow-md`,
@@ -12,17 +20,23 @@ function RecuiterCard() {
         `cursor-pointer`
       )}
     >
-      <div className={classNames('w-full shadow relative')}>
-        <img
-          src='https://static.topcv.vn/company_covers/cong-ty-tnhh-mtv-vien-thong-quoc-te-fpt-d3875e922aae8e448c57c760a55305ca-617fa613e3ddf.jpg'
-          alt='blog_image'
-          className={classNames('w-full h-[150px] object-cover aspect-video rounded-t-md')}
-        />
+      <div className='relative w-full shadow'>
+        {/* Tối ưu hiển thị hình ảnh với object-fit và xác định tỉ lệ */}
+        <div className='h-[150px] box-border'>
+          <img
+            src={recruiter.companyCoverPhoto}
+            alt='Company cover'
+            className='object-cover w-full h-full max-w-full align-middle rounded-t-md'
+            loading='lazy'
+          />
+        </div>
         <div className='absolute bottom-[-20px] left-5'>
+          {/* Thêm object-fit và object-position nếu cần */}
           <img
             className='object-cover w-1/4 h-full border'
-            src='https://cdn-new.topcv.vn/unsafe/200x/https://static.topcv.vn/company_logos/cong-ty-co-phan-dana-139c6d216ab5b2c1f012449d3c30c0ec-65fb8d6f41f1c.jpg'
-            alt=''
+            src={recruiter.companyLogo}
+            alt={`${recruiter.companyName} logo`}
+            loading='lazy'
           />
         </div>
       </div>
@@ -30,22 +44,16 @@ function RecuiterCard() {
       <div className='flex flex-col items-center gap-1 px-4 py-2'>
         <div className='flex items-center gap-3 mt-5'>
           <h3
-            className={classNames(
-              'text-black font-semibold text-base hover:text-emerald-500', // Color và font-weight
-              'text-left uppercase' // Căn lề và chữ hoa
-            )}
+            className={classNames('text-black font-semibold text-base hover:text-emerald-500', 'text-left uppercase')}
           >
-            CÔNG TY TNHH LOTTE VIỆT NAM
+            {recruiter.companyName}
           </h3>
         </div>
-        <div>
-          <p>
-            " Trở thành người dẫn đầu trong lĩnh vực giáo dục và đào tạo với cam kết mang đến những trải nghiệm học tập
-            quý giá, nhằm giúp học viên khám phá bản thân.
-          </p>
+        <div className='text-[#555] text-sm pt-4'>
+          <p className='line-clamp-5'>{parse(recruiter.about)}</p>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 

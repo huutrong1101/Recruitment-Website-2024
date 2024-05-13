@@ -69,6 +69,18 @@ import RecuiterDetail from './pages/RecuiterDetail/RecuiterDetail'
 import AuthenticateRecSignUp from './pages/Authenticate/AuthenticateRecSignUp'
 import UserInterestJob from './pages/UserProfile/UserInterestJob'
 import ConfirmRec from './pages/ConfirmRec/ConfirmRec'
+import ConfirmComplete from './pages/ConfirmRec/ConfirmComplete'
+import ConfirmRecLayout from './pages/ConfirmRec/ConfirmRecLayout'
+import RecProfile from './pages/Rec/RecProfile'
+import RecCompany from './pages/Rec/RecCompany'
+import RecListJobRecruitment from './pages/Rec/RecListJobRecretment/RecListJobRecretment'
+import RecAddJob from './pages/Rec/RecAddJob/RecAddJob'
+import AdminManageJobs from './pages/Admin/AdminManageJobs/AdminManageJobs'
+import AdminManageJobDetail from './pages/Admin/AdminManageJobs/AdminManageJobDetail'
+import AdminManageCompanies from './pages/Admin/AdminManageCompanies/AdminManageCompanies'
+import AdminManageCompanyDetail from './pages/Admin/AdminManageCompanies/AdminManageCompanyDetail'
+import ListCandidateApply from './pages/Rec/RecListJobRecretment/ListCandidateApply/ListCandidateApply'
+import CandidateProfileDetail from './pages/Rec/RecListJobRecretment/ListCandidateApply/CandidateProfileDetail/CandidateProfileDetail'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -84,11 +96,12 @@ function App() {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    JobService.getJobs(dispatch)
-    JobService.getLocation(dispatch)
-    JobService.getPosition(dispatch)
+    JobService.getProvince(dispatch)
+    JobService.getExperience(dispatch)
+    JobService.getLevelRequirement(dispatch)
+    JobService.getGenderRequirement(dispatch)
+    JobService.getActivity(dispatch)
     JobService.getType(dispatch)
-    EventService.getEvents(dispatch)
   }, [])
 
   return (
@@ -106,7 +119,7 @@ function App() {
           <Route path='/events/:eventId' element={<EventDetail />} />
           <Route path='contact' element={<Contact />} />
           <Route path='recruiters' element={<Recruiters />} />
-          <Route path='recruiters/:recruiterId' element={<RecuiterDetail />} />
+          <Route path='recruiters/:recruiterSlug' element={<RecuiterDetail />} />
           <Route path='auth' element={<Authenticate />}>
             <Route path='login' element={<AuthenticateLogin />} />
             <Route path='signup' element={<AuthenticateSignUp />} />
@@ -114,9 +127,13 @@ function App() {
             <Route element={<AuthenticateLogin />} />
           </Route>
 
+          <Route path='/confirm-rec' element={<ConfirmRecLayout />}>
+            <Route index element={<ConfirmRec />} />
+            <Route path='complete' element={<ConfirmComplete />} />
+          </Route>
+
           {/* This route is accepted when user is not logged in */}
           <Route element={<FilterNonLogin />}>
-            <Route path='/confirm-rec' element={<ConfirmRec />} />
             <Route path='/email' element={<EmailConfirmationLayout />}>
               <Route path='incomplete' element={<IncompleteConfirmEmail />} />
               <Route path='complete' element={<CompleteConfirmEmail />} />
@@ -142,41 +159,59 @@ function App() {
         {/* </Route> */}
 
         {/* ADMIN  */}
-        <Route element={<FilterAdmin />}>
-          <Route path='/admin' element={<ManagementAppLayOut />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path='profile' element={<ReccerProfile />} />
-            <Route path='account' element={<AdminManagerAccount />} />
-            <Route path='create_account' element={<CreateAccount />} />
-            <Route path='jobs' element={<AdminJobs />} />
-            <Route path='jobs/:jobId' element={<AdminJobDetail />} />
-            <Route path='events' element={<AdminEvents />} />
-            <Route path='events/:eventId' element={<AdminEventDetail />} />
-          </Route>
+        {/* <Route element={<FilterAdmin />}> */}
+        <Route path='/admin' element={<ManagementAppLayOut />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path='manage_jobs' element={<AdminManageJobs />} />
+          <Route path='manage_jobs/:jobId' element={<AdminManageJobDetail />} />
+          <Route path='manage_companies' element={<AdminManageCompanies />} />
+          <Route path='manage_companies/:companyId' element={<AdminManageCompanyDetail />} />
+
+          {/* <Route path='profile' element={<ReccerProfile />} />
+          <Route path='account' element={<AdminManagerAccount />} />
+          <Route path='create_account' element={<CreateAccount />} />
+          <Route path='jobs' element={<AdminJobs />} />
+          <Route path='jobs/:jobId' element={<AdminJobDetail />} />
+          <Route path='events' element={<AdminEvents />} />
+          <Route path='events/:eventId' element={<AdminEventDetail />} /> */}
         </Route>
+        {/* </Route> */}
 
         {/* RECRUITER  */}
-        <Route element={<FilterRecruiter />}>
-          <Route path='/recruiter' element={<ManagementAppLayOut />}>
-            {/* Define recruiter routes here */}
-            <Route index element={<ReccerDashboard />} />
-            <Route path='profile' element={<ReccerProfile />} />
-
-            <Route path='jobs' element={<ReccerJobManagement />} />
-            <Route path='jobdetail/:jobId' element={<ReccerJobDetail />} />
-            <Route path='addjob' element={<AddJob />} />
-            <Route path='jobdetail/:jobId/edit' element={<EditJob />} />
-            <Route path='candidates' element={<ReccerCandidateManagement />} />
-            <Route path='candidates/:userId' element={<CandidateDetail />} />
-            <Route path='interviewers' element={<ReccerInterviewerManagement />} />
-            <Route path='interviewers/:interviewerId' element={<ReccerInterviewerDetail />} />
-            <Route path='events' element={<ReccerEventManagement />} />
-            <Route path='events/:eventId' element={<ReccerEventDetail />} />
-            <Route path='addevent' element={<AddEvent />} />
-
-            <Route path='jobdetail/:jobId/interview-schedule/:userId' element={<InterviewSched />} />
+        <Route path='/recruiter' element={<UserAppLayout />}>
+          <Route path='profile' element={<UserProfileLayout />}>
+            <Route index element={<RecProfile />} />
+            <Route path='company' element={<RecCompany />} />
+            <Route path='jobsPosted' element={<RecListJobRecruitment />} />
+            <Route path='jobsPosted/listCandidate/:jobid' element={<ListCandidateApply />} />
+            <Route
+              path='jobsPosted/listCandidate/:jobid/candidateDetail/:candidateId'
+              element={<CandidateProfileDetail />}
+            />
+            <Route path='createJob' element={<RecAddJob />} />
           </Route>
         </Route>
+        {/* <Route element={<FilterRecruiter />}> */}
+        {/* <Route path='/recruiter' element={<ManagementAppLayOut />}>
+        
+          <Route index element={<ReccerDashboard />} />
+          <Route path='profile' element={<ReccerProfile />} />
+
+          <Route path='jobs' element={<ReccerJobManagement />} />
+          <Route path='jobdetail/:jobId' element={<ReccerJobDetail />} />
+          <Route path='addjob' element={<AddJob />} />
+          <Route path='jobdetail/:jobId/edit' element={<EditJob />} />
+          <Route path='candidates' element={<ReccerCandidateManagement />} />
+          <Route path='candidates/:userId' element={<CandidateDetail />} />
+          <Route path='interviewers' element={<ReccerInterviewerManagement />} />
+          <Route path='interviewers/:interviewerId' element={<ReccerInterviewerDetail />} />
+          <Route path='events' element={<ReccerEventManagement />} />
+          <Route path='events/:eventId' element={<ReccerEventDetail />} />
+          <Route path='addevent' element={<AddEvent />} />
+
+          <Route path='jobdetail/:jobId/interview-schedule/:userId' element={<InterviewSched />} />
+        </Route> */}
+        {/* </Route> */}
 
         {/* INTERVIEW  */}
         <Route element={<FilterInterviewer />}>

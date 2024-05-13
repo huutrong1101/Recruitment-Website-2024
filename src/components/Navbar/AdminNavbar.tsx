@@ -34,7 +34,7 @@ export default function AdminNavbar({ showNav, setShowNav }: AdminNavbarProps) {
         <Bars3CenterLeftIcon className='w-8 h-8 text-gray-700 cursor-pointer' onClick={() => setShowNav(!showNav)} />
       </div>
       <div className='flex items-center pr-2 md:pr-8'>
-        <Menu as='div' className='relative inline-block text-left'>
+        {/* <Menu as='div' className='relative inline-block text-left'>
           <div>
             <Menu.Button className='inline-flex items-center justify-center w-full gap-2'>
               {user?.avatar === null ? (
@@ -89,7 +89,7 @@ export default function AdminNavbar({ showNav, setShowNav }: AdminNavbarProps) {
               </div>
             </Menu.Items>
           </Transition>
-        </Menu>
+        </Menu> */}
       </div>
     </div>
   )

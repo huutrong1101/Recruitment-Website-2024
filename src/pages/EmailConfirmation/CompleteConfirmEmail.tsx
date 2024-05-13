@@ -52,9 +52,7 @@ export default function CompleteConfirmEmail() {
         enterFrom='transform opacity-0 translate-y-12'
         enterTo='transform opacity-100 translate-y-0'
       >
-        <h1 className={classNames(`text-white text-3xl font-bold leading-10 my-4`)}>
-          You are safety now, let's enjoy.
-        </h1>
+        <h1 className={classNames(`text-white text-3xl font-bold leading-10 my-4`)}>Đăng ký tài khoản thành công.</h1>
       </Transition>
 
       <Transition
@@ -66,7 +64,7 @@ export default function CompleteConfirmEmail() {
         enterTo='opacity-100'
       >
         <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-          <PrimaryButton text="Let's login to enjoy using the website" onClick={handleSeekingJobs} />
+          <PrimaryButton text='Đăng nhập ngay bằng tài khoản vừa tạo' onClick={handleSeekingJobs} />
         </div>
       </Transition>
     </div>

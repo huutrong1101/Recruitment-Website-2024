@@ -1,15 +1,26 @@
 import { Transition } from '@headlessui/react'
 import { EnvelopeIcon } from '@heroicons/react/24/outline'
 import classNames from 'classnames'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
+import { AuthService } from '../../services/AuthService'
 
 export default function IncompleteConfirmEmail() {
   const navigate = useNavigate()
+
+  const query = new URLSearchParams(useLocation().search)
+  const email = query.get('email')
+
   const handleResendEmail = () => {
-    toast.warning(`Resend email logic not initialize.`)
-    // navigate("/email/complete");
+    toast
+      .promise(AuthService.resendEmail(email), {
+        pending: `Email xác minh tài khoản đang được gửi đến cho bạn`,
+        success: `Email đã được gửi đến rồi. Hãy kiểm tra nhé`
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message)
+      })
   }
 
   return (
@@ -43,7 +54,7 @@ export default function IncompleteConfirmEmail() {
         enterTo='transform opacity-100 translate-y-0'
       >
         <h1 className={classNames(`text-white text-3xl font-bold leading-10 my-4`)}>
-          Everything is ready, only need one more step.
+          Mọi thứ đã sẵn sàng, chỉ cần một bước nữa thôi.
         </h1>
       </Transition>
 
@@ -56,7 +67,7 @@ export default function IncompleteConfirmEmail() {
         enterTo='transform opacity-100 translate-y-0'
       >
         <h2 className={classNames(`text-[#87D3B7]  leading-normal text-xl`)}>
-          Your email need to be verified, please check your email.
+          Email của bạn cần được xác minh, vui lòng kiểm tra email của bạn.
         </h2>
       </Transition>
 
@@ -69,7 +80,7 @@ export default function IncompleteConfirmEmail() {
         enterTo='opacity-100'
       >
         <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-          <PrimaryButton text='Resend the email' onClick={handleResendEmail} />
+          <PrimaryButton text='Gửi lại email' onClick={handleResendEmail} />
         </div>
       </Transition>
     </div>

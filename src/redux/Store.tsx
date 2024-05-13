@@ -15,6 +15,8 @@ import INTInterviewsSlice from './reducer/INTInterviewsSlice'
 import INTQuestionsSlice from './reducer/INTQuestionsSlice'
 import UserInterviewSlice from './reducer/UserInterviewSlice'
 import AdminListAcountRecentSlice from './reducer/AdminListAcountRecentSlice'
+import RecSlice from './reducer/RecSlice'
+import AdminSlice from './reducer/AdminSlice'
 
 export const ApplicationStore = configureStore({
   reducer: {
@@ -22,9 +24,13 @@ export const ApplicationStore = configureStore({
     Job: JobSlice,
     JobDetail: JobDetailSlice,
 
+    RecJobs: RecSlice,
+
     Navbar: NavbarSlice,
     Auth: AuthSlice,
     OneTimePassword: OneTimePasswordSlice,
+
+    AdminSlice: AdminSlice,
 
     RecJobList: RecJobSlice,
     RecJobDetail: RecJobDetailSlice,

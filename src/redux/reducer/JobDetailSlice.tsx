@@ -53,8 +53,9 @@ const JobDetailSlice = createSlice({
 export const fetchJobDetail = createAsyncThunk('JobDetail/fetchJobDetail', async ({ jobId }: any, thunkAPI) => {
   try {
     const jobResponse = await JobService.getJobFromId(jobId)
+    console.log({ jobResponse })
     // TODO: add job fetch and check if the user is applied onto this job or not
-    thunkAPI.dispatch(setJobResponse(jobResponse.data.result))
+    thunkAPI.dispatch(setJobResponse(jobResponse.data.metadata))
     // const isUserAppliedToTheJob = (await JobService.getIfUserAppliedTheJob(jobId)).data
     // thunkAPI.dispatch(setJobIsApplied(isUserAppliedToTheJob.result !== null))
   } catch (e) {

@@ -1,37 +1,74 @@
 export interface JobInterface {
-  jobId: string
+  _id: string
   name: string
-  jobType: string
-  quantity: number
-  benefit: string
-  salaryRange: string
-  requirement: string
   location: string
+  province: string
+  type: string
+  levelRequirement: string
+  experience: string
+  salary: string
+  field: string
   description: string
-  isActive: boolean
-  createdAt: string
-  updatedAt: string | null
+  requirement: string
+  benefit: string
+  quantity: number
   deadline: string
-  position: string
-  skills: []
+  status: string
+  acceptanceStatus: string
+  createdAt: string
+  updatedAt: string
+  genderRequirement: string
+  approvalDate: string
+  companyName: string
+  companyLogo: string
+  employeeNumber: number
+  companyAddress: string
 }
 
 export interface AdminJobInterface {
-  jobId: string
-  jobName: string
-  quantity: number
-  benefit: string
-  salaryRange: string
-  requirement: string
-  description: string
-  createdAt: string
-  deadline: string
-  position: string
+  _id: string
+  name: string
   location: string
-  jobType: string
-  author: string
-  process: number
-  skills: string[]
+  province: string
+  type: string
+  levelRequirement: string
+  experience: string
+  salary: string
+  field: string
+  description: string
+  requirement: string
+  benefit: string
+  quantity: number
+  deadline: string
+  gender: string
+  status: string
+  acceptanceStatus: string
+  createdAt: string
+  updatedAt: string
+  companyName: string
+  companyLogo: string
+  employeeNumber: number
+  companyAddress: string
+}
+
+export interface AdminCompanyInterface {
+  _id: string
+  name: string
+  email: string
+  contactEmail: string
+  phone: string
+  acceptanceStatus: string
+  verifyEmail: boolean
+  position: string
+  companyName: string
+  fieldOfActivity: string[]
+  about: string
+  companyAddress: string
+  companyCoverPhoto: string
+  companyLogo: string
+  companyWebsite: string
+  employeeNumber: number
+  role: string
 }
 
 export interface JobListConfig {

@@ -32,14 +32,10 @@ import OtherJobsWidget from './JobTab/OtherJobsWidget'
 const { TabPane } = Tabs
 
 export default function JobDetail() {
-  const { jobId } = useParams()
   const dispatch = useAppDispatch()
-  // const [job, setJob] = useState<JobInterface | null>(null);
-  const jobs: JobInterface[] = useAppSelector((state) => state.Home.jobs)
-  const { status } = useAppSelector((state) => state.JobDetail)
-  const { job } = useAppSelector((state) => state.JobDetail.response)
-  const { isApplied } = useAppSelector((state) => state.JobDetail.response)
-  const { user } = useAppSelector((state) => state.Auth)
+  const { jobId } = useParams()
+
+  const jobDetail = useAppSelector((state) => state.JobDetail.response.job)
 
   const [jobInformation, setJobInformation] = useState([
     { icon: <UserIcon />, name: 'Loại hình công việc', value: '' },
@@ -63,123 +59,66 @@ export default function JobDetail() {
     }
   ])
 
-  const navigate = useNavigate()
-
   useEffect(() => {
-    if (!jobId) {
-      throw new Error(`The parameter jobId is undefined`)
-    }
-
-    dispatch(fetchJobDetail({ jobId }))
-      .unwrap()
-      .catch((message) => toast.error(message))
-
-    if (user) {
-      dispatch(checkApplyJob({ jobId }))
-        .unwrap()
-        .catch((message) => toast.error(message))
-    }
-
-    return () => {}
-  }, [jobId])
-
-  const handleBackToJobs = () => {
-    navigate('/jobs')
-  }
-
-  useEffect(() => {
-    if (job) {
+    if (jobDetail) {
       setJobInformation([
         {
           icon: <UserIcon />,
           name: 'Loại hình công việc',
-          value: JOB_POSITION[job.jobType]
+          value: jobDetail.type
         },
         {
           icon: <MapPinIcon />,
           name: 'Địa điểm',
-          value: JOB_POSITION[job.location]
+          value: jobDetail.location
         },
         {
           icon: <ComputerDesktopIcon />,
           name: 'Vị trí',
-          value: JOB_POSITION[job.position]
+          value: jobDetail.levelRequirement
         },
         {
           icon: <CurrencyDollarIcon />,
           name: 'Mức lương',
-          value: job.salaryRange
+          value: jobDetail.salary
         },
         {
           icon: <ClockIcon />,
           name: 'Hạn nộp hồ sợ',
-          value: moment(job.deadline).format('DD-MM-YYYY').toString()
+          value: jobDetail.deadline
         }
       ])
     }
-  }, [job])
+  }, [jobDetail])
 
-  const otherJobs = jobs.filter((job) => job.jobId !== jobId)
+  useEffect(() => {
+    dispatch(fetchJobDetail({ jobId }))
+      .unwrap()
+      .catch((message) => toast.error(message))
+  }, [jobId])
 
-  const shuffledJobs = [...otherJobs]
-  let currentIndex = shuffledJobs.length
-  let temporaryValue, randomIndex
-
-  while (0 !== currentIndex) {
-    randomIndex = Math.floor(Math.random() * currentIndex)
-    currentIndex -= 1
-
-    temporaryValue = shuffledJobs[currentIndex]
-    shuffledJobs[currentIndex] = shuffledJobs[randomIndex]
-    shuffledJobs[randomIndex] = temporaryValue
-  }
-
-  const suggestedJobs = shuffledJobs.slice(0, 3)
+  console.log(jobDetail)
 
   return (
     <Container>
-      <div className={classNames(`job-detail`)}>
-        {status.jobStatus === 'fulfill' ? (
-          job ? (
-            <>
-              {/* Widgets */}
-              <JobDescriptionWidget
-                companyName='FPT Software'
-                jobRole={job.name}
-                quantity={job.quantity}
-                publishDate={moment(job.createdAt).format('DD-MM-YYYY').toString()}
-                logo={{ src: Logo, alt: 'image' }}
-                jobId={jobId || ''}
-              />
+      {jobDetail ? (
+        <>
+          <JobDescriptionWidget job={jobDetail} role='user' />
+          <JobDetailWidget job={jobDetail} jobInformation={jobInformation} />
 
-              <JobDetailWidget job={job} jobInformation={jobInformation} />
+          <div className={classNames(`flex flex-col gap-2 items-center justify-center my-12`)}>
+            <h1 className={classNames(`text-3xl font-semibold capitalize`)}>Công việc liên quan</h1>
 
-              {/* Footer */}
-              <div className={classNames(`my-8 w-full`)}>
-                <h1 className={classNames(`text-3xl font-semibold capitalize text-center mb-2`)}>
-                  Công việc liên quan
-                </h1>
-
-                <div className='flex flex-wrap -mx-4 mt-[10px]'>
-                  {/* <!-- Card --> */}
-                  {suggestedJobs &&
-                    suggestedJobs.map((data) => (
-                      <div key={data.jobId} className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
-                        <JobCard job={data} isShow={false} />
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </>
-          ) : (
-            <NotFound />
-          )
-        ) : (
-          <div className='flex justify-center items-center my-4 min-h-[70vh]'>
-            <LoadSpinner className='text-4xl text-gray-400' />
+            <div className={classNames(`flex flex-col md:flex-row gap-6`)}>
+              {/* {suggestedJobs.map((data) => {
+                return <JobCard job={data} />
+              })} */}
+            </div>
           </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <div className='flex justify-center items-center my-4 min-h-[70vh]'>Loading</div>
+      )}
     </Container>
   )
 }

@@ -8,7 +8,7 @@ import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import { UserLoginParamsInterface } from '../../types/user.type'
-import { authLogin, fetchUserFromToken } from '../../redux/reducer/AuthSlice'
+import { authLogin, fetchAdminFromToken, fetchRecFromToken } from '../../redux/reducer/AuthSlice'
 import { getLocalToken } from '../../utils/localToken'
 
 export default function AuthenticateLogin() {
@@ -23,26 +23,32 @@ export default function AuthenticateLogin() {
     try {
       await dispatch(authLogin(data))
         .unwrap()
-        .then(() => {
+        .then(async (res: any) => {
           toast.success(`Đăng nhập thành công`)
+          const token = getLocalToken()
+
+          const permission = res.metadata.permission
+
+          if (permission === '002') {
+            console.log('check')
+            const userData = await dispatch(fetchRecFromToken({ token }))
+            if (userData.payload.acceptanceStatus === 'waiting') {
+              navigate('/confirm-rec')
+            } else {
+              navigate('/recruiter/profile')
+            }
+          } else if (permission === '001') {
+            const userData = await dispatch(fetchAdminFromToken({ token }))
+            navigate('/admin')
+          } else {
+            const userData = await dispatch(fetchRecFromToken({ token }))
+            if (from) {
+              navigate(from)
+            } else {
+              navigate('/')
+            }
+          }
         })
-
-      const token = getLocalToken()
-      const userData = await dispatch(fetchUserFromToken({ token }))
-
-      if (userData.payload.role === 'ADMIN') {
-        navigate('/admin')
-      } else if (userData.payload.role === 'RECRUITER') {
-        navigate('/recruiter')
-      } else if (userData.payload.role === 'INTERVIEWER') {
-        navigate('/interviewer')
-      } else {
-        if (from) {
-          navigate(from)
-        } else {
-          navigate('/')
-        }
-      }
     } catch (err: any) {
       toast.error(`${err.message}`)
       throw err
@@ -71,7 +77,7 @@ export default function AuthenticateLogin() {
           type='text'
           placeholder='Địa chỉ email hoặc SĐT'
           register={register}
-          label={`credentialId`}
+          label={`email`}
         />
 
         <InputIcon

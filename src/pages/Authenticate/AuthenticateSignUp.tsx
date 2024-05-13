@@ -56,7 +56,7 @@ function TermAndConditionsDialog({ visible, onClose, onOkay }: any) {
                 <div className='flex flex-row-reverse mt-4'>
                   <button
                     type='button'
-                    className='inline-flex justify-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md bg-orange hover:bg-orange-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2'
+                    className='inline-flex justify-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md bg-emerald-500 hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2'
                     onClick={onOkay}
                   >
                     OK
@@ -84,14 +84,15 @@ export default function AuthenticateSignUp() {
   const navigate = useNavigate()
 
   const onSubmit = (data: any) => {
-    dispatch(authRegister(data))
+    const { agreeTerms, ...formData } = data
+    dispatch(authRegister(formData))
       .unwrap()
       .then(() => {
         // toast.success(`Successfully register the`)
         navigate('/email/incomplete')
       })
-      .catch((data) => {
-        toast.error(data.message)
+      .catch((errorData) => {
+        toast.error(errorData.message)
       })
   }
 
@@ -124,10 +125,10 @@ export default function AuthenticateSignUp() {
           icon={<UserIcon />}
           placeholder='Tên'
           register={register}
-          label='fullName'
+          label='name'
           required
           wrapperClassName={classnames({
-            'border-red-300': errors && errors.fullName
+            'border-red-300': errors && errors.name
           })}
         />
 
@@ -167,20 +168,6 @@ export default function AuthenticateSignUp() {
           required
           wrapperClassName={classnames({
             'border-red-300': errors && errors.confirmPassword
-          })}
-        />
-        {/* <input type="tel" /> */}
-        <InputIcon
-          icon={<PhoneIcon />}
-          register={register}
-          label='phone'
-          required
-          placeholder='Số điện thoại'
-          type='tel'
-          maxLength={12}
-          pattern='([0-9]{8,12})'
-          wrapperClassName={classnames({
-            'border-red-300': errors && errors.phone
           })}
         />
 
