@@ -8,12 +8,16 @@ import InputIcon from '../../components/InputIcon/InputIcon'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { AuthService } from '../../services/AuthService'
 
+interface FormData {
+  email: string
+}
+
 export default function ForgetPassword() {
   const {
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm()
+  } = useForm<FormData>()
 
   const [showing, setShowing] = useState(false)
 
@@ -64,14 +68,25 @@ export default function ForgetPassword() {
           enterFrom='transform-gpu opacity-0 translate-y-12'
           enterTo='transform-gpu opacity-100 translate-y-0'
         >
-          <InputIcon
-            icon={<HiEnvelope />}
-            type={`text`}
-            placeholder={`Nhập địa chỉ email của tài khoản`}
-            register={register}
-            label={`email`}
-            required
-          />
+          <div className='relative'>
+            <InputIcon
+              icon={<HiEnvelope />}
+              type={`text`}
+              placeholder={`Nhập địa chỉ email của tài khoản`}
+              register={register}
+              label={`email`}
+              validation={{
+                required: 'Vui lòng nhập email',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Địa chỉ email không hợp lệ'
+                }
+              }}
+            />
+            {errors.email && errors.email.message && (
+              <p className='absolute mt-1 text-sm font-bold text-red-500'>{errors.email.message}</p>
+            )}
+          </div>
         </Transition>
 
         <Transition

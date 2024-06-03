@@ -6,8 +6,10 @@ import LatestJob from './LatestJob'
 import FeaturedRecruiter from './FeaturedRecruiter'
 import Blog from './Blog'
 import Select from './Select'
+import { useAppSelector } from '../../hooks/hooks'
 
 export default function Home() {
+  const { isLoggedIn } = useAppSelector((state) => state.Auth)
   return (
     <div className={classNames('h-full')}>
       {/* Banner không bị bao bởi Container khi hiển thị */}
@@ -16,7 +18,7 @@ export default function Home() {
       {/* Các phần còn lại được bao bởi Container */}
       <div className='my-[25px] md:my-[50px]'>
         <Container>
-          <Select />
+          {!isLoggedIn && <Select />}
           <InterestJobs />
           <LatestJob />
           <FeaturedRecruiter />

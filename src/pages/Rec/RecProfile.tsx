@@ -12,6 +12,9 @@ import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import { UserService } from '../../services/UserService'
 import { setRec, setUser } from '../../redux/reducer/AuthSlice'
 import { RecruiterResponseState } from '../../types/user.type'
+import { Button, Form, Input } from 'antd'
+import { AiOutlineUser } from 'react-icons/ai'
+import { validateEmail, validatePhone } from '../../utils/validation'
 
 function UserProfileInformation() {
   const {
@@ -20,6 +23,7 @@ function UserProfileInformation() {
     formState: { errors }
   } = useForm()
 
+  const [form] = Form.useForm()
   const { recruiter, loading } = useAppSelector((app) => app.Auth)
   const dispatch = useAppDispatch()
   const [isUploading, setUploading] = useState<boolean>(false)
@@ -39,12 +43,13 @@ function UserProfileInformation() {
 
     setUploading(true)
     toast
-      .promise(UserService.changeUserAvatar(formData), {
-        pending: `Uploading your avatar`,
-        success: `Your avatar was updated`
+      .promise(UserService.changeRecAvatar(formData), {
+        pending: `Ảnh đại diện đang được cập nhật`,
+        success: `Cập nhật ảnh đại diện thành công`
       })
       .then((response) => {
         const result = response.data.metadata
+        console.log(result)
         dispatch(setRec({ ...recruiter, avatar: result.avatar }))
         setUploading(false)
       })
@@ -54,17 +59,15 @@ function UserProfileInformation() {
       })
   }
 
-  const handleUpdateProfile = (data: any) => {
+  const handleUpdateProfile = (values: any) => {
     const updatedFields: Partial<RecruiterResponseState> = {}
-    ;(Object.keys(data) as Array<keyof RecruiterResponseState>).forEach((key) => {
-      const newData = data[key]
+    ;(Object.keys(values) as Array<keyof RecruiterResponseState>).forEach((key) => {
+      const newData = values[key]
       const originalData = recruiter && recruiter[key]
-
       if (JSON.stringify(newData) !== JSON.stringify(originalData)) {
         updatedFields[key] = newData
       }
     })
-
     if (Object.keys(updatedFields).length > 0) {
       toast
         .promise(UserService.updateRecProfile(updatedFields), {
@@ -73,6 +76,7 @@ function UserProfileInformation() {
         })
         .then((response: any) => {
           const result = response.data.metadata
+          console.log(result)
           dispatch(setRec(result))
         })
         .catch((error: any) => toast.error(error.response.data.message))
@@ -117,52 +121,51 @@ function UserProfileInformation() {
           </div>
 
           {/* General information fields */}
-          <form className={classNames(`flex-1 flex flex-col gap-2`)} onSubmit={handleSubmit(handleUpdateProfile)}>
-            <InputIcon
-              icon={<HiUserCircle />}
-              placeholder={`Họ và tên người đại diện`}
-              type={`text`}
-              register={register}
-              label={`name`}
-              defaultValue={recruiter.name}
-              required
-            />
+          <div className={classNames(`flex-1 flex flex-col gap-2`)}>
+            <Form form={form} layout='vertical' onFinish={handleUpdateProfile} className='flex flex-col flex-1 gap-2'>
+              <Form.Item
+                label='Họ tên'
+                name='name'
+                initialValue={recruiter.name}
+                rules={[{ required: true, message: 'Không được để trống' }]}
+              >
+                <Input prefix={<AiOutlineUser />} />
+              </Form.Item>
 
-            <InputIcon
-              icon={<HiEnvelope />}
-              type={`text`}
-              placeholder={`Email người đại diện`}
-              register={register}
-              label={`contactEmail`}
-              required
-              defaultValue={recruiter.contactEmail}
-            />
+              <Form.Item
+                label='Email liên hệ'
+                name='contactEmail'
+                initialValue={recruiter.contactEmail}
+                rules={[{ validator: validateEmail }]}
+              >
+                <Input prefix={<AiOutlineUser />} />
+              </Form.Item>
 
-            <InputIcon
-              type={`text`}
-              icon={<HiMapPin />}
-              placeholder={`Chức vụ`}
-              register={register}
-              required
-              label='position'
-              defaultValue={recruiter.position}
-            />
+              <Form.Item
+                label='Chức vụ'
+                name='position'
+                initialValue={recruiter.position}
+                rules={[{ required: true, message: 'Không được để trống' }]}
+              >
+                <Input prefix={<AiOutlineUser />} />
+              </Form.Item>
 
-            <InputIcon
-              icon={<HiPhone />}
-              type='text'
-              placeholder={`Điện thoại`}
-              register={register}
-              required
-              label='phone'
-              defaultValue={recruiter.phone}
-            />
+              <Form.Item
+                label='Số điện thoại'
+                name='phone'
+                initialValue={recruiter.phone}
+                rules={[{ validator: validatePhone }]}
+              >
+                <Input prefix={<AiOutlineUser />} />
+              </Form.Item>
 
-            {/* Submit button */}
-            <div className='flex flex-row-reverse'>
-              <PrimaryButton type='submit' text={`Cập nhật`} size={'sm'} className={`md:!w-3/12`} />
-            </div>
-          </form>
+              <div className='flex flex-row-reverse'>
+                <Button type='primary' htmlType='submit' size='large'>
+                  Cập nhật
+                </Button>
+              </div>
+            </Form>
+          </div>
         </div>
       )}
     </div>
@@ -170,24 +173,19 @@ function UserProfileInformation() {
 }
 
 function UserProfilePassword() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm()
+  const [form] = Form.useForm()
+  const { recruiter } = useAppSelector((app) => app.Auth)
 
-  const handleChangePassword = (data: any) => {
-    const { email, ...rest } = data
+  const handleChangePassword = (values: any) => {
+    const { email, ...rest } = values
 
     toast
-      .promise(UserService.changePassword(rest), {
+      .promise(UserService.changeRecPassword(rest), {
         pending: `Mật khẩu của bạn đang được cập nhật`,
         success: `Cập nhật mật khẩu thành công`
       })
       .catch((error) => toast.error(error.response.data.message))
   }
-
-  const { recruiter } = useAppSelector((app) => app.Auth)
 
   return (
     <div className='p-4 border rounded-xl border-zinc-100'>
@@ -197,7 +195,63 @@ function UserProfilePassword() {
         <div className={classNames(`w-full md:w-3/12 flex flex-col gap-4 px-4`)}></div>
 
         {/* General information fields */}
-        <form onSubmit={handleSubmit(handleChangePassword)} className={classNames(`flex-1 flex flex-col gap-2`)}>
+        <div className={classNames(`flex-1 flex flex-col gap-2`)}>
+          <Form form={form} layout='vertical' onFinish={handleChangePassword} className={`flex-1 flex flex-col gap-4`}>
+            <Form.Item
+              label='Email đăng nhập'
+              name='email'
+              initialValue={recruiter?.email}
+              rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
+            >
+              <Input prefix={<HiEnvelope />} readOnly />
+            </Form.Item>
+            <Form.Item
+              label='Mật khẩu hiện tại'
+              name='currentPassword'
+              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại!' }]}
+            >
+              <Input.Password prefix={<HiKey />} />
+            </Form.Item>
+
+            <Form.Item
+              label='Mật khẩu mới'
+              name='newPassword'
+              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu mới!' }]}
+            >
+              <Input.Password prefix={<HiKey />} />
+            </Form.Item>
+
+            <Form.Item
+              label='Nhập lại mật khẩu mới'
+              name='confirmNewPassword'
+              dependencies={['newPassword']}
+              hasFeedback
+              rules={[
+                {
+                  required: true,
+                  message: 'Vui lòng xác nhận mật khẩu mới của bạn!'
+                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('newPassword') === value) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'))
+                  }
+                })
+              ]}
+            >
+              <Input.Password prefix={<HiKey />} />
+            </Form.Item>
+
+            <div className='flex flex-row-reverse'>
+              <Button type='primary' htmlType='submit' size='large'>
+                Đổi mật khẩu
+              </Button>
+            </div>
+          </Form>
+        </div>
+        {/* <form onSubmit={handleSubmit(handleChangePassword)}>
           <InputIcon
             icon={<HiEnvelope />}
             type={`text`}
@@ -234,11 +288,10 @@ function UserProfilePassword() {
             required
           />
 
-          {/* Submit button */}
           <div className='flex flex-row-reverse'>
             <PrimaryButton text={`Đổi mật khẩu`} size={'sm'} className={`md:!w-5/12`} />
           </div>
-        </form>
+        </form> */}
       </div>
     </div>
   )

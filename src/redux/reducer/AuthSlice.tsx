@@ -22,6 +22,7 @@ import {
 import { AuthService } from '../../services/AuthService'
 import axiosInstance from '../../utils/AxiosInstance'
 import { UserService } from '../../services/UserService'
+import { ResumeResponse } from '../../types/resume.type'
 
 interface AuthState {
   isLoggedIn: boolean
@@ -32,6 +33,8 @@ interface AuthState {
   loading: LoadingState
   signInLoadingState: LoadingState
   registerLoadingState: LoadingState
+  listResume: ResumeResponse[]
+  resumeDetail?: ResumeResponse | null
 }
 
 const initialState: AuthState = {
@@ -39,7 +42,8 @@ const initialState: AuthState = {
   token: hasLocalToken() ? getLocalToken() : null,
   loading: `idle`,
   signInLoadingState: `idle`,
-  registerLoadingState: `idle`
+  registerLoadingState: `idle`,
+  listResume: []
 }
 
 export const authRegister = createAsyncThunk(
@@ -131,7 +135,8 @@ export const fetchUserFromToken = createAsyncThunk('Auth/fetch-user-from-token',
     console.debug(`Trying to fetch user from token ${getLocalToken()}`)
     axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${getLocalToken()}`
     // Get the profile
-    const profileResponse = await UserService.getRecFromToken()
+    const profileResponse = await UserService.getUserFromToken()
+    // console.log(profileResponse.data.metadata)
 
     // thunkAPI.dispatch(setUser(profileResponse.data.metadata))
     return profileResponse.data.metadata
@@ -213,6 +218,12 @@ const AuthSlice = createSlice({
     },
     setSignedInLoadingState: (state, action: { type: string; payload: LoadingState }) => {
       state.signInLoadingState = action.payload
+    },
+    setListResume: (state, action) => {
+      state.listResume = action.payload
+    },
+    setResumeDetail: (state, action) => {
+      state.resumeDetail = action.payload
     }
   },
   extraReducers(builder) {
@@ -230,6 +241,23 @@ const AuthSlice = createSlice({
     builder.addCase(authLogin.rejected, (state, _action) => {
       state.signInLoadingState = 'failed'
       state.isLoggedIn = false
+    })
+
+    builder.addCase(fetchUserFromToken.pending, (state, _action) => {
+      state.user = null
+      state.isLoggedIn = false
+      state.loading = `pending`
+    })
+
+    builder.addCase(fetchUserFromToken.fulfilled, (state, action) => {
+      state.user = action.payload
+      state.isLoggedIn = true
+      state.loading = `success`
+    })
+    builder.addCase(fetchUserFromToken.rejected, (state, action) => {
+      state.user = null
+      state.isLoggedIn = false
+      state.loading = `failed`
     })
 
     builder.addCase(fetchRecFromToken.pending, (state, _action) => {

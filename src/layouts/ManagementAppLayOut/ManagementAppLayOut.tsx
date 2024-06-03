@@ -1,16 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   DesktopOutlined,
-  FileOutlined,
   PieChartOutlined,
-  TeamOutlined,
   UserOutlined,
   LogoutOutlined,
-  BankOutlined
+  BankOutlined,
+  FileOutlined
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Avatar, Breadcrumb, Layout, Menu, theme } from 'antd'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { authLogout } from '../../redux/reducer/AuthSlice'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 
@@ -28,14 +27,14 @@ function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode,
 }
 
 function ManagementAppLayout() {
-  const { admin, loading } = useAppSelector((app) => app.Auth)
-
+  const { admin } = useAppSelector((app) => app.Auth)
   const [collapsed, setCollapsed] = useState(false)
   const {
     token: { colorBgContainer, borderRadiusLG }
   } = theme.useToken()
 
   const navigate = useNavigate()
+  const location = useLocation()
   const dispatch = useAppDispatch()
 
   const handleLogout = () => {
@@ -49,13 +48,32 @@ function ManagementAppLayout() {
 
   const items: MenuItem[] = [
     getItem('THỐNG KÊ', '1', <PieChartOutlined />, () => navigate('/admin')),
-    getItem('CÔNG VIỆC', '2', <DesktopOutlined />, () => navigate('/admin/manage_jobs')),
-    getItem('CÔNG TY', '3', <BankOutlined />, () => navigate('/admin/manage_companies')),
-    getItem('ĐĂNG XUẤT', '4', <LogoutOutlined />, handleLogout)
-    // getItem('User', 'sub1', <UserOutlined />, [getItem('Tom', '3'), getItem('Bill', '4'), getItem('Alex', '5')]),
-    // getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-    // getItem('Files', '9', <FileOutlined />)
+    getItem('CÔNG TY', '2', <BankOutlined />, () => navigate('/admin/manage_companies')),
+    getItem('CÔNG VIỆC', '3', <DesktopOutlined />, () => navigate('/admin/manage_jobs')),
+    getItem('TIN TỨC', '4', <FileOutlined />, () => navigate('/admin/manage_news')),
+    getItem('ĐĂNG XUẤT', '5', <LogoutOutlined />, handleLogout)
   ]
+
+  const getDefaultSelectedKey = () => {
+    if (location.pathname.startsWith('/admin/manage_companies')) {
+      return '2' // Chọn CÔNG TY
+    } else if (location.pathname.startsWith('/admin/manage_jobs')) {
+      return '3' // Chọn CÔNG TY
+    } else if (location.pathname.startsWith('/admin/manage_news')) {
+      return '4' // Chọn CÔNG TY
+    } else {
+      switch (location.pathname) {
+        case '/admin':
+          return '1'
+        case '/admin/manage_jobs':
+          return '2'
+        case '/admin/manage_news':
+          return '4'
+        default:
+          return '1'
+      }
+    }
+  }
 
   return (
     <div className='flex flex-col'>
@@ -65,7 +83,7 @@ function ManagementAppLayout() {
             <Avatar size={64} icon={<UserOutlined />} />
             {!collapsed && <div className='mt-2 text-white'>{admin && admin.name}</div>}
           </div>
-          <Menu theme='dark' defaultSelectedKeys={['1']} mode='inline' items={items} className='mt-2' />
+          <Menu theme='dark' selectedKeys={[getDefaultSelectedKey()]} mode='inline' items={items} className='mt-2' />
         </Sider>
         <Layout className='site-layout'>
           <Content style={{ margin: '0 16px' }} className='pt-4 pb-12'>

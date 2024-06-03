@@ -1,8 +1,6 @@
 import classnames from 'classnames'
 import { FieldValues, Path, UseFormRegister } from 'react-hook-form'
 
-// export interface InputIconValues extends React.HTMLProps<HTMLInputElement> {}
-
 interface InputIconProps<T extends FieldValues> extends React.HTMLProps<HTMLInputElement> {
   register: UseFormRegister<T>
   required?: boolean
@@ -10,6 +8,18 @@ interface InputIconProps<T extends FieldValues> extends React.HTMLProps<HTMLInpu
   wrapperClassName?: string
   className?: string
   label: Path<T>
+  validation?: {
+    required?: string | boolean
+    pattern?: {
+      value: RegExp
+      message: string
+    }
+    minLength?: {
+      value: number
+      message: string
+    }
+    validate?: (value: string) => true | string
+  }
 }
 
 export default function InputIcon<T extends FieldValues>({
@@ -18,6 +28,7 @@ export default function InputIcon<T extends FieldValues>({
   register,
   label,
   required,
+  validation,
   ...children
 }: InputIconProps<T>) {
   return (
@@ -36,8 +47,14 @@ export default function InputIcon<T extends FieldValues>({
 
       <div className='flex-1'>
         <input
-          className={classnames(`p-2`, `font-light`, `outline-none rounded-r-md`, `w-full`)}
-          {...register(label, { required })}
+          className={classnames(
+            `p-2`,
+            `font-light`,
+            `outline-none rounded-r-md`,
+            `w-full`,
+            `border-0 focus:ring-0 focus-within:border-blue-500`
+          )}
+          {...register(label, validation)}
           {...children}
         />
       </div>

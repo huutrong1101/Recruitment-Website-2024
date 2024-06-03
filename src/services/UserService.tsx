@@ -6,7 +6,7 @@ const getUserFromToken = async () => {
   if (!hasLocalToken()) {
     throw new Error(`Unable to load the token`)
   }
-  return await axiosInstance.get(`/recruiter/information`, {
+  return await axiosInstance.get(`/candidate/information`, {
     headers: {
       Authorization: `Bearer ${getLocalToken()}`
     }
@@ -36,6 +36,14 @@ const getAdminFromToken = async () => {
 }
 
 const changeUserAvatar = async (data: FormData) => {
+  return await axiosInstance.patch(`/candidate/update_avatar`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+const changeRecAvatar = async (data: FormData) => {
   return await axiosInstance.patch(`/recruiter/update_avatar`, data, {
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -56,11 +64,15 @@ const deleteResume = async (resumeId: any) => {
 }
 
 const updateProfile = async (data: FormData) => {
-  return await axiosInstance.put(`/user/update`, data)
+  return await axiosInstance.patch(`/candidate/update_information`, data)
+}
+
+const changeRecPassword = async (data: any) => {
+  return await axiosInstance.post(`/recruiter/change_password`, data)
 }
 
 const changePassword = async (data: any) => {
-  return await axiosInstance.post(`/recruiter/change_password`, data)
+  return await axiosInstance.post(`/candidate/change_password`, data)
 }
 
 /**
@@ -92,6 +104,63 @@ const updateRecCompanyInfor = async (values: FormData) => {
   return await axiosInstance.patch(`/recruiter/update_company_information`, values)
 }
 
+const saveFavoriteJob = async (jobId: any) => {
+  return await axiosInstance.post(`/candidate/favorite_jobs/add/${jobId}`)
+}
+
+const deleteFavoriteJob = async (jobId: any) => {
+  return await axiosInstance.delete(`/candidate/favorite_jobs/remove/${jobId}`)
+}
+
+const deleteAllFavoriteJob = async () => {
+  return await axiosInstance.delete(`/candidate/favorite_jobs/remove_all`)
+}
+
+const createResume = async (data: FormData) => {
+  return await axiosInstance.post(`/candidate/resumes/add`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+const updateResume = async (data: FormData, resumeId: string) => {
+  return await axiosInstance.patch(`/candidate/resumes/update/${resumeId}`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+const uploadCertification = async (data: FormData) => {
+  return await axiosInstance.post(`/candidate/resumes/upload_certification`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+const deleteCertification = async (uploadFileUrl: string) => {
+  return await axiosInstance.delete(`/candidate/resumes/delete_upload_certification`, {
+    data: {
+      uploadFile: uploadFileUrl
+    }
+  })
+}
+
+const getListNotification = async () => {
+  return await axiosInstance.get(`/candidate/notifications`)
+}
+
+const markNotificationAsRead = async (notiId: string) => {
+  return await axiosInstance.patch(`/candidate/notifications/${notiId}`)
+}
+
+const changeResumeStatus = async (resumeId: string, status: string) => {
+  const requestBody = { status: status }
+  return await axiosInstance.patch(`/candidate/resumes/change_status/${resumeId}`, requestBody)
+}
+
 export const UserService = {
   getRecFromToken,
   getAdminFromToken,
@@ -105,5 +174,18 @@ export const UserService = {
   updateUserInformation,
   updateRecInformation,
   updateRecProfile,
-  updateRecCompanyInfor
+  updateRecCompanyInfor,
+  getUserFromToken,
+  changeRecAvatar,
+  saveFavoriteJob,
+  deleteFavoriteJob,
+  createResume,
+  changeRecPassword,
+  uploadCertification,
+  deleteCertification,
+  deleteAllFavoriteJob,
+  updateResume,
+  getListNotification,
+  changeResumeStatus,
+  markNotificationAsRead
 }

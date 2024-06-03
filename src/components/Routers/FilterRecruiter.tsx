@@ -7,13 +7,13 @@ import FilterLoadingLayout from './FilterLoadingLayout'
 export default function FilterRecruiter() {
   useTokenAuthorize()
 
-  const { isLoggedIn, loading, user } = useAppSelector((app) => app.Auth)
+  const { isLoggedIn, loading, recruiter } = useAppSelector((app) => app.Auth)
 
   if (loading === 'idle' || loading === 'pending') {
     return <FilterLoadingLayout />
   }
 
-  if (loading === 'failed' || !isLoggedIn || !user || user.role !== 'RECRUITER') {
+  if (loading === 'failed' || !isLoggedIn || !recruiter) {
     return <NotFound />
   }
 

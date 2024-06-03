@@ -50,6 +50,10 @@ function Step1Form({ form, onFormChange, nextStep, onFieldOfActivityChange, acti
             {
               required: true,
               message: 'Vui lòng nhập số lượng thành viên của công ty!'
+            },
+            {
+              pattern: new RegExp(/^[0-9]+$/),
+              message: 'Số lượng là số nguyên dương'
             }
           ]}
           className='w-1/2'

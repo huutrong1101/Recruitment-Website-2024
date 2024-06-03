@@ -8,7 +8,7 @@ export default function FilterAdmin() {
   useTokenAuthorize()
   const navigate = useNavigate()
 
-  const { isLoggedIn, loading, user, token } = useAppSelector((app) => app.Auth)
+  const { isLoggedIn, loading, admin, token } = useAppSelector((app) => app.Auth)
 
   if (!token && loading === 'idle') {
     navigate('/auth/login')
@@ -20,7 +20,7 @@ export default function FilterAdmin() {
     return <FilterLoadingLayout />
   }
 
-  if (loading === 'failed' || !isLoggedIn || !user || user.role !== 'ADMIN') {
+  if (loading === 'failed' || !isLoggedIn || !admin) {
     return <NotFound />
   }
 

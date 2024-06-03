@@ -13,6 +13,7 @@ import {
   MapPinIcon,
   UserIcon
 } from '@heroicons/react/24/outline'
+import { Spin } from 'antd'
 
 function AdminManageJobDetail() {
   const dispatch = useAppDispatch()
@@ -80,6 +81,8 @@ function AdminManageJobDetail() {
     }
   }, [jobDetail])
 
+  console.log(jobDetail)
+
   return (
     <>
       {jobDetail ? (
@@ -88,7 +91,9 @@ function AdminManageJobDetail() {
           <JobDetailWidget job={jobDetail} jobInformation={jobInformation} />
         </>
       ) : (
-        <div className='flex justify-center items-center my-4 min-h-[70vh]'>Loading</div>
+        <div className='flex justify-center items-center my-4 min-h-[70vh]'>
+          <Spin size='large' />
+        </div>
       )}
     </>
   )

@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import {
   prepareCandidateProvider,
-  prepareInterviewerProvider,
   prepareOtherProvider,
   prepareRecruiterProvider,
   prepareRecruiterProviderConfirm
@@ -15,37 +14,78 @@ import { setNavbarMenu } from '../../redux/reducer/NavbarSlice'
 import { BellOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Dropdown, Space } from 'antd'
+import { UserService } from '../../services/UserService'
+import { RecService } from '../../services/RecService'
+import moment from 'moment'
+import { useNavigate } from 'react-router-dom'
+
+interface Notification {
+  _id: string
+  title: string
+  content: string
+  link: string
+  isRead: boolean
+  createdAt: string
+}
 
 export default function NavbarUserLoggedInCard() {
   const { menu } = useAppSelector((app) => app.Navbar)
-  const { loading, recruiter } = useAppSelector((app) => app.Auth)
+  const { loading, recruiter, user } = useAppSelector((app) => app.Auth)
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0)
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [notificationLink, setNotificationLink] = useState('')
 
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const [dropdownItemList, setDropdownItemList] = useState<any[]>([])
 
+  const loggedInUser = user || recruiter
+
   useEffect(() => {
-    if (loading === 'success' && recruiter) {
-      const supplierDropdownItem =
-        recruiter.role === 'CANDIDATE'
-          ? prepareCandidateProvider()
-          : recruiter.role === 'RECRUITER'
-            ? recruiter.acceptanceStatus !== 'waiting'
-              ? prepareRecruiterProviderConfirm()
-              : prepareRecruiterProvider()
-            : prepareOtherProvider()
+    if (loading === 'success' && loggedInUser) {
+      const supplierDropdownItem = user
+        ? prepareCandidateProvider()
+        : recruiter
+          ? recruiter.acceptanceStatus !== 'waiting'
+            ? prepareRecruiterProviderConfirm()
+            : prepareRecruiterProviderConfirm()
+          : prepareOtherProvider()
       setDropdownItemList(supplierDropdownItem)
     }
-  }, [loading, recruiter])
+  }, [loading, loggedInUser])
+
+  useEffect(() => {
+    if (notificationLink) {
+      navigate(notificationLink)
+      setNotificationLink('')
+    }
+  }, [notificationLink, navigate])
 
   const handleOnExpandNavbarMenuDropdown = () => {
     dispatch(setNavbarMenu({ ...menu, visible: !menu.visible }))
   }
 
   useEffect(() => {
-    // giả sử sau khi gọi API bạn nhận được số lượng là 4
-    setUnreadNotificationsCount(4)
-  }, [])
+    const fetchNotifications = async () => {
+      if (user) {
+        const response = await UserService.getListNotification()
+        setNotifications(response.data.metadata.listNotification)
+        setUnreadNotificationsCount(
+          response.data.metadata.listNotification.filter((notification: any) => !notification.isRead).length
+        )
+      } else if (recruiter) {
+        const response = await RecService.getListNotification()
+        setNotifications(response.data.metadata.listNotification)
+        setUnreadNotificationsCount(
+          response.data.metadata.listNotification.filter((notification: any) => !notification.isRead).length
+        )
+      }
+    }
+
+    if (loggedInUser) {
+      fetchNotifications()
+    }
+  }, [loggedInUser, navigate])
 
   const newItems = dropdownItemList.map((item) => ({
     label: (
@@ -66,32 +106,73 @@ export default function NavbarUserLoggedInCard() {
     key: item.url
   }))
 
-  const showNotification = false
+  const formatTimeAgo = (dateString: string) => {
+    const now = moment()
+    const then = moment(dateString, 'DD/MM/YYYY HH:mm:ss')
+    const minutesDiff = now.diff(then, 'minutes')
+    const hoursDiff = now.diff(then, 'hours')
 
-  const notifications = [
-    { id: 1, content: 'Đây là thông báo thứ nhất' },
-    { id: 2, content: 'Thông báo số hai đến rồi' },
-    { id: 3, content: 'Wow, bạn đã nhận được thông báo thứ ba!' }
-    // thêm các thông báo khác...
-  ]
+    if (minutesDiff < 60) {
+      return `${minutesDiff} phút trước`
+    } else if (hoursDiff < 24) {
+      return `${hoursDiff} giờ trước`
+    } else {
+      return then.fromNow()
+    }
+  }
+
+  const handleNotificationClick = async (notificationId: string, fullUrl: string) => {
+    try {
+      const url = new URL(fullUrl)
+      const pathname = url.pathname
+
+      setNotifications((prevNotifications) => {
+        return prevNotifications.map((notification) => {
+          if (notification._id === notificationId) {
+            return { ...notification, isRead: true }
+          }
+          return notification
+        })
+      })
+
+      setUnreadNotificationsCount((prevCount) => prevCount - 1)
+
+      if (user) {
+        await UserService.markNotificationAsRead(notificationId)
+      } else if (recruiter) {
+        await RecService.markNotificationAsRead(notificationId)
+      }
+
+      navigate(pathname)
+    } catch (error) {
+      console.error('Error when marking notification as read', error)
+    }
+  }
 
   const notificationContent = (
     <div className='flex flex-col w-64 rounded-none shadow-md bg-slate-50'>
       <div className='p-2 rounded-tl-sm rounded-tr-sm'>
         <p className='pb-2 text-sm font-medium text-center uppercase border-b-2'>THÔNG BÁO</p>
       </div>
-      <div className='flex flex-col items-center justify-center px-3 pb-2'>
-        {showNotification ? (
+      <div className='flex flex-col items-start justify-start px-3 pb-2 overflow-y-auto max-h-[360px] scrollbar-thin scrollbar-track-gray-200 scrollbar-thumb-slate-400'>
+        {notifications ? (
           <>
             {notifications.map((notification) => (
-              <div key={notification.id} className='w-full p-2 hover:bg-gray-100'>
-                {notification.content}
+              <div
+                key={notification._id}
+                className='flex flex-col w-full p-2 border-b cursor-pointer hover:bg-gray-200'
+                onClick={() => handleNotificationClick(notification._id, notification.link)}
+              >
+                <p className='text-sm font-bold text-black'>{notification.title}</p>
+                <span>{notification.content}</span>
+                <div className='flex items-center justify-between'>
+                  <span>{formatTimeAgo(notification.createdAt)}</span>
+                  <span>{notification.isRead ? 'Đã đọc' : 'Chưa đọc'}</span>
+                </div>
               </div>
             ))}
           </>
         ) : (
-          // ))}
-          // </div>
           <div>Bạn chưa có thông báo nào</div>
         )}
       </div>
@@ -103,7 +184,7 @@ export default function NavbarUserLoggedInCard() {
       <Dropdown overlay={notificationContent} trigger={['click']} placement='bottomRight'>
         <a onClick={(e) => e.preventDefault()}>
           <div className='relative'>
-            <div className='flex items-center justify-center rounded-full w-14 h-14 bg-slate-100'>
+            <div className='flex items-center justify-center rounded-full cursor-pointer w-14 h-14 bg-slate-100'>
               <BellOutlined className='text-xl text-emerald-500' />
               {unreadNotificationsCount > 0 && (
                 <span className='absolute flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-600 rounded-full -top-2 -right-2'>
@@ -124,15 +205,15 @@ export default function NavbarUserLoggedInCard() {
               <span
                 className={classNames(`py-4`, `text-zinc-400 hover:text-zinc-600`, ` transition-colors ease-in-out `)}
               >
-                {recruiter?.name}
+                {loggedInUser?.name}
               </span>
-              {!recruiter?.avatar || recruiter?.avatar === null ? (
+              {!loggedInUser?.avatar || loggedInUser?.avatar === null ? (
                 <DummyAvatar iconClassName='text-xl' />
               ) : (
                 <img
                   className='inline-block rounded-full w-9 h-9 ring-2 ring-white'
-                  src={recruiter?.avatar || ''}
-                  alt={`${recruiter?.name}'s avatar`}
+                  src={loggedInUser?.avatar || ''}
+                  alt={`${loggedInUser?.name}'s avatar`}
                 />
               )}
             </div>

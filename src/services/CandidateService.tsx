@@ -9,7 +9,7 @@ export async function sendApplyRequestToJob({ jobId, resumeId }: { jobId: string
   if (!jobId || !resumeId) {
     throw new Error(`Parameter is not found`)
   }
-  return axiosInstance.post(`/candidate/jobs/${jobId}`, { resumeId })
+  return axiosInstance.post(`/candidate/jobs/apply/${jobId}`, { resumeId })
 }
 
 export async function getCandidateSubmittedJobs({ page, limit }: any) {

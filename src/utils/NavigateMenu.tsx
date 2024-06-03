@@ -65,19 +65,16 @@ const candidateProvider = [
   }
 ]
 
-const informationProvider = [
-  {
-    url: '/profile/information',
-    icon: <HiInformationCircle />,
-    text: 'Thông tin bổ sung'
-  }
-]
-
 const recInformationProviderConfirm = [
   {
     url: '/recruiter/profile',
     icon: <HiUserCircle />,
     text: 'Thông tin tài khoản'
+  },
+  {
+    url: '/recruiter/profile/service',
+    icon: <HiUserCircle />,
+    text: 'Dịch vụ của tôi'
   },
   {
     url: '/recruiter/profile/company',
@@ -118,11 +115,7 @@ export const prepareRecruiterProvider = () => {
 }
 
 export const prepareCandidateProvider = () => {
-  return prepareMenuItem([...informationProvider, ...candidateProvider])
-}
-
-export const prepareInterviewerProvider = () => {
-  return prepareMenuItem([...informationProvider])
+  return prepareMenuItem([...candidateProvider])
 }
 
 export const prepareOtherProvider = () => {

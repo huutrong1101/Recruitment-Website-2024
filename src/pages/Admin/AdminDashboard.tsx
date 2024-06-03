@@ -8,53 +8,6 @@ import { ClockIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
 import StatisticsChart from '../../components/Card/StatisticsChart'
 import axiosInstance from '../../utils/AxiosInstance'
 
-const statisticsCardsData = [
-  {
-    color: 'bg-blue-500',
-    icon: <BanknotesIcon className='w-6 h-6 text-white' />,
-    title: "Today's Money",
-    value: '$53k',
-    footer: (
-      <Typography className='font-normal text-blue-gray-600'>
-        <strong className='text-green-500'>+55%</strong>&nbsp;than last week
-      </Typography>
-    )
-  },
-  {
-    color: 'bg-pink-500',
-    icon: <UserIcon className='w-6 h-6 text-white' />,
-    title: "Today's Users",
-    value: '2,300',
-    footer: (
-      <Typography className='font-normal text-blue-gray-600'>
-        <strong className='text-green-500'>+3%</strong>&nbsp;than last month
-      </Typography>
-    )
-  },
-  {
-    color: 'bg-green-500',
-    icon: <UserPlusIcon className='w-6 h-6 text-white' />,
-    title: 'New Clients',
-    value: '3,462',
-    footer: (
-      <Typography className='font-normal text-blue-gray-600'>
-        <strong className='text-red-500'>-2%</strong>&nbsp;than yesterday
-      </Typography>
-    )
-  },
-  {
-    color: 'bg-orange-500',
-    icon: <ChartBarIcon className='w-6 h-6 text-white' />,
-    title: 'Sales',
-    value: '$103,430',
-    footer: (
-      <Typography className='font-normal text-blue-gray-600'>
-        <strong className='text-green-500'>+5%</strong>&nbsp;than yesterday
-      </Typography>
-    )
-  }
-]
-
 const websiteViewsChart = {
   type: 'bar',
   height: 220,
@@ -148,18 +101,6 @@ interface StatisticsData {
 
 export default function AdminDashboard() {
   const [statistics, setStatistics] = useState<StatisticsData>()
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axiosInstance('/admin/statistics')
-        setStatistics(response.data.result)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchData()
-  }, [])
 
   const statisticsCardsData = [
     {

@@ -3,13 +3,15 @@ import React, { useEffect, useState } from 'react'
 import { Form, Input, Button, DatePicker, Select, Radio } from 'antd'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
-import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
-import { JobService } from '../../../services/JobService'
 import moment from 'moment'
 import { toast } from 'react-toastify'
-import { RecService } from '../../../services/RecService'
 import { useNavigate } from 'react-router-dom'
-import SelectFormItem from './SelectFormItem'
+import { useAppDispatch, useAppSelector } from '../../../../hooks/hooks'
+import { JobService } from '../../../../services/JobService'
+import { RecService } from '../../../../services/RecService'
+import SelectFormItem from '../../../Rec/RecJob/SelectFormItem'
+import { RecruiterResponseState } from '../../../../types/user.type'
+import { AdminService } from '../../../../services/AdminService'
 
 const { Option } = Select
 
@@ -30,7 +32,12 @@ interface FormData {
   genderRequirement?: string
 }
 
-function RecAddJob() {
+interface ActivityOption {
+  value: string
+  label: string
+}
+
+function AdminManageAddJob() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -38,6 +45,7 @@ function RecAddJob() {
   const [form] = Form.useForm()
   const [salaryType, setSalaryType] = useState('')
   const [salary, setSalary] = useState('')
+  const [companyOptions, setCompanyOptions] = useState<string[]>([])
 
   const provinces = useAppSelector((state) => state.Job.province)
   const experiences = useAppSelector((state) => state.Job.experience)
@@ -45,6 +53,7 @@ function RecAddJob() {
   const levelRequirement = useAppSelector((state) => state.Job.levelRequirement)
   const genderRequirement = useAppSelector((state) => state.Job.genderRequirement)
   const activities = useAppSelector((state) => state.Job.activities)
+  const listRec = useAppSelector((state): RecruiterResponseState[] => state.AdminSlice.listRec)
 
   useEffect(() => {
     JobService.getProvince(dispatch)
@@ -52,11 +61,19 @@ function RecAddJob() {
     JobService.getLevelRequirement(dispatch)
     JobService.getGenderRequirement(dispatch)
     JobService.getActivity(dispatch)
+    AdminService.getListRec(dispatch)
   }, [])
 
   useEffect(() => {
     form.setFieldsValue({ salary: salary })
   }, [salaryType, salary, form])
+
+  useEffect(() => {
+    const companyNames = listRec.map((item) => item.companyName)
+
+    // Set the unique company options as the companyOptions state
+    setCompanyOptions(companyNames)
+  }, [listRec])
 
   // Hàm xử lý khi giá trị của Radio.Group thay đổi
   const handleSalaryTypeChange = (e: any) => {
@@ -82,39 +99,97 @@ function RecAddJob() {
     setSalary(newSalaryValue)
     form.setFieldsValue({ salary: newSalaryValue })
   }
+
   const handleFormChange = (changedValues: any, allValues: any) => {
     setFormData({ ...formData, ...changedValues })
   }
 
+  const validateQuantity = (_: any, value: any) => {
+    if (value === 'o') {
+      return Promise.resolve()
+    }
+    if (/^[1-9]\d*$/.test(value)) {
+      return Promise.resolve()
+    }
+    return Promise.reject('Số lượng phải là số nguyên dương hoặc chữ o')
+  }
+
   const onFinish = () => {
-    const formValues = form.getFieldsValue(true)
+    let formValues = form.getFieldsValue(true)
+
+    if (formValues.salaryRange) {
+      delete formValues.salaryRange
+    }
+
+    if (formValues.startingSalary) {
+      delete formValues.startingSalary
+    }
 
     console.log(formValues)
+    // toast
+    //   .promise(RecService.createJob(formValues), {
+    //     pending: `Công việc của bạn đang được khởi tạo`,
+    //     success: `Công việc đã được khởi tạo thành công. Hãy chờ đợi để admin xét duyệt`
+    //   })
+    //   .then((response) => {
+    //     navigate('/recruiter/profile/jobsPosted')
+    //   })
+    //   .catch((error) => {
+    //     toast.error(error.response.data.message)
+    //   })
+  }
 
-    toast
-      .promise(RecService.createJob(formValues), {
-        pending: `Công việc của bạn đang được khởi tạo`,
-        success: `Công việc đã được khởi tạo thành công. Hãy chờ đợi để admin xét duyệt`
-      })
-      .then((response) => {
-        navigate('/recruiter/profile/jobsPosted')
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message)
-      })
+  const validateSalary = (_: any, value: string) => {
+    if (/^[1-9]\d*$/.test(value)) {
+      return Promise.resolve()
+    }
+    return Promise.reject(new Error('Mức lương khởi điểm phải là số nguyên dương'))
+  }
+
+  // Hàm định dạng lại giá trị tiền tệ
+  const formatCurrency = (value: string | number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(Number(value))
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/[^0-9]/g, '')
+    const numericValue = parseInt(rawValue, 10) || ''
+    form.setFieldsValue({ startingSalary: numericValue })
+    setSalary(numericValue.toString())
+  }
+
+  const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/[^0-9]/g, '')
+    const numericValue = parseInt(rawValue, 10) || ''
+    const max = form.getFieldValue(['salaryRange', 'max']) || ''
+    form.setFieldsValue({
+      salaryRange: { min: numericValue },
+      salary: `${numericValue}-${max}`
+    })
+    setSalary(`${numericValue}-${max}`)
+  }
+
+  const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/[^0-9]/g, '')
+    const numericValue = parseInt(rawValue, 10) || ''
+    const min = form.getFieldValue(['salaryRange', 'min']) || ''
+    form.setFieldsValue({
+      salaryRange: { max: numericValue },
+      salary: `${min}-${numericValue}`
+    })
+    setSalary(`${min}-${numericValue}`)
   }
 
   return (
     <div className='flex flex-col flex-1 gap-4'>
-      <div className='w-full p-4 border rounded-xl border-zinc-100'>
+      <div className='w-full p-4'>
         <div className='mb-2'>
-          <h1 className='flex-1 text-2xl font-semibold md:mb-4'>Đăng tin tuyển dụng</h1>
-          <p className='flex items-center gap-2'>
-            <ExclamationCircleIcon className='w-4 h-4' /> Lưu ý: Sau khi thêm mới việc làm thành công, việc làm sẽ
-            chuyển sang trạng thái chờ duyệt
-          </p>
+          <h1 className='flex-1 text-2xl font-semibold text-center md:mb-4'>Đăng tin tuyển dụng</h1>
         </div>
-        <div className='flex-col gap-6 marker:flex md:flex-row'>
+        <div className='flex-col gap-6 px-5 marker:flex md:flex-row'>
           <Form
             name='recAddJob'
             form={form}
@@ -122,6 +197,13 @@ function RecAddJob() {
             onValuesChange={handleFormChange}
             labelCol={{ span: 24 }}
           >
+            <SelectFormItem
+              name='companyName'
+              label='Công ty'
+              requiredMessage='Vui lòng chọn lĩnh vực!'
+              options={companyOptions}
+              className='w-full'
+            />
             <div className='flex items-center justify-center gap-2'>
               <Form.Item
                 name='name'
@@ -224,6 +306,9 @@ function RecAddJob() {
                   {
                     required: true,
                     message: 'Vui lòng nhập số lượng'
+                  },
+                  {
+                    validator: validateQuantity
                   }
                 ]}
                 className='w-1/2'
@@ -249,14 +334,13 @@ function RecAddJob() {
               <Form.Item
                 name='startingSalary'
                 label='Mức lương khởi điểm'
-                rules={[{ required: true, message: 'Vui lòng nhập mức lương khởi điểm' }]}
+                rules={[
+                  { required: true, message: 'Vui lòng nhập mức lương khởi điểm' },
+                  { validator: validateSalary }
+                ]}
               >
-                <Input
-                  onChange={(e) => {
-                    form.setFieldsValue({ salary: e.target.value })
-                    setSalary(e.target.value)
-                  }}
-                />
+                <Input value={salary} onChange={handleChange} addonAfter='VND' placeholder='Nhập mức lương khởi điểm' />
+                {salary && <div className='mt-1 text-green-600'>{formatCurrency(salary)}</div>}
               </Form.Item>
             )}
 
@@ -266,36 +350,22 @@ function RecAddJob() {
                   <Form.Item
                     name={['salaryRange', 'min']}
                     noStyle
-                    rules={[{ required: true, message: 'Mức lương tối thiểu!' }]}
+                    rules={[{ required: true, message: 'Mức lương tối thiểu!' }, { validator: validateSalary }]}
                   >
-                    <Input
-                      style={{ width: '50%' }}
-                      placeholder='Min'
-                      onChange={(e) => {
-                        // Cập nhật giá trị min vào salary
-                        const max = form.getFieldValue(['salaryRange', 'max']) || ''
-                        form.setFieldsValue({ salary: `${e.target.value}-${max}` })
-                        setSalary(`${e.target.value}-${max}`)
-                      }}
-                    />
+                    <Input style={{ width: '50%' }} placeholder='Min' onChange={handleMinChange} />
                   </Form.Item>
                   <Form.Item
                     name={['salaryRange', 'max']}
                     noStyle
-                    rules={[{ required: true, message: 'Mức lương tối đa!' }]}
+                    rules={[{ required: true, message: 'Mức lương tối đa!' }, { validator: validateSalary }]}
                   >
-                    <Input
-                      style={{ width: '50%' }}
-                      placeholder='Max'
-                      onChange={(e) => {
-                        // Cập nhật giá trị max vào salary
-                        const min = form.getFieldValue(['salaryRange', 'min']) || ''
-                        form.setFieldsValue({ salary: `${min}-${e.target.value}` })
-                        setSalary(`${min}-${e.target.value}`)
-                      }}
-                    />
+                    <Input style={{ width: '50%' }} placeholder='Max' onChange={handleMaxChange} />
                   </Form.Item>
                 </Input.Group>
+                <div className='mt-1 text-green-600'>
+                  {formatCurrency(form.getFieldValue(['salaryRange', 'min']) || 0)} -{' '}
+                  {formatCurrency(form.getFieldValue(['salaryRange', 'max']) || 0)}
+                </div>
               </Form.Item>
             )}
 
@@ -362,7 +432,7 @@ function RecAddJob() {
                 />
               </div>
             </Form.Item>
-            <Form.Item>
+            <Form.Item className='flex justify-end'>
               <Button type='primary' htmlType='submit'>
                 Đăng tin
               </Button>
@@ -374,4 +444,4 @@ function RecAddJob() {
   )
 }
 
-export default RecAddJob
+export default AdminManageAddJob

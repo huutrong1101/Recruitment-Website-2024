@@ -8,11 +8,16 @@ import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import { UserLoginParamsInterface } from '../../types/user.type'
-import { authLogin, fetchAdminFromToken, fetchRecFromToken } from '../../redux/reducer/AuthSlice'
+import { authLogin, fetchAdminFromToken, fetchRecFromToken, fetchUserFromToken } from '../../redux/reducer/AuthSlice'
 import { getLocalToken } from '../../utils/localToken'
+import ErrorMessage from '../../components/ErrorMessage/ErrorMessage'
 
 export default function AuthenticateLogin() {
-  const { register, handleSubmit } = useForm<UserLoginParamsInterface>()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<UserLoginParamsInterface>()
   const dispatch = useAppDispatch()
   const [searchParams] = useSearchParams()
   const from = searchParams.get('from')
@@ -30,18 +35,17 @@ export default function AuthenticateLogin() {
           const permission = res.metadata.permission
 
           if (permission === '002') {
-            console.log('check')
             const userData = await dispatch(fetchRecFromToken({ token }))
-            if (userData.payload.acceptanceStatus === 'waiting') {
+            if (userData.payload?.firstApproval === true) {
               navigate('/confirm-rec')
             } else {
               navigate('/recruiter/profile')
             }
           } else if (permission === '001') {
-            const userData = await dispatch(fetchAdminFromToken({ token }))
+            await dispatch(fetchAdminFromToken({ token }))
             navigate('/admin')
           } else {
-            const userData = await dispatch(fetchRecFromToken({ token }))
+            await dispatch(fetchUserFromToken({ token }))
             if (from) {
               navigate(from)
             } else {
@@ -60,11 +64,12 @@ export default function AuthenticateLogin() {
   ) : (
     <form
       className={classnames(
-        `py-8 gap-4 items-center justify-center flex flex-col h-[400px]`,
+        `py-8 gap-4 items-center justify-center flex flex-col mb-3`,
         `bg-zinc-100 shadow-md`,
         `rounded-xl px-4 md:px-5 lg:px-6`
       )}
       onSubmit={handleSubmit(onSubmit)}
+      style={{ height: 'auto', minHeight: '400px' }}
     >
       <div className='flex flex-col items-center w-full gap-4 mx-6'>
         <h1 className='text-xl font-semibold capitalize text-emerald-500'>Chào mừng bạn đã quay trở lại</h1>
@@ -72,29 +77,51 @@ export default function AuthenticateLogin() {
           Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
         </p>
 
+        {/* Display errors */}
+
         <InputIcon
           icon={<EnvelopeIcon />}
           type='text'
           placeholder='Địa chỉ email hoặc SĐT'
           register={register}
-          label={`email`}
+          label='email'
+          required
+          validation={{
+            required: 'Email không được để trống',
+            pattern: {
+              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+              message: 'Định dạng email không hợp lệ'
+            }
+          }}
         />
+
+        <ErrorMessage error={errors.email} />
 
         <InputIcon
           icon={<LockClosedIcon />}
           placeholder='Mật khẩu'
           type='password'
           register={register}
-          label={`password`}
+          label='password'
+          required
           autoComplete='current-password'
+          validation={{
+            required: 'Mật khẩu không được để trống',
+            minLength: {
+              value: 8,
+              message: 'Mật khẩu phải có ít nhất 8 ký tự'
+            }
+          }}
         />
+
+        <ErrorMessage error={errors.password} />
 
         {/* Forgot password */}
         <button className='inline-flex flex-col items-center justify-center h-10 text-sm bg-white bg-opacity-0 rounded-lg Button w-44'>
           <div className='Basebutton px-3 py-1.5 justify-center items-center inline-flex'>
             <div className='flex items-center justify-center gap-2 Content'>
               <Link
-                to='/forget-password'
+                to='/forgot-password'
                 className='font-semibold leading-7 tracking-wide capitalize Button text-emerald-800'
               >
                 Quên mật khẩu ?

@@ -26,9 +26,9 @@ async function getJobs(
     levelRequirement = '',
     experience = '',
     field = '',
-    genderRequirement = ''
-    // page = 1,
-    // limit = 10
+    genderRequirement = '',
+    page = 1,
+    limit = 10
   } = {}
 ) {
   dispatch(setJobsStatus(STATUS.LOADING))
@@ -43,12 +43,10 @@ async function getJobs(
     if (field) params.append('field', field)
     if (genderRequirement) params.append('genderRequirement', genderRequirement)
 
-    // params.append('page', page.toString())
-    // params.append('limit', limit.toString())
+    params.append('page', page.toString())
+    params.append('limit', limit.toString())
 
     const queryParams = params.toString()
-
-    console.log(`/jobs?${queryParams}`)
 
     const response = await axiosInstance.get(`/jobs?${queryParams}`, {
       headers: { Authorization: null }
@@ -138,7 +136,11 @@ async function getJobFromId(jobId: string) {
 }
 
 async function getIfUserAppliedTheJob(jobId: string) {
-  return axiosInstance.get(`/candidate/applied-jobs/${jobId}`)
+  return axiosInstance.get(`/candidate/jobs/check_apply/${jobId}`)
+}
+
+async function getIfUserFavoriteTheJob(jobId: string) {
+  return axiosInstance.get(`/candidate/favorite_jobs/check/${jobId}`)
 }
 
 async function getRecJobFromID(jobId: string) {
@@ -175,5 +177,6 @@ export const JobService = {
   getProvince,
   getExperience,
   getLevelRequirement,
-  getGenderRequirement
+  getGenderRequirement,
+  getIfUserFavoriteTheJob
 }

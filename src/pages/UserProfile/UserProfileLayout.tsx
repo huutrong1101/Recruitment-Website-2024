@@ -11,25 +11,26 @@ import Container from '../../components/Container/Container'
 import { useAppSelector } from '../../hooks/hooks'
 
 export default function UserProfileLayout() {
-  const { recruiter, loading } = useAppSelector((app) => app.Auth)
+  const { recruiter, loading, user } = useAppSelector((app) => app.Auth)
   const [asideMenuItems, setAsideMenuItems] = useState<any[]>([])
   const { pathname } = useLocation()
 
+  const loggedInUser = user || recruiter
+
   useEffect(() => {
-    if (loading === 'success' && recruiter) {
-      const supplyMenuItems =
-        recruiter.role === 'CANDIDATE'
-          ? prepareCandidateProvider()
-          : recruiter.role === 'RECRUITER'
-            ? recruiter.acceptanceStatus !== 'waiting'
-              ? prepareRecruiterProviderConfirm()
-              : prepareRecruiterProvider()
-            : prepareOtherProvider()
+    if (loading === 'success' && loggedInUser) {
+      const supplyMenuItems = user
+        ? prepareCandidateProvider()
+        : recruiter
+          ? recruiter.acceptanceStatus !== 'waiting'
+            ? prepareRecruiterProviderConfirm()
+            : prepareRecruiterProviderConfirm()
+          : prepareOtherProvider()
       // const supplyMenuItems: any[] = prepareCandidateProvider()
 
       setAsideMenuItems(supplyMenuItems)
     }
-  }, [loading, recruiter])
+  }, [loading, loggedInUser])
 
   return (
     <Container>

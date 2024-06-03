@@ -14,9 +14,9 @@ const initialState: OneTimePasswordSlice = {
 
 export const sendVerify = createAsyncThunk(
   'OneTimePassword/sendVerify',
-  async ({ otp, email }: UserVerifySendParamsInterface, thunkAPI) => {
+  async ({ otp, email, code }: UserVerifySendParamsInterface, thunkAPI) => {
     try {
-      const response = await AuthService.verifyOtp({ otp, email })
+      const response = await AuthService.verifyOtp({ otp, email, code })
 
       // Full filled
       thunkAPI.fulfillWithValue(response.data)

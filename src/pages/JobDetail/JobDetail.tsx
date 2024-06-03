@@ -8,34 +8,26 @@ import {
   UserIcon
 } from '@heroicons/react/24/outline'
 import classNames from 'classnames'
-import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import JobCard from '../../components/JobCard/JobCard'
-import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
-import NotFound from '../../components/NotFound/NotFound'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
-import { JOB_POSITION } from '../../utils/Localization'
-import Logo from './../../../images/logo_FPT.png'
 import JobDescriptionWidget from './JobDescriptionWidget'
-import JobInformationCard from './JobInformationCard'
-import { JobInterface } from '../../types/job.type'
-import { checkApplyJob, fetchJobDetail } from '../../redux/reducer/JobDetailSlice'
-import axiosInstance from '../../utils/AxiosInstance'
+import { checkApplyJob, checkFavoriteJob, fetchJobDetail } from '../../redux/reducer/JobDetailSlice'
 import Container from '../../components/Container/Container'
-import { Tabs } from 'antd'
 import JobDetailWidget from './JobTab/JobDetailWidget'
-import CompanyInfoWidget from './JobTab/CompanyInfoWidget '
-import OtherJobsWidget from './JobTab/OtherJobsWidget'
-
-const { TabPane } = Tabs
+import axios from 'axios'
+import axiosInstance from '../../utils/AxiosInstance'
+import JobCard from '../../components/JobCard/JobCard'
+import { Spin } from 'antd'
 
 export default function JobDetail() {
   const dispatch = useAppDispatch()
   const { jobId } = useParams()
 
   const jobDetail = useAppSelector((state) => state.JobDetail.response.job)
+  const { user } = useAppSelector((state) => state.Auth)
+  const [relatedJobs, setRelatedJobs] = useState([])
 
   const [jobInformation, setJobInformation] = useState([
     { icon: <UserIcon />, name: 'Loại hình công việc', value: '' },
@@ -88,16 +80,46 @@ export default function JobDetail() {
           value: jobDetail.deadline
         }
       ])
+
+      const fetchRelatedJobs = async () => {
+        try {
+          // Gọi API để lấy danh sách công việc liên quan
+          const response = await axiosInstance.get(`/jobs/${jobDetail._id}/related_jobs`)
+
+          if (response && response.data) {
+            setRelatedJobs(response.data.metadata.listJob)
+          }
+        } catch (err: any) {
+          toast.error(`${err.message}`)
+          throw err
+        }
+      }
+
+      fetchRelatedJobs()
     }
   }, [jobDetail])
 
   useEffect(() => {
+    if (!jobId) {
+      throw new Error(`The parameter jobId is undefined`)
+    }
+
     dispatch(fetchJobDetail({ jobId }))
       .unwrap()
       .catch((message) => toast.error(message))
-  }, [jobId])
 
-  console.log(jobDetail)
+    if (user) {
+      dispatch(checkApplyJob({ jobId }))
+        .unwrap()
+        .catch((message) => toast.error(message))
+
+      dispatch(checkFavoriteJob({ jobId }))
+        .unwrap()
+        .catch((message) => toast.error(message))
+    }
+
+    return () => {}
+  }, [jobId])
 
   return (
     <Container>
@@ -109,15 +131,25 @@ export default function JobDetail() {
           <div className={classNames(`flex flex-col gap-2 items-center justify-center my-12`)}>
             <h1 className={classNames(`text-3xl font-semibold capitalize`)}>Công việc liên quan</h1>
 
-            <div className={classNames(`flex flex-col md:flex-row gap-6`)}>
-              {/* {suggestedJobs.map((data) => {
-                return <JobCard job={data} />
-              })} */}
+            <div className='flex flex-wrap -mx-4 mt-[10px] w-full'>
+              {relatedJobs && relatedJobs.length > 0 ? (
+                relatedJobs.slice(0, 3).map((job) => (
+                  <div key={job} className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
+                    <JobCard job={job} isShow={false} />
+                  </div>
+                ))
+              ) : (
+                <div className='flex items-center justify-center w-full'>
+                  <p>Hiện chưa có công việc nào liên quan</p>
+                </div>
+              )}
             </div>
           </div>
         </>
       ) : (
-        <div className='flex justify-center items-center my-4 min-h-[70vh]'>Loading</div>
+        <div className='flex justify-center items-center my-4 min-h-[70vh]'>
+          <Spin size='large' />
+        </div>
       )}
     </Container>
   )

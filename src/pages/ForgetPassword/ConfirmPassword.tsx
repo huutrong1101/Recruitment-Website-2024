@@ -9,17 +9,25 @@ import InputIcon from '../../components/InputIcon/InputIcon'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { AuthService } from '../../services/AuthService'
 
+interface FormData {
+  newPassword: string
+  confirmPassword: string
+}
+
 export default function ConfirmPassword() {
   const {
     register,
     handleSubmit,
-    formState: { errors }
-  } = useForm()
+    formState: { errors },
+    watch
+  } = useForm<FormData>()
+
   const [showing, setShowing] = useState(false)
 
   const navigate = useNavigate()
 
   const [token, setToken] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -29,9 +37,11 @@ export default function ConfirmPassword() {
     // Lấy giá trị của tham số "token" từ URL
     const searchParams = new URLSearchParams(window.location.search)
     const token = searchParams.get('token')
+    const email = searchParams.get('email')
 
     // Lưu giá trị token vào state
     setToken(token || '')
+    setEmail(email || '')
 
     return () => {
       clearTimeout(timeoutId)
@@ -40,14 +50,13 @@ export default function ConfirmPassword() {
 
   const handleSend = (data: any) => {
     const newData = new FormData()
-    newData.append('token', token)
-    newData.append('confirmPassword', data.confirmPassword)
+    newData.append('confirmNewPassword', data.confirmPassword)
     newData.append('newPassword', data.newPassword)
 
     toast
-      .promise(AuthService.createNewPassword(token, newData), {
-        pending: `Creating your new password`,
-        success: `Your new password was created. Let's login `
+      .promise(AuthService.createNewPassword(token, email, newData), {
+        pending: `Đang cập nhật mật khẩu mới`,
+        success: `Mật khẩu mới đã được cập nhật. Hãy đăng nhập lại nhé.`
       })
       .then((response) => {
         navigate('/auth/login')
@@ -70,9 +79,7 @@ export default function ConfirmPassword() {
               enterFrom='transform-gpu opacity-0  scale-50 rotate-180'
               enterTo='transform-gpu opacity-100 scale-100 rotate-0'
             >
-              <h1 className={classNames(`text-white text-3xl font-semibold leading-10 my-4`)}>
-                Create Your New Password
-              </h1>
+              <h1 className={classNames(`text-white text-3xl font-semibold leading-10 my-4`)}>Đặt lại mật khẩu</h1>
             </Transition.Child>
           </Transition>
         </div>
@@ -85,22 +92,48 @@ export default function ConfirmPassword() {
           enterFrom='transform-gpu opacity-0 translate-y-12'
           enterTo='transform-gpu opacity-100 translate-y-0'
         >
+          <div className='flex flex-col gap-1 mb-2'>
+            {errors.newPassword && errors.newPassword.message && (
+              <p className='text-sm font-bold text-red-500'>{errors.newPassword.message}</p>
+            )}
+            {errors.confirmPassword && errors.confirmPassword.message && (
+              <p className='text-sm font-bold text-red-500'>{errors.confirmPassword.message}</p>
+            )}
+          </div>
+
           <div className='flex flex-col gap-5'>
+            {/* <InputIcon /> */}
             <InputIcon
               icon={<HiKey />}
-              placeholder={`New password`}
+              placeholder={`Nhập mật khẩu mới`}
               type={`password`}
               register={register}
               label={`newPassword`}
               required
+              validation={{
+                required: 'Vui lòng nhập mật khẩu',
+                minLength: {
+                  value: 8,
+                  message: 'Mật khẩu phải chứa ít nhất 8 ký tự'
+                }
+              }}
             />
+
             <InputIcon
               icon={<HiKey />}
-              placeholder={`Confirm new password`}
+              placeholder={`Nhập lại mật khẩu mới`}
               type={`password`}
               register={register}
               label={`confirmPassword`}
               required
+              validation={{
+                required: 'Vui lòng nhập lại mật khẩu',
+                minLength: {
+                  value: 8,
+                  message: 'Mật khẩu phải chứa ít nhất 8 ký tự'
+                },
+                validate: (value) => value === watch('newPassword') || 'Mật khẩu xác nhận không khớp'
+              }}
             />
           </div>
         </Transition>
@@ -114,7 +147,7 @@ export default function ConfirmPassword() {
           enterTo='opacity-100'
         >
           <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-            <PrimaryButton text='Send' type='submit' />
+            <PrimaryButton text='Cập nhật mật khẩu' type='submit' />
           </div>
         </Transition>
       </Transition>

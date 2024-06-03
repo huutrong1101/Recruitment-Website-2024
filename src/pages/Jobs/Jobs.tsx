@@ -1,20 +1,14 @@
-import classNames from 'classnames'
-import { isEmpty, isEqual, isUndefined, omit, omitBy } from 'lodash'
-import qs from 'query-string'
 import { useEffect, useState } from 'react'
-import { AiOutlineBlock } from 'react-icons/ai'
-import { createSearchParams, useNavigate } from 'react-router-dom'
-import JobCard from '../../components/JobCard/JobCard'
-import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
-import Pagination from '../../components/Pagination/Pagination'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
-import useQueryParams from '../../hooks/useQueryParams'
-import axiosInstance from '../../utils/AxiosInstance'
 import { JobInterface, JobListConfig } from '../../types/job.type'
+import { useLocation, useNavigate } from 'react-router-dom'
+import JobCard from '../../components/JobCard/JobCard'
 import FilterJobs from './FilterJobs'
 import Container from '../../components/Container/Container'
 import { JobService } from '../../services/JobService'
-import { data } from '../../data/fetchData'
+import { Spin, Pagination } from 'antd'
+import classNames from 'classnames'
+import qs from 'query-string'
 
 export type QueryConfig = {
   [key in keyof JobListConfig]: string
@@ -23,47 +17,76 @@ export type QueryConfig = {
 export default function Jobs() {
   const dispatch = useAppDispatch()
   const jobs: JobInterface[] = useAppSelector((state) => state.Job.jobs)
-
+  const totalJobs = useAppSelector((state) => state.Job.totalJobs)
   const provinces = useAppSelector((state) => state.Job.province)
   const experiences = useAppSelector((state) => state.Job.experience)
   const jobTypes = useAppSelector((state) => state.Job.type)
   const levelRequirement = useAppSelector((state) => state.Job.levelRequirement)
   const genderRequirement = useAppSelector((state) => state.Job.genderRequirement)
   const activities = useAppSelector((state) => state.Job.activities)
-  const [resetToken, setResetToken] = useState(Date.now())
 
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(6)
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    JobService.getJobs(dispatch)
-  }, [])
+  const [resetToken, setResetToken] = useState(Date.now())
 
   const [dataSearch, setDataSearch] = useState({
-    key: '',
-    selectedProvince: '',
-    selectedExperiences: '',
-    selectedActivity: '',
-    selectedLevelRequirements: '',
-    selectedGenderRequirements: '',
-    selectedJobTypes: ''
+    name: '',
+    province: '',
+    experience: '',
+    field: '',
+    levelRequirement: '',
+    genderRequirement: '',
+    type: ''
   })
 
-  const handleSearch = async (e: any) => {
-    e.preventDefault()
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const name = searchParams.get('name') || ''
+    const province = searchParams.get('province') || ''
+    const experience = searchParams.get('experience') || ''
+    const field = searchParams.get('field') || ''
+    const type = searchParams.get('type') || ''
+    const levelRequirement = searchParams.get('levelRequirement') || ''
+    const genderRequirement = searchParams.get('genderRequirement') || ''
+    const page = parseInt(searchParams.get('page') || '1', 10)
+
+    setDataSearch({
+      name,
+      province,
+      experience,
+      field,
+      type,
+      levelRequirement,
+      genderRequirement
+    })
+    setCurrentPage(page)
+
+    fetchJobs({
+      name,
+      province,
+      experience,
+      field,
+      type,
+      levelRequirement,
+      genderRequirement,
+      page,
+      limit: pageSize
+    })
+  }, [location.search, currentPage, pageSize])
+
+  const fetchJobs = async (params: any) => {
     try {
       setIsLoading(true)
-
-      const params = {
-        name: dataSearch.key,
-        province: dataSearch.selectedProvince,
-        type: dataSearch.selectedJobTypes,
-        levelRequirement: dataSearch.selectedLevelRequirements,
-        experience: dataSearch.selectedExperiences,
-        field: dataSearch.selectedActivity,
-        genderRequirement: dataSearch.selectedGenderRequirements
-      }
-
-      JobService.getJobs(dispatch, params)
+      await JobService.getJobs(dispatch, {
+        ...params,
+        page: params.page || 1, // Ensuring page is set
+        limit: pageSize // Keeping limit only in fetchJobs and not in the URL
+      })
     } catch (error) {
       console.error(error)
     } finally {
@@ -71,30 +94,79 @@ export default function Jobs() {
     }
   }
 
+  const handleSearch = async (e: any) => {
+    e.preventDefault()
+    const params = {
+      name: dataSearch.name,
+      province: dataSearch.province,
+      type: dataSearch.type,
+      levelRequirement: dataSearch.levelRequirement,
+      experience: dataSearch.experience,
+      field: dataSearch.field,
+      genderRequirement: dataSearch.genderRequirement
+    }
+
+    // Filter out empty values
+    const filteredParams: any = Object.fromEntries(Object.entries(params).filter(([key, value]) => value))
+
+    if (currentPage > 1) {
+      filteredParams.page = String(currentPage) // Convert the page to a string
+    }
+
+    navigate({
+      pathname: '/jobs',
+      search: qs.stringify(filteredParams)
+    })
+    fetchJobs(filteredParams)
+  }
+
   const handleReset = () => {
     setDataSearch({
-      key: '',
-      selectedProvince: '',
-      selectedExperiences: '',
-      selectedActivity: '',
-      selectedLevelRequirements: '',
-      selectedGenderRequirements: '',
-      selectedJobTypes: ''
+      name: '',
+      province: '',
+      experience: '',
+      field: '',
+      levelRequirement: '',
+      genderRequirement: '',
+      type: ''
     })
 
-    setResetToken(Date.now())
+    setResetToken(Date.now()) // Reset token to refresh FormSearch
 
-    try {
-      JobService.getJobs(dispatch)
-    } catch (error) {
-      // Xử lý lỗi nếu có
-      console.error('Error fetching jobs:', error)
+    navigate('/jobs') // Navigate back to the jobs page without params
+
+    fetchJobs({
+      page: 1
+    })
+    setCurrentPage(1) // Set the current page back to 1
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    const params: any = {
+      ...dataSearch,
+      page: String(page) // Convert page to a string
     }
+
+    // Filter out empty values
+    const filteredParams: any = Object.fromEntries(Object.entries(params).filter(([key, value]) => value))
+
+    // Remove `page` if it is 1
+    if (page === 1) {
+      delete filteredParams.page
+    }
+
+    navigate({
+      pathname: '/jobs',
+      search: qs.stringify(filteredParams)
+    })
+
+    fetchJobs(params)
   }
 
   return (
-    <Container>
-      <div className={classNames('flex flex-col gap-5 mb-12')}>
+    <Container className='mb-12'>
+      <div className={classNames('flex flex-col gap-5 ')}>
         {/* Sidebar Search  */}
         <FilterJobs
           dataSearch={dataSearch}
@@ -111,11 +183,10 @@ export default function Jobs() {
         />
 
         {/* List Jobs  */}
-
         <div className={classNames('w-full')}>
           {isLoading ? (
-            <div className='flex justify-center my-4 min-h-[70vh] flex-col items-center'>
-              <LoadSpinner className='text-3xl text-emerald-500' />
+            <div className='flex justify-center my-4 min-h-[70vh]'>
+              <Spin size='large' />
             </div>
           ) : (
             <div className='flex flex-wrap -mx-4'>
@@ -140,6 +211,9 @@ export default function Jobs() {
             </div>
           )}
         </div>
+      </div>
+      <div className='flex justify-center p-4'>
+        <Pagination current={currentPage} onChange={handlePageChange} total={totalJobs} pageSize={pageSize} />
       </div>
     </Container>
   )

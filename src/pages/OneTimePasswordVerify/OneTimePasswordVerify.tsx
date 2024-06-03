@@ -25,9 +25,11 @@ export default function OneTimePasswordVerify() {
     setValue('otp', '')
   }, [])
 
+  const code = searchParams.get('code')
+
   useEffect(() => {
     const searchEmailValue = searchParams.get('email')
-    if (searchEmailValue === '' || searchEmailValue === null) {
+    if (searchEmailValue === '' || searchEmailValue === null || code === '' || code === null) {
       toast.error(`Invalid or undefined email`)
       navigate('/')
     } else {
@@ -38,8 +40,10 @@ export default function OneTimePasswordVerify() {
   }, [searchParams])
 
   const handleVerifyOneTimePassword = (data: UserVerifySendParamsInterface) => {
-    console.log(data)
-    dispatch(sendVerify(data))
+    const code = searchParams.get('code') || '' // Lấy giá trị code từ searchParams, nếu không tồn tại sẽ dùng chuỗi rỗng.
+    const dataWithCode = { ...data, code: code } // Tạo một object mới có bao gồm cả code.
+
+    dispatch(sendVerify(dataWithCode)) // Gọi action với dữ liệu mới có bao gồm code.
       .unwrap()
       .then(() => {
         toast.success(`Xác minh thành công. Bạn đã có thể đăng nhập vào hệ thống.`)

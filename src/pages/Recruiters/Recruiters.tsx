@@ -1,23 +1,65 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Container from '../../components/Container/Container'
-import { MagnifyingGlassIcon, UserCircleIcon } from '@heroicons/react/24/outline'
-import classNames from 'classnames'
+import { UserCircleIcon } from '@heroicons/react/24/outline'
 import RecuiterCard from '../../components/RecuiterCard/RecuiterCard'
-import { Input } from 'antd'
+import { Input, Pagination, Spin } from 'antd'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import { RecruiterResponseState } from '../../types/user.type'
 import { RecService } from '../../services/RecService'
 import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 
 function Recruiters() {
   const dispatch = useAppDispatch()
   const listRec: RecruiterResponseState[] = useAppSelector((state) => state.RecJobs.listRec)
+  const totalRec = useAppSelector((state) => state.RecJobs.totalRec)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [isLoading, setIsLoading] = useState(false)
+  const [searchText, setSearchText] = useState(searchParams.get('search') || '')
+  const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1)
+  const [pageSize] = useState(6) // Keeping pageSize fixed as per requirement
 
   useEffect(() => {
-    RecService.getListRec(dispatch)
-  }, [])
+    fetchRecruiters()
+  }, [dispatch, currentPage, pageSize])
+
+  const fetchRecruiters = async () => {
+    setIsLoading(true)
+    await RecService.getListRec(dispatch, { searchText, page: currentPage, limit: pageSize })
+    setIsLoading(false)
+  }
+
+  const handleSearch = () => {
+    setCurrentPage(1)
+    updateParams(searchText, 1)
+    fetchRecruiters() // Call API search after set URL params
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    updateParams(searchText, page)
+    fetchRecruiters() // Call API search after changing page
+  }
+
+  const updateParams = (searchText: string, page: number) => {
+    const params: any = {}
+    if (searchText) params.search = searchText
+    if (page > 1) params.page = page
+    setSearchParams(params)
+  }
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const searchQuery = params.get('search') || ''
+    const page = Number(params.get('page')) || 1
+
+    setSearchText(searchQuery)
+    setCurrentPage(page)
+  }, [location.search])
 
   return (
     <Container>
@@ -29,14 +71,17 @@ function Recruiters() {
         <Input
           size='large'
           placeholder='Nhập tên công ty'
-          prefix={<UserCircleIcon />}
+          prefix={<UserCircleIcon className='text-gray-500' />}
           className='w-full'
           type='text'
-          style={{ width: '100%' }}
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          onPressEnter={handleSearch}
         />
         <button
           type='submit'
           className='flex items-center justify-center flex-shrink-0 px-4 py-2 text-white rounded-md bg-emerald-500 hover:bg-emerald-700'
+          onClick={handleSearch}
         >
           Tìm kiếm
         </button>
@@ -44,14 +89,14 @@ function Recruiters() {
 
       {isLoading ? (
         <div className='flex justify-center my-4 min-h-[70vh] flex-col items-center'>
-          <LoadSpinner className='text-3xl text-emerald-500' />
+          <Spin size='large' />
         </div>
       ) : (
         <div className='flex flex-wrap mt-5 -mx-4'>
-          {listRec.length > 0 ? (
+          {listRec && listRec.length > 0 ? (
             <>
               {listRec.map((recruiter) => (
-                <div className='w-full px-4 mb-8 md:w-1/3' key={recruiter._id}>
+                <div className='flex w-full px-4 mb-8 md:w-1/3' key={recruiter._id}>
                   <RecuiterCard recruiter={recruiter} />
                 </div>
               ))}
@@ -68,6 +113,10 @@ function Recruiters() {
           )}
         </div>
       )}
+
+      <div className='flex justify-center mt-2 mb-5'>
+        <Pagination current={currentPage} pageSize={pageSize} total={totalRec} onChange={handlePageChange} />
+      </div>
     </Container>
   )
 }

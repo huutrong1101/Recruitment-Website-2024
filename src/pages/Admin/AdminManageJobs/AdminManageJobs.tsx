@@ -8,8 +8,10 @@ import { RecruiterResponseState } from '../../../types/user.type'
 import FilterPanelComponent from './FilterPanelComponent'
 import JobTableComponent from './JobTableComponent'
 import { AdminService } from '../../../services/AdminService'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ColumnType } from 'antd/es/table'
+import { useTokenAuthorize } from '../../../hooks/useTokenAuthorize'
+import { PlusCircleOutlined } from '@ant-design/icons'
 
 // Định nghĩa các interface
 interface DataType {
@@ -20,6 +22,7 @@ interface DataType {
   field: string
   levelRequirement: string
   deadline: string
+  premiumAccount: boolean
 }
 
 interface JobFromApi {
@@ -31,6 +34,7 @@ interface JobFromApi {
   acceptanceStatus: string
   companyName: string
   companyLogo: string
+  premiumAccount: boolean
 }
 
 interface ActivityOption {
@@ -95,6 +99,7 @@ const mapTabKeyToStatus = {
 
 function AdminManageJobs() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const activities = useAppSelector((state): string[] => state.Job.activities)
   const levels = useAppSelector((state): string[] => state.Job.levelRequirement)
@@ -119,10 +124,10 @@ function AdminManageJobs() {
       jobName: job.name,
       field: job.field,
       levelRequirement: job.levelRequirement,
-      deadline: job.deadline
+      deadline: job.deadline,
+      premiumAccount: job.premiumAccount // Thêm thuộc tính này
     }))
   }
-
   useEffect(() => {
     JobService.getActivity(dispatch)
     JobService.getType(dispatch)
@@ -146,7 +151,6 @@ function AdminManageJobs() {
     fetchDataByTab(activeTabKey, currentPage, pageSize)
   }, [activeTabKey, currentPage, pageSize])
 
-  // Tạo options từ activities
   const optionsActivity: ActivityOption[] = activities.map((activity) => ({
     value: activity,
     label: activity
@@ -160,33 +164,20 @@ function AdminManageJobs() {
   const fetchDataByTab = async (key: string, page: number, size: number) => {
     setIsLoading(true)
     try {
-      let response
-      switch (key) {
-        case '1':
-          response = await AdminService.getListJobs({ acceptanceStatus: 'accept', page: page, limit: size })
-          if (response && response.data) {
-            setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
-            setTotalElement(response.data.metadata.totalElement)
-          }
-          break
-        case '2':
-          response = await AdminService.getListJobs({ acceptanceStatus: 'waiting', page: page, limit: size })
-          if (response && response.data) {
-            setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
-            setTotalElement(response.data.metadata.totalElement)
-          }
-          break
-        case '3':
-          response = await AdminService.getListJobs({ acceptanceStatus: 'decline', page: page, limit: size })
-          if (response && response.data) {
-            setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
-            setTotalElement(response.data.metadata.totalElement)
-          }
-          break
-        default:
-          setActiveData([])
-          setIsLoading(false)
-          return
+      const params = {
+        acceptanceStatus: mapTabKeyToStatus[key as keyof typeof mapTabKeyToStatus],
+        name: searchValue,
+        field: selectedActivity,
+        levelRequirement: selectedType,
+        companyName: selectedCompany,
+        page: page,
+        limit: size
+      }
+
+      const response = await AdminService.getListJobs(params)
+      if (response && response.data) {
+        setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
+        setTotalElement(response.data.metadata.totalElement)
       }
     } catch (error) {
       console.error('An error occurred while fetching data:', error)
@@ -203,6 +194,7 @@ function AdminManageJobs() {
   }
 
   const handleSearch = async () => {
+    setIsLoading(true)
     try {
       const acceptanceStatus = mapTabKeyToStatus[activeTabKey as keyof typeof mapTabKeyToStatus]
 
@@ -210,6 +202,7 @@ function AdminManageJobs() {
         name: searchValue,
         field: selectedActivity,
         levelRequirement: selectedType,
+        companyName: selectedCompany,
         acceptanceStatus
       }
 
@@ -218,24 +211,24 @@ function AdminManageJobs() {
       if (response) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
       }
-
-      console.log(response.data.metadata.listJob)
     } catch (error) {
-      // Xử lý lỗi ở đây
       console.error('Error searching jobs:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const handleResetFilters = async () => {
-    // Reset tất cả các state filter về giá trị ban đầu
-    setSelectedActivity(undefined)
-    setSelectedType(undefined)
-    setSelectedCompany(undefined)
-    setSearchValue('')
-
-    const acceptanceStatus = mapTabKeyToStatus[activeTabKey as keyof typeof mapTabKeyToStatus]
+    setIsLoading(true)
 
     try {
+      // Reset tất cả các state filter về giá trị ban đầu
+      setSelectedActivity(undefined)
+      setSelectedType(undefined)
+      setSelectedCompany(undefined)
+      setSearchValue('')
+
+      const acceptanceStatus = mapTabKeyToStatus[activeTabKey as keyof typeof mapTabKeyToStatus]
       // Gọi API với acceptanceStatus sau khi reset và các tham số khác ở giá trị ban đầu
       const response = await AdminService.getListJobs({ acceptanceStatus: acceptanceStatus })
       if (response) {
@@ -244,15 +237,24 @@ function AdminManageJobs() {
     } catch (error) {
       // Xử lý lỗi nếu có
       console.error('Error fetching jobs:', error)
+    } finally {
+      setIsLoading(false) // Kết thúc loading
     }
+  }
+
+  const handleNavigate = () => {
+    navigate('/admin/manage_jobs/addJob')
   }
 
   return (
     <div className='flex flex-col flex-1 gap-4'>
       <div className='w-full'>
-        <h1 className='flex-1 text-2xl font-semibold text-center md:mb-4'>
-          Quản lí danh sách công việc trong hệ thống
-        </h1>
+        <div className='flex items-center justify-between mb-6'>
+          <h1 className='flex-1 text-2xl font-semibold text-center'>Quản lí danh sách công việc trong hệ thống</h1>
+          <Button type='primary' icon={<PlusCircleOutlined />} onClick={handleNavigate}>
+            Tạo công việc
+          </Button>
+        </div>
         <div className='flex flex-col gap-3'>
           <div className='flex flex-col gap-2'>
             <FilterPanelComponent

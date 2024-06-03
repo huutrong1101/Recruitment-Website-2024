@@ -1,11 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { STATUS } from '../../utils/contanst'
+import { set } from 'lodash'
 
 const initialState = {
   jobs: [],
   jobDetail: null,
+  jobFavorite: [],
   postion: [],
   location: [],
+  workStatus: [],
 
   activities: [],
   type: [],
@@ -57,6 +60,12 @@ const JobSlice = createSlice({
     },
     setJobDetail(state, action) {
       state.jobDetail = action.payload
+    },
+    setWorkStatus(state, action) {
+      state.workStatus = action.payload
+    },
+    setJobFavorite(state, action) {
+      state.jobFavorite = action.payload
     }
   }
 })
@@ -73,7 +82,9 @@ export const {
   setExperience,
   setLevelRequirement,
   setGenderRequirement,
-  setJobDetail
+  setJobDetail,
+  setWorkStatus,
+  setJobFavorite
 } = JobSlice.actions
 
 export default JobSlice.reducer

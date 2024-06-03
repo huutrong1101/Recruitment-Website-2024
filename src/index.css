@@ -42,14 +42,44 @@ body {
   background: #000; /* Đặt màu của bạn ở đây, ví dụ #000 là màu đen */
 }
 
-.ant-btn{
+.ant-btn {
   background-color: #10b981;
 }
 
-.ant-btn:hover{
+.ant-btn:hover {
   background-color: #047857;
 }
 
 .ck.ck-editor__main .ck-content {
   height: 250px;
+}
+
+.Crop-Controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.Crop-Container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.Crop-Container img {
+  max-width: 50%;
+}
+
+.Crop-Container canvas {
+  border: 1px solid black;
+  max-width: 50%;
+}
+
+img {
+  max-width: 100%;
+}
+
+:where(.css-dev-only-do-not-override-kghr11).ant-upload-wrapper.ant-upload-picture-card-wrapper
+  .ant-upload.ant-upload-select {
+  width: 100%;
 }

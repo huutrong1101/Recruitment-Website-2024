@@ -14,10 +14,10 @@ import Container from '../../components/Container/Container'
 
 export default function Banner() {
   const listBanner = [
-    { id: 1, img: 'https://fptjobs.com/Media/Images/BannerImages/352024120000AM1350293051920x503@100x.png' },
+    { id: 1, img: 'https://vieclam.thegioididong.com/img/mobile/searchv2/detail_banner/common.jpg' },
     { id: 2, img: 'https://fptjobs.com/Media/Images/BannerImages/9222023120000AM744207061920x503.png' },
     { id: 3, img: 'https://fptjobs.com/Media/Images/BannerImages/872023120000AM15651189banner%201920x503.png' },
-    { id: 4, img: 'https://fptjobs.com/Media/Images/BannerImages/5102023120000AM148543911920x503.png' }
+    { id: 4, img: 'https://fptjobs.com/Media/Images/BannerImages/352024120000AM1350293051920x503@100x.png' }
   ]
   return (
     <Swiper

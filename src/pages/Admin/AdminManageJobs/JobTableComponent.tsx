@@ -7,9 +7,12 @@ const { TabPane } = Tabs
 interface DataType {
   _id: string
   stt: number
-  jobName: string
-  levelRequirement: string
   companyName: string
+  jobName: string
+  field: string
+  levelRequirement: string
+  deadline: string
+  premiumAccount: boolean
 }
 
 interface JobTableProps {
@@ -39,13 +42,15 @@ function JobTableComponent({
   fetchDataForTab,
   fetchDataByTab
 }: JobTableProps) {
-  // Xử lý khi trang được thay đổi
   const handlePageChange = (page: number, size?: number) => {
-    const newPageSize = size || pageSize // Sử dụng pageSize hiện tại nếu size không được cung cấp
+    const newPageSize = size || pageSize
     setCurrentPage(page)
     setPageSize(newPageSize)
-    fetchDataByTab(activeTabKey, page, newPageSize) // Gọi fetchDataByTab với các tham số được update
+    fetchDataByTab(activeTabKey, page, newPageSize)
   }
+
+  // Thêm class TailwindCSS để làm nổi bật các job với trạng thái premiumAccount
+  const rowClassName = (record: DataType) => (record.premiumAccount ? 'bg-yellow-100 font-bold ' : '')
 
   return (
     <Tabs defaultActiveKey='1' onChange={(activeKey) => fetchDataForTab(activeKey, currentPage, pageSize)}>
@@ -55,6 +60,7 @@ function JobTableComponent({
           columns={columns}
           dataSource={activeData}
           size='middle'
+          rowClassName={rowClassName}
           pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
         />
       </TabPane>
@@ -64,6 +70,7 @@ function JobTableComponent({
           columns={columns}
           dataSource={activeData}
           size='middle'
+          rowClassName={rowClassName}
           pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
         />
       </TabPane>
@@ -73,6 +80,7 @@ function JobTableComponent({
           columns={columns}
           dataSource={activeData}
           size='middle'
+          rowClassName={rowClassName}
           pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
         />
       </TabPane>

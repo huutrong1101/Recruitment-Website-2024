@@ -28,6 +28,7 @@ export interface UserLoginParamsInterface {
 export interface UserVerifySendParamsInterface {
   otp: string
   email: string
+  code: string
 }
 
 export interface RecruiterResponseState {
@@ -36,6 +37,7 @@ export interface RecruiterResponseState {
   email: string
   contactEmail: string
   phone: string
+  acceptanceStatus: string
   verifyEmail: boolean
   position: string
   companyName: string
@@ -46,13 +48,11 @@ export interface RecruiterResponseState {
   about: string
   companyCoverPhoto: string
   companyLogo: string
-  acceptanceStatus: string
-  avatar: {
-    publicId: string
-    url: string
-  }
+  avatar: string
   slug: string
   role: string
+  likeNumber: string
+  premiumAccount: boolean
 }
 
 export interface AdminResponseState {
@@ -64,19 +64,19 @@ export interface AdminResponseState {
 }
 
 export interface UserResponseState {
-  userId: string
-  phone: string
+  _id: string
+  name: string
   email: string
-  fullName: string
-  avatar: string | null
-  address: string | null
-  dateOfBirth: Date | null
-  about: string | null
-  gender: 'male' | 'female' | null
-  createdAt: Date | null
-  updatedAt: Date | null
-  role: RoleType
-  active: boolean
+  verifyEmail: boolean
+  dateOfBirth: Date
+  gender: string
+  homeTown: string
+  phone: string
+  workStatus: string
+  avatar: string
+  allowSearch: boolean
+  role: string
+  listAllowSearchResume: string[]
 }
 
 export interface AuthState {

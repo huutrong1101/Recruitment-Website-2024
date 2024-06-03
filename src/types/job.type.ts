@@ -23,6 +23,8 @@ export interface JobInterface {
   companyLogo: string
   employeeNumber: number
   companyAddress: string
+  companySlug: string
+  premiumAccount: boolean
 }
 
 export interface AdminJobInterface {
@@ -79,6 +81,8 @@ export interface JobListConfig {
   location?: string
   position?: string
   active?: boolean
+  search?: string
+  selectedProvince?: string
 }
 
 export interface AdminJobInterface {

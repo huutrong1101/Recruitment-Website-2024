@@ -19,7 +19,7 @@ import EventDetail from './pages/EventDetail/EventDetail'
 import UserProfileLayout from './pages/UserProfile/UserProfileLayout'
 import UserProfileMyProfile from './pages/UserProfile/UserProfileMyProfile'
 import UserProfileMyInformation from './pages/UserProfile/UserProfileMyInformation'
-import UserProfileMyResume from './pages/UserProfile/UserProfileMyResume'
+import UserProfileMyResume from './pages/UserProfile/UserResume/UserProfileMyResume'
 import UserProfileSubmittedJob from './pages/UserProfile/UserProfileSubmittedJob'
 import OneTimePasswordVerify from './pages/OneTimePasswordVerify/OneTimePasswordVerify'
 import PrintResume from './pages/PrintResume/PrintResume'
@@ -27,7 +27,7 @@ import ManagementAppLayOut from './layouts/ManagementAppLayOut/ManagementAppLayO
 import AdminDashboard from './pages/Admin/AdminDashboard'
 import AdminManagerAccount from './pages/Admin/AdminManagerAccount'
 import Logout from './pages/Logout/Logout'
-import { useAppDispatch } from './hooks/hooks'
+import { useAppDispatch, useAppSelector } from './hooks/hooks'
 import { JobService } from './services/JobService'
 import CreateAccount from './pages/Admin/CreateAccount'
 import AdminJobs from './pages/Admin/AdminJobs'
@@ -61,11 +61,8 @@ import InterviewInformation from './pages/Interviewer/InterviewInformation'
 import InterviewProfile from './pages/Interviewer/InterviewProfile'
 import INTCandidateDetail from './pages/Interviewer/Candidate/Detail/INTCandidateDetail'
 import InterviewDetail from './pages/Interviewer/Interview/Detail/InterviewDetail'
-import InterviewSched from './pages/Recruiter/Jobs/CreateInterview/InterviewSched'
-import UserProfileInterviews from './pages/UserProfile/UserProfileInterviews/UserProfileInterviews'
 import ScorePage from './pages/Interviewer/Interview/ScorePage'
 import Recruiters from './pages/Recruiters/Recruiters'
-import RecuiterDetail from './pages/RecuiterDetail/RecuiterDetail'
 import AuthenticateRecSignUp from './pages/Authenticate/AuthenticateRecSignUp'
 import UserInterestJob from './pages/UserProfile/UserInterestJob'
 import ConfirmRec from './pages/ConfirmRec/ConfirmRec'
@@ -74,13 +71,28 @@ import ConfirmRecLayout from './pages/ConfirmRec/ConfirmRecLayout'
 import RecProfile from './pages/Rec/RecProfile'
 import RecCompany from './pages/Rec/RecCompany'
 import RecListJobRecruitment from './pages/Rec/RecListJobRecretment/RecListJobRecretment'
-import RecAddJob from './pages/Rec/RecAddJob/RecAddJob'
+import RecAddJob from './pages/Rec/RecJob/RecAddJob'
 import AdminManageJobs from './pages/Admin/AdminManageJobs/AdminManageJobs'
 import AdminManageJobDetail from './pages/Admin/AdminManageJobs/AdminManageJobDetail'
 import AdminManageCompanies from './pages/Admin/AdminManageCompanies/AdminManageCompanies'
 import AdminManageCompanyDetail from './pages/Admin/AdminManageCompanies/AdminManageCompanyDetail'
 import ListCandidateApply from './pages/Rec/RecListJobRecretment/ListCandidateApply/ListCandidateApply'
 import CandidateProfileDetail from './pages/Rec/RecListJobRecretment/ListCandidateApply/CandidateProfileDetail/CandidateProfileDetail'
+import UserResumeDetail from './pages/UserProfile/UserResume/UserResumeEdit'
+import UserResumeAdd from './pages/UserProfile/UserResume/UserResumeAdd'
+import UserResumeEdit from './pages/UserProfile/UserResume/UserResumeEdit'
+import RecEditJob from './pages/Rec/RecJob/RecEditJob'
+import RecMyService from './pages/Rec/RecMyService/RecMyService'
+import { RecService } from './services/RecService'
+import RecuiterDetail from './pages/RecuiterDetail/RecuiterDetail'
+import Payment from './pages/Recruiter/Payment.tsx/Payment'
+import RecFindCandidate from './pages/Rec/RecMyService/RecFindCandidate'
+import RecStatistical from './pages/Rec/RecMyService/RecStatistical'
+import AdminManageNews from './pages/Admin/AdminManageNews/AdminManageNews'
+import AdminManageNewDetail from './pages/Admin/AdminManageNews/AdminManageNewDetail'
+import AdminManageAddCompany from './pages/Admin/AdminManageCompanies/AddCompany/AdminManageAddCompany'
+import AdminManageAddJob from './pages/Admin/AdminManageJobs/AdminManageAddJob/AdminManageAddJob'
+import AdminManageAddNew from './pages/Admin/AdminManageNews/AdminManageAddNew/AdminManageAddNew'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -102,6 +114,8 @@ function App() {
     JobService.getGenderRequirement(dispatch)
     JobService.getActivity(dispatch)
     JobService.getType(dispatch)
+    JobService.getJobs(dispatch)
+    RecService.getListRec(dispatch)
   }, [])
 
   return (
@@ -139,7 +153,7 @@ function App() {
               <Route path='complete' element={<CompleteConfirmEmail />} />
             </Route>
             <Route path='/otp' element={<OneTimePasswordVerify />} />
-            <Route path='/forget-password' element={<ForgetPasswordLayout />}>
+            <Route path='/forgot-password' element={<ForgetPasswordLayout />}>
               <Route index element={<ForgetPassword />} />
               <Route path='confirm-password' element={<ConfirmPassword />} />
             </Route>
@@ -151,6 +165,9 @@ function App() {
             <Route index element={<UserProfileMyProfile />} />
             <Route path='information' element={<UserProfileMyInformation />} />
             <Route path='resume' element={<UserProfileMyResume />} />
+            <Route path='resume/add' element={<UserResumeAdd />} />
+            <Route path='resume/edit/:resumeId' element={<UserResumeEdit />} />
+            {/* <Route path='resume/:resumeId' element={<UserResumeDetail />} /> */}
             <Route path='submitted-jobs' element={<UserProfileSubmittedJob />} />
             <Route path='interest-jobs' element={<UserInterestJob />} />
           </Route>
@@ -159,28 +176,32 @@ function App() {
         {/* </Route> */}
 
         {/* ADMIN  */}
-        {/* <Route element={<FilterAdmin />}> */}
-        <Route path='/admin' element={<ManagementAppLayOut />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path='manage_jobs' element={<AdminManageJobs />} />
-          <Route path='manage_jobs/:jobId' element={<AdminManageJobDetail />} />
-          <Route path='manage_companies' element={<AdminManageCompanies />} />
-          <Route path='manage_companies/:companyId' element={<AdminManageCompanyDetail />} />
+        <Route element={<FilterAdmin />}>
+          <Route path='/admin' element={<ManagementAppLayOut />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path='manage_jobs' element={<AdminManageJobs />} />
+            <Route path='manage_jobs/:jobId' element={<AdminManageJobDetail />} />
+            <Route path='manage_jobs/addJob' element={<AdminManageAddJob />} />
 
-          {/* <Route path='profile' element={<ReccerProfile />} />
-          <Route path='account' element={<AdminManagerAccount />} />
-          <Route path='create_account' element={<CreateAccount />} />
-          <Route path='jobs' element={<AdminJobs />} />
-          <Route path='jobs/:jobId' element={<AdminJobDetail />} />
-          <Route path='events' element={<AdminEvents />} />
-          <Route path='events/:eventId' element={<AdminEventDetail />} /> */}
+            <Route path='manage_companies' element={<AdminManageCompanies />} />
+            <Route path='manage_companies/:companyId' element={<AdminManageCompanyDetail />} />
+            <Route path='manage_companies/addCompany' element={<AdminManageAddCompany />} />
+
+            <Route path='manage_news' element={<AdminManageNews />} />
+            <Route path='manage_news/:newId' element={<AdminManageNewDetail />} />
+            <Route path='manage_news/addNew' element={<AdminManageAddNew />} />
+          </Route>
         </Route>
-        {/* </Route> */}
 
         {/* RECRUITER  */}
+
         <Route path='/recruiter' element={<UserAppLayout />}>
+          <Route path='thankyou' element={<Payment />} />
           <Route path='profile' element={<UserProfileLayout />}>
             <Route index element={<RecProfile />} />
+            <Route path='service' element={<RecMyService />} />
+            <Route path='service/findCandidate' element={<RecFindCandidate />} />
+            <Route path='service/statistical' element={<RecStatistical />} />
             <Route path='company' element={<RecCompany />} />
             <Route path='jobsPosted' element={<RecListJobRecruitment />} />
             <Route path='jobsPosted/listCandidate/:jobid' element={<ListCandidateApply />} />
@@ -189,42 +210,7 @@ function App() {
               element={<CandidateProfileDetail />}
             />
             <Route path='createJob' element={<RecAddJob />} />
-          </Route>
-        </Route>
-        {/* <Route element={<FilterRecruiter />}> */}
-        {/* <Route path='/recruiter' element={<ManagementAppLayOut />}>
-        
-          <Route index element={<ReccerDashboard />} />
-          <Route path='profile' element={<ReccerProfile />} />
-
-          <Route path='jobs' element={<ReccerJobManagement />} />
-          <Route path='jobdetail/:jobId' element={<ReccerJobDetail />} />
-          <Route path='addjob' element={<AddJob />} />
-          <Route path='jobdetail/:jobId/edit' element={<EditJob />} />
-          <Route path='candidates' element={<ReccerCandidateManagement />} />
-          <Route path='candidates/:userId' element={<CandidateDetail />} />
-          <Route path='interviewers' element={<ReccerInterviewerManagement />} />
-          <Route path='interviewers/:interviewerId' element={<ReccerInterviewerDetail />} />
-          <Route path='events' element={<ReccerEventManagement />} />
-          <Route path='events/:eventId' element={<ReccerEventDetail />} />
-          <Route path='addevent' element={<AddEvent />} />
-
-          <Route path='jobdetail/:jobId/interview-schedule/:userId' element={<InterviewSched />} />
-        </Route> */}
-        {/* </Route> */}
-
-        {/* INTERVIEW  */}
-        <Route element={<FilterInterviewer />}>
-          <Route path='/interviewer' element={<ManagementAppLayOut />}>
-            <Route index element={<InterviewerDashboard />} />
-            <Route path='profile' element={<InterviewProfile />} />
-            <Route path='information' element={<InterviewInformation />} />
-            <Route path='interview-recent' element={<InterviewRecent />} />
-            <Route path='interview-recent/:id' element={<InterviewDetail />} />
-            <Route path='candidate-recent' element={<CandidateRecent />} />
-            <Route path='candidate-recent/:id' element={<INTCandidateDetail />} />
-            <Route path='question' element={<ManageQuestion />} />
-            <Route index path='interview-recent/:id/score-page' element={<ScorePage />} />
+            <Route path='editJob/:jobId' element={<RecEditJob />} />
           </Route>
         </Route>
       </Routes>

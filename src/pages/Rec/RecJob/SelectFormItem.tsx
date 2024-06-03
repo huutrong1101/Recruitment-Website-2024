@@ -7,7 +7,7 @@ interface SelectFormItemProps {
   name: string
   label: string
   requiredMessage: string
-  options: string[]
+  options: string[] // Thay đổi kiểu từ string[] thành ActivityOption[]
   className?: string
 }
 

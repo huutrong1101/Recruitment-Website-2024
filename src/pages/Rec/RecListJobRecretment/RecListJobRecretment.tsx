@@ -1,6 +1,6 @@
 // Import React và các thành phần từ 'antd'
 import React, { useEffect, useState } from 'react'
-import { Button, Input, Select, Table, Tabs } from 'antd'
+import { Button, Input, Modal, Select, Table, Tabs, Tooltip } from 'antd'
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 import type { TableColumnsType } from 'antd'
 import { Cog6ToothIcon, EyeIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
@@ -17,7 +17,7 @@ const { TabPane } = Tabs
 
 // Định nghĩa các interface
 interface DataType {
-  key: React.Key
+  key: string
   stt: number
   jobName: string
   jobPosition: string
@@ -41,63 +41,6 @@ interface ActivityOption {
   label: string
 }
 
-const columns: TableColumnsType<DataType> = [
-  {
-    title: 'STT',
-    dataIndex: 'stt',
-    key: 'stt'
-  },
-  {
-    title: 'TÊN VIỆC LÀM',
-    dataIndex: 'jobName', // Tên trường dữ liệu mà bạn muốn hiển thị
-    key: 'jobName'
-  },
-  {
-    title: 'VỊ TRÍ CÔNG VIỆC',
-    dataIndex: 'jobPosition',
-    key: 'jobPosition'
-  },
-  {
-    title: 'NGÀY HẾT HẠN',
-    dataIndex: 'expirationDate',
-    key: 'expirationDate',
-    render: (expirationDate) => moment(expirationDate).format('DD-MM-YYYY')
-  },
-  {
-    title: 'HỒ SƠ ỨNG TUYỂN',
-    dataIndex: 'applicationProfile',
-    key: 'applicationProfile',
-    align: 'center',
-    render: (applicationProfile, record) => (
-      <div className='flex flex-col items-center justify-center'>
-        {applicationProfile} hồ sơ
-        {applicationProfile === 0 && <Link to={`/recruiter/profile/jobsPosted/listCandidate/${record.key}`}>Xem</Link>}
-      </div>
-    )
-  },
-  {
-    title: 'TRẠNG THÁI',
-    dataIndex: 'status',
-    key: 'status',
-    align: 'center',
-    render: (text, record) => (
-      <div className={text === 'Kích hoạt' ? 'p-1 text-white bg-emerald-500' : 'p-1 text-white bg-red-500'}>{text}</div>
-    )
-  },
-  {
-    title: <Cog6ToothIcon className='w-6 h-6' />,
-    dataIndex: 'action',
-    key: 'action',
-    render: () => (
-      <span>
-        <Button>
-          <PencilSquareIcon className='w-4 h-4' />
-        </Button>
-      </span>
-    )
-  }
-]
-
 function RecListJobRecruitment(): JSX.Element {
   const dispatch = useAppDispatch()
 
@@ -112,7 +55,81 @@ function RecListJobRecruitment(): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
   const [isLoading, setIsLoading] = useState(false)
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [currentJob, setCurrentJob] = useState<DataType | null>(null)
 
+  const columns: TableColumnsType<DataType> = [
+    {
+      title: 'STT',
+      dataIndex: 'stt',
+      key: 'stt'
+    },
+    {
+      title: 'TÊN VIỆC LÀM',
+      dataIndex: 'jobName', // Tên trường dữ liệu mà bạn muốn hiển thị
+      key: 'jobName'
+    },
+    {
+      title: 'VỊ TRÍ CÔNG VIỆC',
+      dataIndex: 'jobPosition',
+      key: 'jobPosition'
+    },
+    {
+      title: 'NGÀY HẾT HẠN',
+      dataIndex: 'expirationDate',
+      key: 'expirationDate',
+      render: (expirationDate) => moment(expirationDate).format('DD-MM-YYYY')
+    },
+    {
+      title: 'HỒ SƠ ỨNG TUYỂN',
+      dataIndex: 'applicationProfile',
+      key: 'applicationProfile',
+      align: 'center',
+      render: (applicationProfile, record) => (
+        <div className='flex flex-col items-center justify-center'>
+          <p className='text-red-500 '> {applicationProfile} hồ sơ</p>
+          {applicationProfile !== 0 && (
+            <Link
+              className='px-2 text-white bg-emerald-500'
+              to={`/recruiter/profile/jobsPosted/listCandidate/${record.key}`}
+            >
+              Xem
+            </Link>
+          )}
+        </div>
+      )
+    },
+    {
+      title: 'TRẠNG THÁI',
+      dataIndex: 'status',
+      key: 'status',
+      align: 'center',
+      render: (text, record) => (
+        <div
+          className={
+            text === 'Kích hoạt'
+              ? 'p-1 text-white bg-emerald-500 cursor-pointer'
+              : 'p-1 text-white bg-red-500 cursor-pointer'
+          }
+          onClick={() => showModal(record)}
+        >
+          {text}
+        </div>
+      )
+    },
+    {
+      title: <Cog6ToothIcon className='w-6 h-6' />,
+      dataIndex: 'action',
+      key: 'action',
+      render: (text, record) => (
+        <Tooltip title='Xem chi tiết'>
+          <Link to={`/recruiter/profile/editJob/${record.key}`}>
+            <Button type='primary' icon={<PencilSquareIcon className='w-4 h-4' />} />
+          </Link>
+        </Tooltip>
+      )
+    }
+  ]
   // Function để chuyển đổi dữ liệu từ API
   const mapApiDataToTableData = (apiData: JobFromApi[]): DataType[] => {
     return apiData.map((job, index) => ({
@@ -156,31 +173,40 @@ function RecListJobRecruitment(): JSX.Element {
       let response
       switch (key) {
         case '1':
-          response = await RecService.getAcceptedJobs({ page: page, limit: size }) // Giả định rằng nó sẽ trả về AxiosResponse
+          response = await RecService.getAcceptedJobs({ page: page, limit: size })
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listAcceptedJob))
             setTotalElement(response.data.metadata.totalElement)
           }
           break
         case '2':
-          response = await RecService.getListWaitingJob() // Giả định rằng nó sẽ trả về AxiosResponse
+          response = await RecService.getListWaitingJob({ page: page, limit: size })
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listWaitingJob))
+            setTotalElement(response.data.metadata.totalElement)
           }
           break
         case '3':
-          response = await RecService.getDeclinedJobs() // Giả định rằng nó sẽ trả về AxiosResponse
+          response = await RecService.getDeclinedJobs({ page: page, limit: size })
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listDeclinedJob))
+            setTotalElement(response.data.metadata.totalElement)
           }
           break
         case '4':
-          setActiveData([])
+          response = await RecService.getNearingExpirationJob({ page: page, limit: size })
+          if (response && response.data) {
+            setActiveData(mapApiDataToTableData(response.data.metadata.listNearingExpirationJob))
+            setTotalElement(response.data.metadata.totalElement)
+          }
           break
         case '5':
-          setActiveData([])
+          response = await RecService.getExpiredJob({ page: page, limit: size })
+          if (response && response.data) {
+            setActiveData(mapApiDataToTableData(response.data.metadata.listExpiredJob))
+            setTotalElement(response.data.metadata.totalElement)
+          }
           break
-        // ... các trường hợp khác tương tự
         default:
           setActiveData([])
           setIsLoading(false)
@@ -205,30 +231,45 @@ function RecListJobRecruitment(): JSX.Element {
     try {
       let response
       const searchParams = {
-        // Chuyển đổi giá trị tìm kiếm sang tham số phù hợp cho API
         name: searchValue,
         field: selectedActivity,
-        type: selectedType
+        levelRequirement: selectedType
       }
 
       switch (activeTabKey) {
         case '1':
-          // Thực hiện tìm kiếm dựa trên tab đang chọn
           response = await RecService.getAcceptedJobs(searchParams)
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listAcceptedJob))
+            setTotalElement(response.data.metadata.totalElement)
           }
           break
         case '2':
           response = await RecService.getListWaitingJob(searchParams)
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listWaitingJob))
+            setTotalElement(response.data.metadata.totalElement)
           }
           break
         case '3':
           response = await RecService.getDeclinedJobs(searchParams)
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listDeclinedJob))
+            setTotalElement(response.data.metadata.totalElement)
+          }
+          break
+        case '4':
+          response = await RecService.getNearingExpirationJob(searchParams)
+          if (response && response.data) {
+            setActiveData(mapApiDataToTableData(response.data.metadata.listNearingExpirationJob))
+            setTotalElement(response.data.metadata.totalElement)
+          }
+          break
+        case '5':
+          response = await RecService.getExpiredJob(searchParams)
+          if (response && response.data) {
+            setActiveData(mapApiDataToTableData(response.data.metadata.listExpiredJob))
+            setTotalElement(response.data.metadata.totalElement)
           }
           break
         default:
@@ -254,6 +295,31 @@ function RecListJobRecruitment(): JSX.Element {
 
     // Gọi lại hàm lấy dữ liệu ban đầu dựa trên tab hiện tại sau khi đã xóa bộ lọc
     fetchDataByTab(activeTabKey, currentPage, pageSize)
+  }
+
+  const showModal = (job: DataType) => {
+    setCurrentJob(job)
+    setIsModalVisible(true)
+  }
+
+  const handleOk = async () => {
+    if (currentJob) {
+      // Giả sử bạn có một dịch vụ để thay đổi trạng thái job
+      try {
+        await RecService.changeJobStatus(currentJob.key, currentJob.status === 'Kích hoạt' ? 'inactive' : 'active')
+        fetchDataByTab(activeTabKey, currentPage, pageSize)
+      } catch (error) {
+        console.error('Failed to update job status:', error)
+      } finally {
+        setIsModalVisible(false)
+        setCurrentJob(null)
+      }
+    }
+  }
+
+  const handleCancel = () => {
+    setIsModalVisible(false)
+    setCurrentJob(null)
   }
 
   return (
@@ -287,6 +353,17 @@ function RecListJobRecruitment(): JSX.Element {
               totalElement={totalElement}
               activeTabKey={activeTabKey}
             />
+            <Modal
+              title='Chuyển đổi trạng thái'
+              visible={isModalVisible}
+              onOk={handleOk}
+              onCancel={handleCancel}
+              okText='Xác nhận'
+              cancelText='Hủy'
+              cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
+            >
+              <p>{`Bạn có chắc chắn muốn ${currentJob?.status === 'Kích hoạt' ? 'Hủy kích hoạt' : 'Kích hoạt'} công việc này không?`}</p>
+            </Modal>
           </div>
         </div>
       </div>

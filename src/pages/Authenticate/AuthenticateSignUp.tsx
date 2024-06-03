@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { EnvelopeIcon, LockClosedIcon, PhoneIcon, UserIcon } from '@heroicons/react/24/outline'
+import { EnvelopeIcon, LockClosedIcon, UserIcon } from '@heroicons/react/24/outline'
 import classnames from 'classnames'
 import { Fragment, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -9,6 +9,9 @@ import InputIcon from '../../components/InputIcon/InputIcon'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import { authRegister } from '../../redux/reducer/AuthSlice'
+import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
+import ErrorMessage from '../../components/ErrorMessage/ErrorMessage'
+import classNames from 'classnames'
 
 function TermAndConditionsDialog({ visible, onClose, onOkay }: any) {
   return (
@@ -75,11 +78,11 @@ export default function AuthenticateSignUp() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors }
-    // reset,
   } = useForm()
   const dispatch = useAppDispatch()
-  const { registerLoadingState } = useAppSelector((app) => app.Auth)
+  const { registerLoadingState, loading } = useAppSelector((app) => app.Auth)
 
   const navigate = useNavigate()
 
@@ -106,10 +109,12 @@ export default function AuthenticateSignUp() {
     setVisibleTermAndCondition(true)
   }
 
-  return (
+  return loading === 'pending' ? (
+    <LoadSpinner />
+  ) : (
     <form
       className={classnames(
-        `py-8 gap-4 items-center justify-center flex flex-col h-[500px] mb-8`,
+        `py-8 gap-4 items-center justify-center flex flex-col h-auto mb-8`,
         `bg-zinc-100 shadow-md`,
         `rounded-xl px-4 md:px-5 lg:px-6`
       )}
@@ -127,10 +132,20 @@ export default function AuthenticateSignUp() {
           register={register}
           label='name'
           required
-          wrapperClassName={classnames({
+          validation={{
+            required: 'Tên không được để trống',
+            minLength: {
+              value: 2,
+              message: 'Tên phải có ít nhất 2 ký tự'
+            }
+          }}
+          wrapperClassName={classNames({
             'border-red-300': errors && errors.name
           })}
         />
+        {errors.name && typeof errors.name.message === 'string' && (
+          <p className='w-full text-red-500'>{errors.name.message}</p>
+        )}
 
         <InputIcon
           icon={<EnvelopeIcon />}
@@ -140,10 +155,20 @@ export default function AuthenticateSignUp() {
           type='email'
           autoComplete='username email'
           required
-          wrapperClassName={classnames({
+          validation={{
+            required: 'Email không được để trống',
+            pattern: {
+              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+              message: 'Định dạng email không hợp lệ'
+            }
+          }}
+          wrapperClassName={classNames({
             'border-red-300': errors && errors.email
           })}
         />
+        {errors.email && typeof errors.email.message === 'string' && (
+          <p className='w-full text-red-500'>{errors.email.message}</p>
+        )}
 
         <InputIcon
           icon={<LockClosedIcon />}
@@ -153,10 +178,20 @@ export default function AuthenticateSignUp() {
           label='password'
           autoComplete='new-password'
           required
-          wrapperClassName={classnames({
+          validation={{
+            required: 'Mật khẩu không được để trống',
+            minLength: {
+              value: 8,
+              message: 'Mật khẩu phải có ít nhất 8 ký tự'
+            }
+          }}
+          wrapperClassName={classNames({
             'border-red-300': errors && errors.password
           })}
         />
+        {errors.password && typeof errors.password.message === 'string' && (
+          <p className='w-full text-red-500'>{errors.password.message}</p>
+        )}
 
         <InputIcon
           icon={<LockClosedIcon />}
@@ -166,30 +201,41 @@ export default function AuthenticateSignUp() {
           label='confirmPassword'
           autoComplete='new-password'
           required
+          validation={{
+            required: 'Nhập lại mật khẩu không được để trống',
+            validate: (value) => value === watch('password') || 'Mật khẩu không khớp'
+          }}
           wrapperClassName={classnames({
             'border-red-300': errors && errors.confirmPassword
           })}
         />
+        {errors.confirmPassword && typeof errors.confirmPassword.message === 'string' && (
+          <p className='w-full text-red-500'>{errors.confirmPassword.message}</p>
+        )}
 
         {/* AgreeTerms */}
         <div className='flex flex-row w-full gap-4 text-zinc-600'>
           <label>
-            <input type='checkbox' {...register('agreeTerms')} required className='mr-3' />
+            <input
+              type='checkbox'
+              {...register('agreeTerms', { required: 'Bạn phải đồng ý với điều khoản dịch vụ' })}
+              className='mr-3'
+            />
             Tôi đã đọc và đồng ý với
             <b className={`cursor-pointer hover:underline ml-1`} onClick={handleOpenTermOfServceDialog}>
               Điều khoản dịch vụ và Chính sách bảo mật
             </b>
           </label>
         </div>
+        {errors.agreeTerms && typeof errors.agreeTerms.message === 'string' && (
+          <p className='w-full text-red-500'>{errors.agreeTerms.message}</p>
+        )}
 
         <PrimaryButton
           type={'submit'}
           text='Đăng Ký'
           disabled={registerLoadingState === 'pending'}
           isLoading={registerLoadingState === 'pending'}
-          // className={classnames({
-          //   "bg-zinc-500 hover:bg-zinc-500": loading === "pending",
-          // })}
         />
       </div>
       <TermAndConditionsDialog

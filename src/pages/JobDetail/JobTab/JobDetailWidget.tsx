@@ -9,7 +9,6 @@ interface JobProps {
 }
 
 function JobDetailWidget({ job, jobInformation }: JobProps) {
-  console.log(jobInformation)
   return (
     <div className={classNames(`flex flex-col md:flex-row gap-12`)}>
       {/* Left side description */}

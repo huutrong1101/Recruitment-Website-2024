@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input, Select } from 'antd'
+import { Button, Input, Select, AutoComplete } from 'antd'
 import { UserCircleIcon } from '@heroicons/react/24/outline'
 import classNames from 'classnames'
 import { SearchOutlined } from '@ant-design/icons'
@@ -18,12 +18,12 @@ interface FilterPanelProps {
   setCareerGoal: (value: string) => void
   fieldOfStudy: string | undefined
   setFieldOfStudy: (value: string) => void
-  genderRequirementSelected: string | undefined
-  setGenderRequirementSelected: (value: string) => void
+  resumeStatusSeleted: string | undefined
+  setResumeStatusSeleted: (value: string) => void
   handleSearch: () => void
   handleResetFilters: () => void
-  optionsGenderRequirements: ActivityOption[]
-  optionsActivities: ActivityOption[]
+  optionsResumeStatus: ActivityOption[]
+  optionsResumeExperience: ActivityOption[]
 }
 
 function FilterListCandidate({
@@ -35,12 +35,12 @@ function FilterListCandidate({
   setCareerGoal,
   fieldOfStudy,
   setFieldOfStudy,
-  genderRequirementSelected,
-  setGenderRequirementSelected,
+  resumeStatusSeleted,
+  setResumeStatusSeleted,
   handleSearch,
   handleResetFilters,
-  optionsActivities,
-  optionsGenderRequirements
+  optionsResumeExperience,
+  optionsResumeStatus
 }: FilterPanelProps) {
   return (
     <>
@@ -66,14 +66,15 @@ function FilterListCandidate({
         </div>
         <div className={classNames('flex gap-4 mt-4')}>
           <div className={classNames('w-1/4')}>
-            <Input
-              placeholder='Kinh nghiệm làm việc'
-              prefix={<UserCircleIcon />}
-              className='w-full'
-              type='text'
+            <AutoComplete
               style={{ width: '100%' }}
+              placeholder='Kinh nghiệm'
+              options={optionsResumeExperience}
               value={workExperience}
-              onChange={(e) => setWorkExperience(e.target.value)}
+              onChange={setWorkExperience}
+              filterOption={(inputValue, option) =>
+                option?.value.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
+              }
             />
           </div>
           <div className={classNames('w-1/4')}>
@@ -88,29 +89,25 @@ function FilterListCandidate({
             />
           </div>
           <div className={classNames('w-1/4')}>
-            <Select
-              showSearch
-              style={{ width: '100%' }}
+            <Input
               placeholder='Ngành học'
-              filterOption={(input, option) =>
-                option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-              }
-              options={optionsActivities}
+              prefix={<UserCircleIcon />}
+              className='w-full'
+              type='text'
+              style={{ width: '100%' }}
               value={fieldOfStudy}
-              onChange={setFieldOfStudy}
+              onChange={(e) => setFieldOfStudy(e.target.value)}
             />
           </div>
           <div className={classNames('w-1/4')}>
             <Select
               showSearch
               style={{ width: '100%' }}
-              placeholder='Yêu cầu giới tính'
-              filterOption={(input, option) =>
-                option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
-              }
-              options={optionsGenderRequirements}
-              value={genderRequirementSelected}
-              onChange={setGenderRequirementSelected}
+              placeholder='Trạng thái hồ sơ'
+              options={optionsResumeStatus}
+              filterOption={(input, option) => option?.label.toLowerCase().includes(input.toLowerCase()) ?? false}
+              value={resumeStatusSeleted}
+              onChange={setResumeStatusSeleted}
             />
           </div>
         </div>

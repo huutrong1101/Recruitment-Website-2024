@@ -1,5 +1,5 @@
 import { Steps, Button, Form, Input, Select } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Container from '../../components/Container/Container'
 import { RcFile, UploadChangeParam, UploadFile } from 'antd/lib/upload/interface'
 import { Upload, message } from 'antd'
@@ -10,6 +10,9 @@ import { toast } from 'react-toastify'
 import { UserService } from '../../services/UserService'
 import { JobService } from '../../services/JobService'
 import { useNavigate } from 'react-router-dom'
+import { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
+import { useDebounceEffect } from '../UserProfile/AvatarCrop/useDebounceEffect'
+import { canvasPreview } from '../UserProfile/AvatarCrop/canvasPreview'
 
 const { Step } = Steps
 const { Option } = Select
@@ -31,6 +34,23 @@ interface FormData {
   slug?: string
 }
 
+function centerAspectCrop(mediaWidth: number, mediaHeight: number) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: 'px', // Sử dụng đơn vị pixel
+        width: mediaWidth, // Đặt kích thước width và height bằng chính kích thước của hình ảnh
+        height: mediaHeight
+      },
+      mediaWidth / mediaHeight,
+      mediaWidth,
+      mediaHeight
+    ),
+    mediaWidth,
+    mediaHeight
+  )
+}
+
 function ConfirmRec() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
@@ -47,6 +67,89 @@ function ConfirmRec() {
   // Lưu trữ danh sách file đã tải lên, bao gồm cả preview
   const [coverList, setCoverList] = useState<UploadFile[]>([])
   const [logoList, setLogoList] = useState<UploadFile[]>([])
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [imgSrc, setImgSrc] = useState('')
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null)
+  const imgRef = useRef<HTMLImageElement>(null)
+  const hiddenAnchorRef = useRef<HTMLAnchorElement>(null)
+  const blobUrlRef = useRef('')
+  const [crop, setCrop] = useState<Crop>()
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
+  const [scale, setScale] = useState(1)
+  const [rotate, setRotate] = useState(0)
+  const [aspect, setAspect] = useState<number | undefined>(undefined)
+
+  const showModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleOk = () => {
+    if (completedCrop && previewCanvasRef.current) {
+      const canvas = previewCanvasRef.current
+      const blob = dataURLtoBlob(canvas.toDataURL('image/png'))
+      const file = new File([blob], 'logo.png', { type: 'image/png' })
+
+      // Cập nhật giá trị avatar trong form
+      form.setFieldsValue({ companyLogo: [{ originFileObj: file }] })
+
+      // Cập nhật previewAvatar để hiển thị ảnh đã crop
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewLogo(reader.result as string)
+        setIsModalOpen(false) // Đóng modal sau khi cập nhật ảnh
+      }
+      reader.readAsDataURL(file)
+    } else {
+      message.error('Vui lòng crop ảnh để cập nhật logo')
+    }
+  }
+  const handleCancel = () => {
+    setIsModalOpen(false)
+  }
+
+  function dataURLtoBlob(dataURL: string): Blob {
+    const arr = dataURL.split(',')
+    const mimeMatch = arr[0].match(/:(.*?);/)?.[1] ?? ''
+
+    if (!mimeMatch) {
+      throw new Error('Invalid dataURL format')
+    }
+
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n)
+    }
+
+    return new Blob([u8arr], { type: mimeMatch })
+  }
+
+  function onSelectFile(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files.length > 0) {
+      setCrop(undefined) // Makes crop preview update between images.
+      const reader = new FileReader()
+      reader.addEventListener('load', () => setImgSrc(reader.result?.toString() || ''))
+      reader.readAsDataURL(e.target.files[0])
+    }
+  }
+
+  function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    const { width, height } = e.currentTarget
+    setCrop(centerAspectCrop(width, height))
+  }
+
+  useDebounceEffect(
+    async () => {
+      if (completedCrop?.width && completedCrop?.height && imgRef.current && previewCanvasRef.current) {
+        canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop, scale, rotate)
+      }
+    },
+    100,
+    [completedCrop, scale, rotate]
+  )
 
   useEffect(() => {
     JobService.getActivity(dispatch)
@@ -74,21 +177,12 @@ function ConfirmRec() {
 
   // Hàm được gọi khi có thay đổi trên Upload component
   const onUploadChange = (info: UploadChangeParam<UploadFile>, fileType: 'logo' | 'cover'): void => {
-    // Cập nhật danh sách file theo loại đang xử lý
-    if (fileType === 'logo') {
-      setLogoList(info.fileList)
-    } else if (fileType === 'cover') {
-      setCoverList(info.fileList)
-    }
-
-    // Tìm file mới nhất (nếu có) trong danh sách của loại file đang xử lý
     const latestFile = info.fileList.slice(-1)[0]?.originFileObj
     if (latestFile) {
       getBase64(latestFile, (imageUrl: string) => {
-        // Cập nhật preview tương ứng với loại file
         if (fileType === 'logo') {
           setPreviewLogo(imageUrl)
-        } else if (fileType === 'cover') {
+        } else {
           setPreviewCover(imageUrl)
         }
       })
@@ -96,14 +190,14 @@ function ConfirmRec() {
   }
 
   // Hàm để chuyển Blob thành base64 để preview
-  const getBase64 = (file: Blob, callback: (imageUrl: string) => void) => {
+  const getBase64 = (file: File, callback: (url: string) => void) => {
     const reader = new FileReader()
-    reader.addEventListener('load', () => callback(reader.result as string))
     reader.readAsDataURL(file)
+    reader.onload = () => callback(reader.result as string)
   }
-
   const handleLogoChange = (info: UploadChangeParam<UploadFile>) => {
-    onUploadChange(info, 'logo')
+    setLogoList(info.fileList) // Update the logoList state
+    onUploadChange(info, 'logo') // Handle base64 conversion and preview update
   }
 
   // Và như sau cho Cover:
@@ -168,12 +262,12 @@ function ConfirmRec() {
     })
 
     // Thêm file logo và cover photo vào formDataObj nếu có
-    if (mergedValues.companyLogo && mergedValues.companyLogo[0].originFileObj instanceof File) {
-      formDataObj.append('companyLogo', mergedValues.companyLogo[0].originFileObj)
+    if (mergedValues.companyLogo && mergedValues.companyLogo.slice(-1)[0].originFileObj instanceof File) {
+      formDataObj.append('companyLogo', mergedValues.companyLogo.slice(-1)[0].originFileObj)
     }
 
-    if (mergedValues.companyCoverPhoto && mergedValues.companyCoverPhoto[0].originFileObj instanceof File) {
-      formDataObj.append('companyCoverPhoto', mergedValues.companyCoverPhoto[0].originFileObj)
+    if (mergedValues.companyCoverPhoto && mergedValues.companyCoverPhoto.slice(-1)[0].originFileObj instanceof File) {
+      formDataObj.append('companyCoverPhoto', mergedValues.companyCoverPhoto.slice(-1)[0].originFileObj)
     }
 
     // Gửi FormData đến server
@@ -223,6 +317,22 @@ function ConfirmRec() {
                 onCoverUploadChange={handleCoverChange}
                 previewLogo={previewLogo}
                 previewCover={previewCover}
+                showModal={showModal}
+                isModalOpen={isModalOpen}
+                handleOk={handleOk}
+                handleCancel={handleCancel}
+                onSelectFile={onSelectFile}
+                imgSrc={imgSrc}
+                crop={crop}
+                setCrop={setCrop}
+                setCompletedCrop={setCompletedCrop}
+                aspect={aspect}
+                imgRef={imgRef}
+                onImageLoad={onImageLoad}
+                scale={scale}
+                rotate={rotate}
+                completedCrop={completedCrop}
+                previewCanvasRef={previewCanvasRef}
               />
             )}
           </Form>

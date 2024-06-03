@@ -1,252 +1,228 @@
-import { Listbox, Transition } from '@headlessui/react'
-import classnames from 'classnames'
-import { Fragment, useEffect, useState } from 'react'
-import { HiListBullet } from 'react-icons/hi2'
-import Button from '../../components/Button/Button'
-import Table from '../../components/Table/Table'
+import React, { useEffect, useState } from 'react'
+import { Button, Table, TableColumnsType, Select, Modal } from 'antd'
+import { Input } from 'antd'
+import { AuthService } from '../../services/AuthService'
+import { JobInterface } from '../../types/job.type'
+import classNames from 'classnames'
+import { SearchProps } from 'antd/es/input'
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
+import { toast } from 'react-toastify'
 
-import moment from 'moment'
-import { useForm } from 'react-hook-form'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import JobStatusBadge from '../../components/Badge/JobStatusBadge'
-import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
-import { getCandidateSubmittedJobs } from '../../services/CandidateService'
-import Search, { SearchProps } from 'antd/es/input/Search'
+const { Option } = Select
 
-export default function UserProfileSubmittedJob() {
-  const [filterType, setFilterType] = useState<number>(0)
-  const [searchParams, setSearchParams] = useSearchParams()
-  const { handleSubmit, register } = useForm()
-  const onSubmit = (data: any) => {}
-  const [applicants, setApplicants] = useState<object[]>([])
-  const navigate = useNavigate()
-  const [pagination, setPagination] = useState({
-    loading: false,
-    pageNumber: 1,
-    pageSize: 10,
-    totalElements: 10,
-    totalPages: 1
-  })
+interface DataType {
+  key: string
+  index: number
+  jobName: string
+  jobPosition: string
+  companyName: string
+  date: string
+  status: string
+}
+
+const statusClasses: { [key: string]: string } = {
+  'Đã nhận': 'bg-emerald-500 text-white',
+  'Không nhận': 'bg-red-500 text-white',
+  'Đã nộp': 'bg-gray-500 text-white'
+}
+
+const UserProfileSubmittedJob = () => {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+  const [activeData, setActiveData] = useState<DataType[]>([])
+  const [totalElement, setTotalElement] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined)
+
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [selectedJob, setSelectedJob] = useState<DataType | null>(null)
 
   useEffect(() => {
-    const page = searchParams.get('page') || 1
-    const limit = searchParams.get('limit') || 5
-    setPagination({ ...pagination, loading: true })
+    fetchJobs(currentPage, pageSize, searchTerm, selectedStatus)
+  }, [currentPage, pageSize])
 
-    getCandidateSubmittedJobs({ page, limit })
-      .then((response) => {
-        const { result } = response.data
-        const { pageNumber, pageSize, totalElements, totalPages } = result
+  const fetchJobs = async (page: number, limit: number, searchTerm: string, status?: string) => {
+    setLoading(true) // Bắt đầu tải, hiển thị spinner loading
+    const params = { name: searchTerm, page, limit, status }
+    try {
+      const response = await AuthService.getJobApply(params)
+      if (response && response.data) {
+        const data = response.data.metadata.listApplication
+        const total = response.data.metadata.totalElement
+        console.log(data)
 
-        // Normalize the result onto a fitted table data
-        // Set onto a data list for rendering
-        setApplicants(normalizeResponseResult(result))
-        setPagination({
-          ...pagination,
-          pageNumber,
-          pageSize,
-          totalElements,
-          totalPages,
-          loading: false
+        setActiveData(convertJobsToTableData(data))
+        setTotalElement(total)
+      }
+    } catch (error) {
+      // Xử lý lỗi nếu cần...
+      console.error('Fetching jobs failed:', error)
+    } finally {
+      setLoading(false) // Khi hoàn thành hoặc có lỗi, dừng spinner loading
+    }
+  }
+
+  const convertJobsToTableData = (jobs: any[]): DataType[] => {
+    return jobs.map((job, index) => ({
+      key: job.jobId,
+      index: job.STT,
+      jobName: job.name,
+      jobPosition: job.levelRequirement,
+      companyName: job.companyName,
+      date: job.deadline,
+      status: job.status
+    }))
+  }
+
+  const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
+    setSearchTerm(value)
+    fetchJobs(currentPage, pageSize, value, selectedStatus)
+  }
+
+  const handlePageChange = (page: number, size?: number) => {
+    const newPageSize = size || pageSize
+    setCurrentPage(page)
+    setPageSize(newPageSize)
+    fetchJobs(page, newPageSize, searchTerm, selectedStatus)
+  }
+
+  const handleStatusChange = (value: string) => {
+    setSelectedStatus(value)
+    fetchJobs(currentPage, pageSize, searchTerm, value)
+  }
+
+  const handleStatusClick = (record: DataType) => {
+    if (record.status === 'Đã nộp') {
+      setSelectedJob(record)
+      setIsModalVisible(true)
+    }
+  }
+
+  const handleModalOk = async () => {
+    if (selectedJob) {
+      toast
+        .promise(AuthService.withdrawJobApplication(selectedJob.key), {
+          pending: `việc thu hồi hồ sơ đang được diễn ra`,
+          success: `Hồ sơ của bạn đã được thu hồi`
         })
-      })
-      .catch(() => {
-        // toast.error(``)
-      })
-  }, [searchParams])
-
-  const normalizeResponseResult = (result: any) => {
-    return (
-      result.content as {
-        jobApplyId: string
-        status: 'NOT_RECEIVED' | 'REVIEWING' | 'PASS' | 'FAIL' | 'PENDING'
-        jobName: string
-        applicationDate: Date
-      }[]
-    ).map((applicant) => {
-      return {
-        jobTitle: applicant.jobName,
-        date: moment(applicant.applicationDate).format('DD/MM/yyyy'),
-        status: <JobStatusBadge status={applicant.status} />
-      }
-    })
+        .then(() => {
+          setIsModalVisible(false)
+          fetchJobs(currentPage, pageSize, searchTerm, selectedStatus)
+        })
+        .catch((error) => toast.error(error.response.data.message))
+    }
   }
 
-  const handleNextPage = () => {
-    setSearchParams((prev) => {
-      const page = prev.get('page') || '1'
-      const limit = prev.get('limit') || '5'
-
-      return {
-        limit,
-        page: (Number.parseInt(page) + 1).toString()
-      }
-    })
-
-    setPagination({ ...pagination, loading: true })
-  }
-  const handlePreviousPage = () => {
-    setSearchParams((prev) => {
-      const page = prev.get('page') || '1'
-      const limit = prev.get('limit') || '5'
-
-      return {
-        limit,
-        page: (Number.parseInt(page) - 1).toString()
-      }
-    })
-
-    setPagination({ ...pagination, loading: true })
+  const handleModalCancel = () => {
+    setIsModalVisible(false)
   }
 
-  const handleChangeLimit = (value: number) => {
-    setSearchParams((prev) => {
-      const page = prev.get('page') || '1'
-
-      return {
-        limit: value.toString() || '5',
-        page
-      }
-    })
-
-    setPagination({ ...pagination, loading: true })
-  }
-
-  const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value)
+  const columns: TableColumnsType<DataType> = [
+    {
+      title: 'STT',
+      dataIndex: 'index',
+      className: 'border border-gray-200'
+    },
+    {
+      title: 'TÊN CÔNG VIỆC',
+      dataIndex: 'jobName',
+      className: 'border border-gray-200'
+    },
+    {
+      title: 'VỊ TRÍ CÔNG VIỆC',
+      dataIndex: 'jobPosition',
+      className: 'border border-gray-200'
+    },
+    {
+      title: 'TÊN CÔNG TY',
+      dataIndex: 'companyName',
+      className: 'border border-gray-200'
+    },
+    {
+      title: 'NGÀY HẾT HẠN',
+      dataIndex: 'date',
+      className: 'border border-gray-200'
+    },
+    {
+      title: 'TRẠNG THÁI',
+      dataIndex: 'status',
+      render: (_, record) => (
+        <div className='w-full'>
+          <div
+            className={classNames(
+              'flex items-center justify-center p-1',
+              statusClasses[record.status],
+              { 'cursor-pointer': record.status === 'Đã nộp' } // Điều kiện cho cursor-pointer
+            )}
+            onClick={() => record.status === 'Đã nộp' && handleStatusClick(record)} // Kiểm tra trạng thái trước khi gọi hàm
+          >
+            {record.status}
+          </div>
+        </div>
+      ),
+      className: 'border border-gray-200'
+    }
+  ]
 
   return (
-    <div className={`px-4 py-2 bg-zinc-100 mt-2 rounded-xl flex flex-col gap-2 flex-1`}>
-      {/* Header */}
-      <div className={classnames(`flex flex-col gap-4`)}>
-        <h1 className={classnames(`font-semibold text-2xl pt-2`)}>Danh sách ứng tuyển</h1>
+    <div className={`px-4 py-4 bg-zinc-100 mt-2 rounded-xl flex flex-col gap-2 flex-1`}>
+      <div className={classNames(`flex flex-col gap-4`)}>
+        <div className='flex items-center justify-between'>
+          <h1 className={classNames(`font-semibold text-xl pt-2`)}>CÔNG VIỆC ỨNG TUYỂN</h1>
 
-        {/* Filter groups */}
-        <div className={classnames(`flex flex-row items-center gap-4`)}>
-          {/* <div className={classnames(`w-10/12`)}>
-            <InputIcon
-              icon={<HiMagnifyingGlass />}
-              className={`text-base px-3 py-2 w-full outline-none`}
-              placeholder="Search for the applicant"
-              type={`text`}
-              register={register}
-              label={`search`}
-            />
-          </div> */}
-          <div className='flex items-center justify-between w-full'>
-            <Listbox value={searchParams.get('limit') || 5} onChange={handleChangeLimit} disabled={pagination.loading}>
-              <div className={classnames(`relative`)}>
-                <Listbox.Button
-                  className={classnames(
-                    `bg-white px-3 py-2 border rounded-md w-full`,
-                    `text-left flex flex-row items-center gap-4`,
-                    filterType !== 0 ? `text-emerald-600` : `text-zinc-500`,
-                    `disabled:bg-gray-200 disabled:border disabled:animate-pulse`
-                  )}
-                >
-                  <span>
-                    <HiListBullet />
-                  </span>
-                  <span>{searchParams.get('limit') || 5} dữ liệu</span>
-                </Listbox.Button>
-                <Transition
-                  as={Fragment}
-                  leave='transition ease-in duration-100'
-                  leaveFrom='opacity-100'
-                  leaveTo='opacity-0'
-                >
-                  <Listbox.Options className='absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
-                    {[...new Array(10)].map((_, idx) => {
-                      const _value = (idx + 1) * 5
-                      return (
-                        <Listbox.Option
-                          key={_value}
-                          className={({ active }) =>
-                            `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                              active ? 'bg-emerald-100 text-emerald-900' : 'text-zinc-600'
-                            }`
-                          }
-                          value={_value}
-                        >
-                          {({ selected }: any) => (
-                            <>
-                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                                {_value}
-                              </span>
-                            </>
-                          )}
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox.Options>
-                </Transition>
-              </div>
-            </Listbox>
-            <Search
-              size='large'
+          <div className='flex items-center gap-2'>
+            <Select
+              placeholder='Chọn trạng thái'
+              onChange={handleStatusChange}
+              allowClear
+              // size='large'
+              style={{ width: 200 }} // Width cố định cho Select
+            >
+              <Option value='Đã nhận'>Đã nhận</Option>
+              <Option value='Không nhận'>Không nhận</Option>
+              <Option value='Đã nộp'>Đã nộp</Option>
+            </Select>
+            <Input.Search
               placeholder='Tìm kiếm'
               onSearch={onSearch}
               enterButton
-              className='w-[35%]'
-              style={{
-                borderRadius: '4px' // Bo góc
-              }}
+              // size='large'
+              style={{ width: '70%' }}
             />
           </div>
         </div>
-      </div>
-
-      {/* Body */}
-      <div>
-        <Table
-          rows={[
-            {
-              id: 'jobTitle',
-              value: 'Tên'
-            },
-            {
-              id: 'date',
-              value: 'Ngày ứng tuyển'
-            },
-            {
-              id: 'status',
-              value: 'Trạng thái'
-            }
-          ]}
-          data={applicants}
-          isModal={false}
-          responsiveColumns={['jobTitle', 'status']}
-        />
-      </div>
-
-      {/* Footer */}
-      <div className={classnames(`flex mb-4 flex-row px-2 text-zinc-500 text-sm items-center gap-4`)}>
+        <p className='flex items-center gap-2'>
+          <ExclamationCircleIcon className='w-4 h-4' /> Lưu ý: Bạn có thể rút hồ sơ ứng tuyển ở những công việc có trạng
+          thái "Đã nộp" bằng cách nhấn vào trạng thái đó.
+        </p>
         <div>
-          {pagination.loading ? (
-            <LoadSpinner />
-          ) : (
-            <>
-              Page {pagination.pageNumber} of {pagination.totalPages}
-            </>
-          )}
-        </div>
-        <div className={classnames(`flex flex-row-reverse flex-1 gap-4`)}>
-          <Button
-            text='Next'
-            className={classnames(``)}
-            size='sm'
-            disabled={pagination.pageNumber >= pagination.totalPages}
-            onClick={handleNextPage}
-          />
-
-          <Button
-            text='Previous'
-            className={classnames(``)}
-            size='sm'
-            disabled={pagination.pageNumber === 1}
-            onClick={handlePreviousPage}
+          <Table
+            className='border border-gray-200'
+            columns={columns}
+            dataSource={activeData}
+            size='middle'
+            loading={loading}
+            pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
           />
         </div>
+        <Modal
+          title='Rút hồ sơ ứng tuyển'
+          visible={isModalVisible}
+          onOk={handleModalOk}
+          onCancel={handleModalCancel}
+          okText='Có'
+          cancelText='Hủy'
+          cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
+        >
+          <p>
+            Bạn có chắc chắn muốn rút hồ sơ ứng tuyển cho công việc "{selectedJob?.jobName}" tại công ty "
+            {selectedJob?.companyName}" không?
+          </p>
+        </Modal>
       </div>
     </div>
   )
 }
+
+export default UserProfileSubmittedJob

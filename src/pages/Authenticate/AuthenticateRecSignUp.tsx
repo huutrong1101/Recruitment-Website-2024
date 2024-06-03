@@ -81,13 +81,13 @@ const signUpSchema = yup.object().shape({
     .string()
     .matches(/^[0-9]{10,12}$/, 'Số điện thoại không hợp lệ')
     .required('Không được để trống.'),
-  contactEmail: yup.string().email('Email không hợp lệ.').required('Email người đại diện không được để trống.'),
-  email: yup.string().email('Email không hợp lệ.').required('Email đăng nhập không được để trống.'),
-  password: yup.string().min(8, 'Mật khẩu phải ít nhất 8 ký tự.').required('Mật khẩu không được để trống.'),
+  contactEmail: yup.string().email('Email không hợp lệ.').required('Không được để trống.'),
+  email: yup.string().email('Email không hợp lệ.').required('Không được để trống.'),
+  password: yup.string().min(8, 'Mật khẩu phải ít nhất 8 ký tự.').required('Không được để trống.'),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], 'Mật khẩu xác nhận không khớp')
-    .required('Mật khẩu xác nhận là bắt buộc'),
+    .required('Không được để trống.'),
   agreeTerms: yup.boolean().oneOf([true], 'Bạn phải đồng ý với các điều khoản và điều kiện.')
 })
 
@@ -131,7 +131,7 @@ function AuthenticateRecSignUp() {
   return (
     <form
       className={classnames(
-        `py-8 gap-4 items-center justify-center flex flex-col h-[550px] mb-8`,
+        `py-8 gap-4 items-center justify-center flex flex-col mb-8`,
         `bg-zinc-100 shadow-md`,
         `rounded-xl px-4 md:px-5 lg:px-6`
       )}
@@ -139,124 +139,133 @@ function AuthenticateRecSignUp() {
     >
       <div className='flex flex-col w-full gap-4 mx-6'>
         <h1 className='text-xl font-semibold text-center capitalize text-emerald-500'>Đăng ký nhà tuyển dụng</h1>
+
+        {/* Section: Thông tin liên hệ */}
         <div className='flex flex-col gap-4 pb-5 border-b-2'>
           <h3 className='font-bold'>Thông tin liên hệ</h3>
-          <div className='flex flex-col gap-4'>
-            <InputIcon
-              icon={<UserIcon />}
-              placeholder='Tên công ty'
-              register={register}
-              label='companyName'
-              required
-              wrapperClassName={classnames({
-                'border-red-300': errors && errors.companyName
-              })}
-            />
 
-            <div className='flex items-center gap-2'>
-              <div className='w-1/2'>
-                <InputIcon
-                  icon={<UserIcon />}
-                  placeholder='Họ và tên người đại diện'
-                  register={register}
-                  label='name'
-                  required
-                  wrapperClassName={classnames({
-                    'border-red-300': errors && errors.name
-                  })}
-                />
-              </div>
-              <div className='w-1/2'>
-                <InputIcon
-                  icon={<UserIcon />}
-                  placeholder='Chức vụ'
-                  register={register}
-                  label='position'
-                  required
-                  wrapperClassName={classnames({
-                    'border-red-300': errors && errors.position
-                  })}
-                />
-              </div>
+          <InputIcon
+            icon={<UserIcon />}
+            placeholder='Tên công ty'
+            register={register}
+            label='companyName'
+            required
+            wrapperClassName={classnames({
+              'border-red-300': errors && errors.companyName
+            })}
+          />
+          {errors.companyName?.message && <p className='text-red-500'>{errors.companyName.message}</p>}
+
+          <div className='flex items-center gap-2'>
+            <div className='w-1/2'>
+              <InputIcon
+                icon={<UserIcon />}
+                placeholder='Họ và tên người đại diện'
+                register={register}
+                label='name'
+                required
+                wrapperClassName={classnames({
+                  'border-red-300': errors && errors.name
+                })}
+              />
+              {errors.name?.message && <p className='text-red-500'>{errors.name.message}</p>}
             </div>
-            <div className='flex items-center gap-2'>
-              <div className='w-1/2'>
-                <InputIcon
-                  icon={<PhoneIcon />}
-                  register={register}
-                  label='phone'
-                  required
-                  placeholder='Số điện thoại'
-                  type='tel'
-                  maxLength={12}
-                  pattern='([0-9]{8,12})'
-                  wrapperClassName={classnames({
-                    'border-red-300': errors && errors.phone
-                  })}
-                />
-              </div>
-              <div className='w-1/2'>
-                <InputIcon
-                  icon={<EnvelopeIcon />}
-                  placeholder='Email người đại diện'
-                  register={register}
-                  label='contactEmail'
-                  type='email'
-                  autoComplete='username email'
-                  required
-                  wrapperClassName={classnames({
-                    'border-red-300': errors && errors.contactEmail
-                  })}
-                />
-              </div>
+            <div className='w-1/2'>
+              <InputIcon
+                icon={<UserIcon />}
+                placeholder='Chức vụ'
+                register={register}
+                label='position'
+                required
+                wrapperClassName={classnames({
+                  'border-red-300': errors && errors.position
+                })}
+              />
+              {errors.position?.message && <p className='text-red-500'>{errors.position.message}</p>}
+            </div>
+          </div>
+          <div className='flex items-center gap-2'>
+            <div className='w-1/2'>
+              <InputIcon
+                icon={<PhoneIcon />}
+                register={register}
+                label='phone'
+                required
+                placeholder='Số điện thoại'
+                type='tel'
+                maxLength={12}
+                pattern='([0-9]{8,12})'
+                wrapperClassName={classnames({
+                  'border-red-300': errors && errors.phone
+                })}
+              />
+              {errors.phone?.message && <p className='text-red-500'>{errors.phone.message}</p>}
+            </div>
+            <div className='w-1/2'>
+              <InputIcon
+                icon={<EnvelopeIcon />}
+                placeholder='Email người đại diện'
+                register={register}
+                label='contactEmail'
+                type='email'
+                autoComplete='username email'
+                required
+                wrapperClassName={classnames({
+                  'border-red-300': errors && errors.contactEmail
+                })}
+              />
+              {errors.contactEmail?.message && <p className='text-red-500'>{errors.contactEmail.message}</p>}
             </div>
           </div>
         </div>
 
+        {/* Section: Thông tin đăng nhập */}
         <div className='flex flex-col gap-4'>
           <h3 className='font-bold'>Thông tin đăng nhập</h3>
-          <div className='flex flex-col gap-4'>
-            <InputIcon
-              icon={<EnvelopeIcon />}
-              placeholder='Email đăng nhập'
-              register={register}
-              label='email'
-              type='email'
-              autoComplete='username email'
-              required
-              wrapperClassName={classnames({
-                'border-red-300': errors && errors.email
-              })}
-            />
-            <div className='flex items-center gap-2'>
-              <div className='w-1/2'>
-                <InputIcon
-                  icon={<LockClosedIcon />}
-                  placeholder='Mật khẩu'
-                  type={`password`}
-                  register={register}
-                  label='password'
-                  autoComplete='new-password'
-                  required
-                  wrapperClassName={classnames({
-                    'border-red-300': errors && errors.password
-                  })}
-                />
-              </div>
-              <div className='w-1/2'>
-                <InputIcon
-                  icon={<LockClosedIcon />}
-                  placeholder='Nhập lại mật khẩu'
-                  type={`password`}
-                  register={register}
-                  label='confirmPassword'
-                  autoComplete='new-password'
-                  required
-                  wrapperClassName={classnames({
-                    'border-red-300': errors && errors.confirmPassword
-                  })}
-                />
-              </div>
+
+          <InputIcon
+            icon={<EnvelopeIcon />}
+            placeholder='Email đăng nhập'
+            register={register}
+            label='email'
+            type='email'
+            autoComplete='username email'
+            required
+            wrapperClassName={classnames({
+              'border-red-300': errors && errors.email
+            })}
+          />
+          {errors.email?.message && <p className='text-red-500'>{errors.email.message}</p>}
+          <div className='flex items-center gap-2'>
+            <div className='w-1/2'>
+              <InputIcon
+                icon={<LockClosedIcon />}
+                placeholder='Mật khẩu'
+                type={`password`}
+                register={register}
+                label='password'
+                autoComplete='new-password'
+                required
+                wrapperClassName={classnames({
+                  'border-red-300': errors && errors.password
+                })}
+              />
+              {errors.password?.message && <p className='text-red-500'>{errors.password.message}</p>}
+            </div>
+            <div className='w-1/2'>
+              <InputIcon
+                icon={<LockClosedIcon />}
+                placeholder='Nhập lại mật khẩu'
+                type={`password`}
+                register={register}
+                label='confirmPassword'
+                autoComplete='new-password'
+                required
+                wrapperClassName={classnames({
+                  'border-red-300': errors && errors.confirmPassword
+                })}
+              />
+              {errors.confirmPassword?.message && <p className='text-red-500'>{errors.confirmPassword.message}</p>}
             </div>
           </div>
         </div>
@@ -277,15 +286,7 @@ function AuthenticateRecSignUp() {
           onOkay={handleCloseDialog}
         />
 
-        <PrimaryButton
-          type={'submit'}
-          text='Đăng Ký'
-          //   disabled={registerLoadingState === 'pending'}
-          //   isLoading={registerLoadingState === 'pending'}
-          // className={classnames({
-          //   "bg-zinc-500 hover:bg-zinc-500": loading === "pending",
-          // })}
-        />
+        <PrimaryButton type={'submit'} text='Đăng Ký' />
       </div>
     </form>
   )

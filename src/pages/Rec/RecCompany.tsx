@@ -1,9 +1,9 @@
 import classNames from 'classnames'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
-import { Form, Input, Select, Upload, UploadFile } from 'antd'
+import { Form, Input, Modal, Select, Upload, UploadFile, message } from 'antd'
 import { JobService } from '../../services/JobService'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
@@ -12,9 +12,12 @@ import { PlusOutlined } from '@ant-design/icons'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { toast } from 'react-toastify'
 import { UserService } from '../../services/UserService'
-import { isEqual } from 'lodash'
+import { isEmpty, isEqual } from 'lodash'
 import { setRec } from '../../redux/reducer/AuthSlice'
+import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
 import ImgCrop from 'antd-img-crop'
+import { useDebounceEffect } from '../UserProfile/AvatarCrop/useDebounceEffect'
+import { canvasPreview } from '../UserProfile/AvatarCrop/canvasPreview'
 
 interface FormData {
   name?: string
@@ -32,13 +35,24 @@ interface FormData {
   emailLogin?: string
 }
 
-function RecCompany() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm()
+function centerAspectCrop(mediaWidth: number, mediaHeight: number) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: 'px', // Sử dụng đơn vị pixel
+        width: mediaWidth, // Đặt kích thước width và height bằng chính kích thước của hình ảnh
+        height: mediaHeight
+      },
+      mediaWidth / mediaHeight,
+      mediaWidth,
+      mediaHeight
+    ),
+    mediaWidth,
+    mediaHeight
+  )
+}
 
+function RecCompany() {
   const [formData, setFormData] = useState<FormData>({})
   const [form] = Form.useForm()
   const activities = useAppSelector((state) => state.Job.activities)
@@ -48,7 +62,88 @@ function RecCompany() {
   const [previewCover, setPreviewCover] = useState('')
   const [initialFormData, setInitialFormData] = useState<FormData>({})
 
-  console.log(previewLogo)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [imgSrc, setImgSrc] = useState('')
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null)
+  const imgRef = useRef<HTMLImageElement>(null)
+  const hiddenAnchorRef = useRef<HTMLAnchorElement>(null)
+  const blobUrlRef = useRef('')
+  const [crop, setCrop] = useState<Crop>()
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
+  const [scale, setScale] = useState(1)
+  const [rotate, setRotate] = useState(0)
+  const [aspect, setAspect] = useState<number | undefined>(undefined)
+
+  const showModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleOk = () => {
+    if (completedCrop && previewCanvasRef.current) {
+      const canvas = previewCanvasRef.current
+      const blob = dataURLtoBlob(canvas.toDataURL('image/png'))
+      const file = new File([blob], 'logo.png', { type: 'image/png' })
+
+      // Cập nhật giá trị avatar trong form
+      form.setFieldsValue({ companyLogo: [{ originFileObj: file }] })
+
+      // Cập nhật previewAvatar để hiển thị ảnh đã crop
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewLogo(reader.result as string)
+        setIsModalOpen(false) // Đóng modal sau khi cập nhật ảnh
+      }
+      reader.readAsDataURL(file)
+    } else {
+      message.error('Vui lòng crop ảnh để cập nhật logo')
+    }
+  }
+  const handleCancel = () => {
+    setIsModalOpen(false)
+  }
+
+  function dataURLtoBlob(dataURL: string): Blob {
+    const arr = dataURL.split(',')
+    const mimeMatch = arr[0].match(/:(.*?);/)?.[1] ?? ''
+
+    if (!mimeMatch) {
+      throw new Error('Invalid dataURL format')
+    }
+
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n)
+    }
+
+    return new Blob([u8arr], { type: mimeMatch })
+  }
+
+  function onSelectFile(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files.length > 0) {
+      setCrop(undefined) // Makes crop preview update between images.
+      const reader = new FileReader()
+      reader.addEventListener('load', () => setImgSrc(reader.result?.toString() || ''))
+      reader.readAsDataURL(e.target.files[0])
+    }
+  }
+
+  function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    const { width, height } = e.currentTarget
+    setCrop(centerAspectCrop(width, height))
+  }
+
+  useDebounceEffect(
+    async () => {
+      if (completedCrop?.width && completedCrop?.height && imgRef.current && previewCanvasRef.current) {
+        canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop, scale, rotate)
+      }
+    },
+    100,
+    [completedCrop, scale, rotate]
+  )
 
   const { recruiter, loading } = useAppSelector((app) => app.Auth)
   const dispatch = useAppDispatch()
@@ -134,7 +229,6 @@ function RecCompany() {
       setCoverList(info.fileList)
     }
 
-    // Tìm file mới nhất (nếu có) trong danh sách của loại file đang xử lý
     const latestFile = info.fileList.slice(-1)[0]?.originFileObj
     if (latestFile) {
       try {
@@ -151,16 +245,9 @@ function RecCompany() {
     }
   }
 
-  const handleLogoChange = async (info: UploadChangeParam<UploadFile>) => {
-    // ...
-    if (info.file.status === 'done' && info.file.originFileObj) {
-      const latestFile = info.fileList.slice(-1)[0]?.originFileObj
-      if (latestFile) {
-        const imageUrl = await getBase64(latestFile)
-        setPreviewLogo(imageUrl)
-      }
-    }
-    setLogoList(info.fileList.filter((file) => !!file.status))
+  const handleLogoChange = (info: UploadChangeParam<UploadFile>) => {
+    setLogoList(info.fileList) // Update the logoList state
+    onUploadChange(info, 'logo') // Handle base64 conversion and preview update
   }
 
   const handleCoverChange = (info: UploadChangeParam<UploadFile>) => {
@@ -168,52 +255,40 @@ function RecCompany() {
   }
 
   const updateCompanyInfo = () => {
-    // Tạo một instance mới của FormData cho việc gửi request.
     const formDataObj = new FormData()
-
-    const formValues = form.getFieldsValue(true) // Lấy tất cả giá trị từ form, kể cả những trường không thay đổi
+    const formValues = form.getFieldsValue(true)
     const mergedValues = { ...formData, ...formValues }
+    const changedValues: { [key: string]: any } = {} // Định nghĩa kiểu cho changedValues
 
-    // Thêm các giá trị từ formData (không phải là files) vào formDataObj
     Object.keys(mergedValues).forEach((key) => {
       if (key === 'emailLogin') {
-        // Nếu là emailLogin thì bỏ qua và không thêm vào formDataObj
         return
       }
 
       const value = mergedValues[key]
+      const originalValue = initialFormData[key as keyof typeof initialFormData]
 
-      console.log({ key, value })
-
-      if (key === 'fieldOfActivity' && Array.isArray(value)) {
-        // Chuyển mảng fieldOfActivity thành chuỗi với các phần tử cách nhau bởi dấu phẩy
-        const fieldOfActivityText = value.join(', ')
-        formDataObj.append('fieldOfActivity', fieldOfActivityText)
-      } else if (key !== 'companyLogo' && key !== 'companyCoverPhoto') {
-        // Nếu không phải là fieldOfActivity, logo, hoặc ảnh bìa, thêm bình thường.
-        formDataObj.append(key, typeof value === 'string' ? value : JSON.stringify(value))
+      if (!isEqual(value, originalValue)) {
+        changedValues[key] = value
+        if (key !== 'companyLogo' && key !== 'companyCoverPhoto') {
+          formDataObj.append(key, typeof value === 'string' ? value : JSON.stringify(value))
+        }
       }
     })
 
-    // Xử lý thêm logo mới nếu có
-    const newLogoFile = logoList.find((file) => file.originFileObj)
-    if (newLogoFile && newLogoFile.originFileObj) {
-      formDataObj.append('companyLogo', newLogoFile.originFileObj)
-    } else if (recruiter?.companyLogo && newLogoFile === undefined) {
-      // Nếu không có sự thay đổi, giữ nguyên logo từ thông tin user hiện tại
-      formDataObj.append('companyLogo', recruiter.companyLogo)
+    if (mergedValues.companyLogo && mergedValues.companyLogo.slice(-1)[0].originFileObj instanceof File) {
+      formDataObj.append('companyLogo', mergedValues.companyLogo.slice(-1)[0].originFileObj)
     }
 
-    // Xử lý thêm cover photo mới nếu có
-    const newCoverFile = coverList.find((file) => file.originFileObj)
-    if (newCoverFile && newCoverFile.originFileObj) {
-      formDataObj.append('companyCoverPhoto', newCoverFile.originFileObj)
-    } else if (recruiter?.companyCoverPhoto && newCoverFile === undefined) {
-      // Nếu không có sự thay đổi, giữ nguyên cover photo từ thông tin user hiện tại
-      formDataObj.append('companyCoverPhoto', recruiter.companyCoverPhoto)
+    if (mergedValues.companyCoverPhoto && mergedValues.companyCoverPhoto.slice(-1)[0].originFileObj instanceof File) {
+      formDataObj.append('companyCoverPhoto', mergedValues.companyCoverPhoto.slice(-1)[0].originFileObj)
     }
 
-    if (!isEqual(mergedValues, initialFormData)) {
+    for (let [key, value] of formDataObj.entries()) {
+      console.log(`${key}: ${value}`)
+    }
+
+    if (!isEmpty(changedValues)) {
       toast
         .promise(UserService.updateRecCompanyInfor(formDataObj), {
           pending: `Thông tin của bạn đang được cập nhật`,
@@ -226,8 +301,6 @@ function RecCompany() {
         .catch((error) => {
           toast.error(error.response.data.message)
         })
-
-      // Tiếp tục logic gửi request tới server...
     } else {
       toast.info('Không có thông tin nào được cập nhật!')
     }
@@ -368,53 +441,108 @@ function RecCompany() {
                 <Form.Item
                   name='companyLogo'
                   label='Logo của công ty'
-                  getValueFromEvent={(e) => e.fileList}
                   rules={[{ required: true, message: 'Vui lòng upload logo của công ty!' }]}
+                  valuePropName='fileList'
+                  getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
+                  className='flex-grow w-full'
                 >
-                  <ImgCrop
-                    rotationSlider // Cung cấp tính năng xoay ảnh nếu cần
-                    // Các props khác của ImgCrop nếu bạn cần tuỳ chỉnh...
+                  {previewLogo ? (
+                    <>
+                      <img
+                        src={previewLogo}
+                        alt='Logo Preview'
+                        style={{ width: '250px', height: '250px', marginTop: '10px', cursor: 'pointer' }}
+                        onClick={showModal}
+                      />
+                      <p>Ảnh Preview Logo</p>
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        onClick={showModal}
+                        className='w-[250px] h-[250px] flex items-center justify-center border-dashed border-2 border-black cursor-pointer'
+                      >
+                        Chọn ảnh logo
+                      </div>
+                    </>
+                  )}
+
+                  <Modal
+                    title='Cập nhật avatar'
+                    visible={isModalOpen}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    okText='Cập nhật avatar'
+                    cancelText='Hủy'
+                    cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
+                    width={650}
                   >
-                    <Upload
-                      fileList={logoList}
-                      listType='picture-card'
-                      showUploadList={false}
-                      onChange={handleLogoChange}
-                      beforeUpload={() => false}
-                      onPreview={async (file) => {
-                        if (file.originFileObj) {
-                          const imageUrl = await getBase64(file.originFileObj)
-                          setPreviewLogo(imageUrl)
-                        }
-                      }}
-                    >
-                      {previewLogo ? (
-                        <img src={previewLogo} style={{ width: '100%' }} alt='avatar' />
-                      ) : (
-                        <div>
-                          <PlusOutlined />
-                          <div style={{ marginTop: 8 }}>Upload</div>
-                        </div>
+                    <div className='mb-3 Crop-Controls'>
+                      <input
+                        type='file'
+                        id='fileInput'
+                        accept='image/*'
+                        onChange={onSelectFile}
+                        style={{ display: 'none' }}
+                      />
+                      <label
+                        htmlFor='fileInput'
+                        className='px-3 py-2 border w-[100px] rounded-md bg-emerald-500 text-white text-center cursor-pointer'
+                      >
+                        Chọn Ảnh
+                      </label>
+                    </div>
+                    <div className='flex items-center justify-center Crop-Container'>
+                      {!!imgSrc && (
+                        <ReactCrop
+                          crop={crop}
+                          onChange={(_, percentCrop) => setCrop(percentCrop)}
+                          onComplete={(c) => setCompletedCrop(c)}
+                          aspect={aspect}
+                        >
+                          <img
+                            ref={imgRef}
+                            alt='Crop me'
+                            src={imgSrc}
+                            style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
+                            onLoad={onImageLoad}
+                          />
+                        </ReactCrop>
                       )}
-                    </Upload>
-                  </ImgCrop>
+                      {!!completedCrop && (
+                        <canvas
+                          ref={previewCanvasRef}
+                          style={{
+                            objectFit: 'cover',
+                            width: '250px',
+                            height: '250px'
+                          }}
+                        />
+                      )}
+                    </div>
+                  </Modal>
                 </Form.Item>
 
                 <Form.Item
                   name='companyCoverPhoto'
-                  label='Ảnh bìa cho công ty'
+                  label='Ảnh bìa của công ty'
                   getValueFromEvent={(e) => e && e.fileList}
                   rules={[{ required: true, message: 'Vui lòng upload ảnh bìa của công ty!' }]}
                 >
                   <Upload
-                    fileList={coverList}
                     listType='picture-card'
                     showUploadList={false}
                     onChange={handleCoverChange}
-                    beforeUpload={() => false} // Trả về false để ngăn không tự upload lên server
+                    beforeUpload={() => false}
+                    className='w-full mb-10'
                   >
                     {previewCover ? (
-                      <img src={previewCover} style={{ width: '100%' }} alt='avatar' />
+                      <img
+                        src={previewCover}
+                        style={{ width: '100%' }}
+                        alt='avatar'
+                        className='object-cover object-center w-full h-[200px] aspect-video'
+                      />
                     ) : (
                       <div>
                         <PlusOutlined />

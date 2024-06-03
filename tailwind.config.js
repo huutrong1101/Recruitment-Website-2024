@@ -11,7 +11,7 @@ const tailwindConfig = {
       }
     }
   },
-  plugins: [require('@headlessui/tailwindcss')]
+  plugins: [require('@headlessui/tailwindcss'), require('tailwind-scrollbar')]
 }
 
 module.exports = tailwindConfig

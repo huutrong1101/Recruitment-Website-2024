@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { useAppSelector } from '../../hooks/hooks'
 
 function Select() {
   return (
@@ -11,7 +12,7 @@ function Select() {
       <div className='z-10 flex flex-col w-1/3 p-6 text-white bg-black bg-opacity-50 rounded-md'>
         <h1 className='mb-4 text-2xl font-bold'>Bạn muốn ứng tuyển ?</h1>
         <Link
-          to='/auth/login'
+          to='/auth/signup'
           className='flex py-3 mt-4 text-white transition duration-300 ease-in-out transform bg-red-500 rounded-md hover:bg-red-600 hover:-translate-y-1'
         >
           <p className='w-full text-center'>Tạo CV ngay</p>
@@ -20,7 +21,7 @@ function Select() {
       <div className='z-10 flex flex-col w-1/3 p-6 text-white bg-black bg-opacity-50 rounded-md'>
         <h1 className='mb-4 text-2xl font-bold'>Bạn là nhà tuyển dụng ?</h1>
         <Link
-          to='/auth/login'
+          to='/auth/rec-signup'
           className='flex py-3 mt-4 text-white transition duration-300 ease-in-out transform bg-green-500 rounded-md hover:bg-green-600 hover:-translate-y-1'
         >
           <p className='w-full text-center'>Đăng tin tuyển dụng tại đây</p>

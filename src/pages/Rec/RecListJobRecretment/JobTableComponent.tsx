@@ -5,7 +5,7 @@ import type { ColumnsType } from 'antd/es/table'
 const { TabPane } = Tabs
 
 interface DataType {
-  key: React.Key
+  key: string
   stt: number
   jobName: string
   jobPosition: string

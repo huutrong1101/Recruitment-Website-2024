@@ -12,9 +12,6 @@ if (appElement === null) {
   throw new Error(`Unable to find #app element.`)
 }
 
-/**
- * Color declaration for ToastContainer
- */
 const contextClass: any = {
   success: 'bg-emerald-600',
   error: 'bg-red-600',

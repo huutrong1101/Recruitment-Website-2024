@@ -72,7 +72,11 @@ export default function Navbar() {
           {/* Icons */}
           <div className={classNames(`flex flex-row items-center gap-12 flex-1`)}>
             <Link to='/' className={classNames(`font-bold text-3xl`, `text-zinc-900`)}>
-              <img src='https://fptjobs.com/public/img/1531190552-Logo-Career-Black.png' alt='' />
+              <img
+                className='w-[200px] object-contain'
+                src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTa8VWD-dY_v40WgvdmLaV-PnmXRElQGjVdxYk_bEp3&s'
+                alt=''
+              />
             </Link>
             <ul className='hidden md:block'>
               <li className={classNames(`flex flex-row gap-12`, `font-semibold`)}>

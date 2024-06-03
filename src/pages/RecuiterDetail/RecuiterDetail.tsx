@@ -3,7 +3,6 @@ import Container from '../../components/Container/Container'
 import classNames from 'classnames'
 import {
   BuildingLibraryIcon,
-  CurrencyDollarIcon,
   GlobeAltIcon,
   MapIcon,
   MapPinIcon,
@@ -11,8 +10,8 @@ import {
   UserGroupIcon
 } from '@heroicons/react/24/outline'
 import { SearchOutlined } from '@ant-design/icons'
-import { Button, Input, Pagination, Select } from 'antd'
-import { Link, useParams } from 'react-router-dom'
+import { Button, Input, Modal, Pagination, Select, Spin } from 'antd'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import RecJobCard from '../../components/JobCard/RecJobCard'
 import RecJobRealtedCard from '../../components/JobCard/RecJobRealtedCard'
 import GoogleMapReact from 'google-map-react'
@@ -20,19 +19,43 @@ import GooglePlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-goo
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import { RecService } from '../../services/RecService'
 import parse from 'html-react-parser'
-
-interface MarkerProps {
-  text: React.ReactNode
-}
+import { JobInterface } from '../../types/job.type'
+import { checkFavoriteRec, setIsRecFavorite } from '../../redux/reducer/RecSlice'
+import { toast } from 'react-toastify'
+import axiosInstance from '../../utils/AxiosInstance'
 
 const AnyReactComponent = (props: { lat: number; lng: number; text: React.ReactNode }) => <div>{props.text}</div>
 
 function RecuiterDetail() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
   const { recruiterSlug } = useParams()
   const [coords, setCoords] = useState({ lat: 0, lng: 0 })
 
+  const { user } = useAppSelector((state) => state.Auth)
+
   const recDetail = useAppSelector((state) => state.RecJobs.companyDetail)
+  const { isRecFavorite } = useAppSelector((state) => state.RecJobs)
+  const provinces = useAppSelector((state) => state.Job.province)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(3)
+  const [activeData, setActiveData] = useState<JobInterface[]>([])
+  const [totalElement, setTotalElement] = useState(0)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedProvince, setSelectedProvince] = useState<string | undefined>(undefined)
+  const [loading, setLoading] = useState(false)
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [showFullDescription, setShowFullDescription] = useState(false)
+  const [showMoreButton, setShowMoreButton] = useState(true)
+  const [shortenedDescription, setShortenedDescription] = useState('')
+  const [relatedRecs, setRelatedRecs] = useState([])
+
+  const optionsProvinces = provinces.map((option) => ({ value: option, label: option }))
+
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription)
+  }
 
   useEffect(() => {
     const fetchCoords = async () => {
@@ -47,6 +70,31 @@ function RecuiterDetail() {
       }
     }
 
+    if (recDetail && recDetail.about) {
+      const fullDescription = recDetail.about
+      const shortened = truncate(fullDescription, 155)
+      setShortenedDescription(shortened)
+      setShowMoreButton(fullDescription.length > 155)
+    }
+
+    if (recDetail) {
+      const fetchRelatedRecs = async () => {
+        try {
+          // Gọi API để lấy danh sách công việc liên quan
+          const response = await axiosInstance.get(`/recruiters/${recDetail._id}/related_recruiter`)
+
+          if (response && response.data) {
+            setRelatedRecs(response.data.metadata.listRecruiter)
+          }
+        } catch (err: any) {
+          toast.error(`${err.message}`)
+          throw err
+        }
+      }
+
+      fetchRelatedRecs()
+    }
+
     fetchCoords()
   }, [recDetail])
 
@@ -55,6 +103,119 @@ function RecuiterDetail() {
       RecService.getRecFromSlug(dispatch, recruiterSlug)
     }
   }, [dispatch, recruiterSlug])
+
+  useEffect(() => {
+    if (user && recDetail) {
+      dispatch(checkFavoriteRec({ recId: recDetail._id }))
+        .unwrap()
+        .catch((message) => toast.error(message))
+    }
+  }, [dispatch, recDetail, user])
+
+  useEffect(() => {
+    if (recruiterSlug) {
+      fetchJobs(currentPage, pageSize, searchTerm, selectedProvince ?? '', recruiterSlug)
+    }
+  }, [currentPage, pageSize, recruiterSlug])
+
+  const fetchJobs = async (
+    page: number,
+    limit: number,
+    searchTerm: string,
+    province: string,
+    recruiterSlug: string
+  ) => {
+    setLoading(true)
+    const params = { name: searchTerm, page, limit, province }
+    try {
+      const response = await RecService.getLsitJobOfRec(recruiterSlug, params)
+      if (response && response.data) {
+        const data = response.data.metadata.listJob
+        const total = response.data.metadata.totalElement
+        setActiveData(data)
+        setTotalElement(total)
+      }
+    } catch (error) {
+      console.error('Fetching jobs failed:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const truncate = (text: string, maxLength: number) => {
+    const words = text.split(' ')
+    if (words.length > maxLength) {
+      return words.slice(0, maxLength).join(' ') + '...'
+    } else {
+      return text
+    }
+  }
+
+  const handlePageChange = (page: number, pageSize: number) => {
+    setCurrentPage(page)
+    setPageSize(pageSize)
+    if (recruiterSlug) {
+      fetchJobs(page, pageSize, searchTerm, selectedProvince ?? '', recruiterSlug)
+    }
+  }
+
+  const handleSearch = () => {
+    if (recruiterSlug) {
+      fetchJobs(currentPage, pageSize, searchTerm, selectedProvince ?? '', recruiterSlug)
+    }
+  }
+
+  const handleReset = () => {
+    setSearchTerm('')
+    setSelectedProvince(undefined)
+    setCurrentPage(1)
+    if (recruiterSlug) {
+      fetchJobs(1, pageSize, '', '', recruiterSlug)
+    }
+  }
+
+  const showModal = () => {
+    setIsModalVisible(true)
+  }
+
+  const handleSaveFavorite = () => {
+    if (recDetail) {
+      toast
+        .promise(RecService.saveFavoriteRec(recDetail._id), {
+          pending: `Đang tiến hành theo dõi công ty`,
+          success: `Theo dõi công ty thành công`
+        })
+        .then(() => {
+          setIsModalVisible(false)
+          dispatch(setIsRecFavorite(true))
+        })
+        .catch((error) => toast.error(error.response.data.message))
+    }
+  }
+
+  const handleRemoveFavorite = () => {
+    if (recDetail) {
+      toast
+        .promise(RecService.removeFavoriteRec(recDetail._id), {
+          pending: `Đang hủy theo dõi công ty`,
+          success: `Hủy theo dõi công ty thành công`
+        })
+        .then(() => {
+          setIsModalVisible(false)
+          dispatch(setIsRecFavorite(false))
+        })
+        .catch((error) => toast.error(error.response.data.message))
+    }
+  }
+
+  const handleCancel = () => {
+    setIsModalVisible(false)
+  }
+
+  const handleNavigateToSignIn = () => {
+    navigate(`/auth/login`)
+    navigate(`/auth/login?from=${encodeURIComponent(window.location.pathname)}`)
+  }
 
   return (
     <Container>
@@ -96,14 +257,41 @@ function RecuiterDetail() {
                   </div>
                   <div className='flex items-center gap-1'>
                     <UserGroupIcon className='w-4 h-4' />
-                    <p>227 người theo dõi</p>
+                    <p>{recDetail?.likeNumber} người theo dõi</p>
                   </div>
                 </div>
               </div>
               <div>
-                <button className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}>
-                  Theo dõi công ty
-                </button>
+                {user ? (
+                  <button
+                    className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
+                    onClick={showModal}
+                  >
+                    {isRecFavorite ? <p>ĐANG THEO DÕI</p> : <p> THEO DÕI CÔNG TY</p>}
+                  </button>
+                ) : (
+                  <button
+                    className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
+                    onClick={handleNavigateToSignIn}
+                  >
+                    THEO DÕI CÔNG TY
+                  </button>
+                )}
+
+                <Modal
+                  title={isRecFavorite ? 'Xác nhận xóa' : 'Xác nhận theo dõi'}
+                  visible={isModalVisible}
+                  onOk={isRecFavorite ? handleRemoveFavorite : handleSaveFavorite}
+                  onCancel={handleCancel}
+                  okText={isRecFavorite ? 'Xóa' : 'Lưu'}
+                  cancelText='Hủy'
+                  cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
+                  width={450}
+                >
+                  <p>
+                    {isRecFavorite ? 'Bạn có muốn bỏ theo dõi công ty không?' : 'Bạn có muốn theo dõi công ty không?'}
+                  </p>
+                </Modal>
               </div>
             </div>
           </div>
@@ -116,7 +304,27 @@ function RecuiterDetail() {
             <div className={classNames('w-full h-[50px] rounded-t-md bg-emerald-500 p-4')}>
               <h2 className='text-lg font-semibold text-white'>Giới thiệu công ty</h2>
             </div>
-            <div className='p-6'>{recDetail && parse(recDetail.about)}</div>
+            <div className='p-6'>
+              <div className='flex gap-2'>
+                <div className='flex items-center justify-center'>
+                  <div>
+                    {showFullDescription ? (
+                      <div>{recDetail && parse(recDetail.about)}</div>
+                    ) : (
+                      <div>{parse(shortenedDescription)}</div>
+                    )}
+                    {showMoreButton && (
+                      <button
+                        onClick={toggleDescription}
+                        className='px-4 py-2 mt-2 text-white rounded bg-emerald-500 hover:bg-emerald-600'
+                      >
+                        {showFullDescription ? 'Rút gọn' : 'Xem thêm'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* TUYỂN DỤNG  */}
@@ -131,57 +339,51 @@ function RecuiterDetail() {
                   placeholder='Tìm kiếm theo tên'
                   prefix={<UserCircleIcon />}
                   className='w-full'
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật giá trị khi thay đổi
                   type='text'
                   style={{ width: '50%' }}
                 />
                 <Select
                   showSearch
                   style={{ width: '30%' }}
-                  placeholder='Tất cả tỉnh/thành phố'
-                  optionFilterProp='children'
-                  filterOption={(input, option) => (option?.label ?? '').includes(input)}
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                  placeholder='Tỉnh/Thành phố'
+                  filterOption={(input, option) =>
+                    option ? (option.label as string).toLowerCase().includes(input.toLowerCase()) : false
                   }
-                  options={[
-                    {
-                      value: '1',
-                      label: 'Not Identified'
-                    },
-                    {
-                      value: '2',
-                      label: 'Closed'
-                    },
-                    {
-                      value: '3',
-                      label: 'Communicated'
-                    },
-                    {
-                      value: '4',
-                      label: 'Identified'
-                    },
-                    {
-                      value: '5',
-                      label: 'Resolved'
-                    },
-                    {
-                      value: '6',
-                      label: 'Cancelled'
-                    }
-                  ]}
+                  options={optionsProvinces}
+                  value={selectedProvince}
+                  onChange={(value) => setSelectedProvince(value)}
                 />
-                <Button type='dashed' icon={<SearchOutlined />} className='w-1/5'>
-                  Tìm kiếm
+
+                <Button type='primary' onClick={handleSearch} icon={<SearchOutlined />}>
+                  Tìm kiếm
+                </Button>
+                <Button danger onClick={handleReset} style={{ backgroundColor: 'transparent' }}>
+                  Xóa bộ lọc
                 </Button>
               </div>
               <div className='flex flex-col gap-3 mt-3'>
-                <RecJobCard />
-                <RecJobCard />
-                <RecJobCard />
+                {loading ? (
+                  <div className='text-center'>
+                    <Spin size='large' />
+                  </div> // Hoặc sử dụng một spinner thực sự
+                ) : activeData && activeData.length > 0 ? (
+                  activeData.map((job) => <RecJobCard key={job._id} job={job} />)
+                ) : (
+                  <h1 className='text-center'>Hiện tại chưa có công việc nào</h1>
+                )}
 
-                <div className='flex items-center justify-center mt-2'>
-                  <Pagination defaultCurrent={1} total={50} />
-                </div>
+                {!loading && (
+                  <div className='flex items-center justify-center mt-2'>
+                    <Pagination
+                      current={currentPage}
+                      pageSize={pageSize}
+                      total={totalElement}
+                      onChange={handlePageChange}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -230,15 +432,17 @@ function RecuiterDetail() {
         <h1 className={classNames(`text-3xl font-semibold capitalize text-center mb-2`)}>Top công ty cùng lĩnh vực</h1>
 
         <div className='flex flex-wrap -mx-4 mt-[10px]'>
-          <div className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
-            <RecJobRealtedCard />
-          </div>
-          <div className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
-            <RecJobRealtedCard />
-          </div>
-          <div className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
-            <RecJobRealtedCard />
-          </div>
+          {relatedRecs && relatedRecs.length > 0 ? (
+            relatedRecs.slice(0, 3).map((rec) => (
+              <div className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
+                <RecJobRealtedCard rec={rec} />
+              </div>
+            ))
+          ) : (
+            <div className='flex items-center justify-center w-full'>
+              <p>Hiện chưa có công ty nào cùng lĩnh vực</p>
+            </div>
+          )}
         </div>
       </div>
     </Container>

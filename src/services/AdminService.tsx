@@ -14,6 +14,7 @@ const getListJobs = async ({
   field = '',
   levelRequirement = '',
   acceptanceStatus = '',
+  companyName = '',
   page = 1, // mặc định là trang đầu tiên nếu không được cung cấp
   limit = 10
 } = {}) => {
@@ -25,6 +26,7 @@ const getListJobs = async ({
   if (field) params.append('field', field)
   if (levelRequirement) params.append('levelRequirement', levelRequirement)
   if (acceptanceStatus) params.append('acceptanceStatus', acceptanceStatus)
+  if (companyName) params.append('companyName', companyName)
 
   params.append('page', page.toString())
   params.append('limit', limit.toString())

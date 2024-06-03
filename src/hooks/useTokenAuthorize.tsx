@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { requestRefreshAccessToken } from '../utils/AxiosInstance'
 import { getLocalToken, getPermission, hasLocalToken, hasPermission, hasRefreshToken } from '../utils/localToken'
 import { useAppDispatch, useAppSelector } from './hooks'
-import { authLogout, fetchAdminFromToken, fetchRecFromToken } from '../redux/reducer/AuthSlice'
+import { authLogout, fetchAdminFromToken, fetchRecFromToken, fetchUserFromToken } from '../redux/reducer/AuthSlice'
 
 export function useTokenAuthorize() {
   const dispatch = useAppDispatch()
@@ -31,11 +31,22 @@ export function useTokenAuthorize() {
             if (!error.success && error.statusCode === 500) {
               dispatch(authLogout())
             }
-
             // Second one, when expired, we trying to refresh it
           })
       } else if (permission === '002') {
         return dispatch(fetchRecFromToken({ token }))
+          .unwrap()
+          .catch((error: any) => {
+            // if failed, trying to look at the scenario.
+            // First, if the token is broken
+            if (!error.success && error.statusCode === 500) {
+              dispatch(authLogout())
+            }
+
+            // Second one, when expired, we trying to refresh it
+          })
+      } else {
+        return dispatch(fetchUserFromToken({ token }))
           .unwrap()
           .catch((error: any) => {
             // if failed, trying to look at the scenario.

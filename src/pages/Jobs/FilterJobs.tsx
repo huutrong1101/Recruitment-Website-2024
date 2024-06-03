@@ -3,18 +3,18 @@ import classNames from 'classnames'
 import { Button, Input, Select } from 'antd'
 import { UserCircleIcon } from '@heroicons/react/24/outline'
 import { SearchOutlined } from '@ant-design/icons'
+import { createSearchParams, useNavigate } from 'react-router-dom'
 
 interface FilterJobsProps {
   dataSearch: {
-    key: string
-    selectedProvince: string
-    selectedExperiences: string
-    selectedActivity: string
-    selectedLevelRequirements: string
-    selectedGenderRequirements: string
-    selectedJobTypes: string
+    name: string
+    province: string
+    experience: string
+    field: string
+    levelRequirement: string
+    genderRequirement: string
+    type: string
   }
-  // Update để chấp nhận các List mới thay vì chỉ vị trí và loại
   provinces: string[]
   experiences: string[]
   jobTypes: string[]
@@ -26,13 +26,13 @@ interface FilterJobsProps {
   handleReset: () => void
   setDataSearch: React.Dispatch<
     React.SetStateAction<{
-      key: string
-      selectedProvince: string
-      selectedExperiences: string
-      selectedActivity: string
-      selectedLevelRequirements: string
-      selectedGenderRequirements: string
-      selectedJobTypes: string
+      name: string
+      province: string
+      experience: string
+      field: string
+      levelRequirement: string
+      genderRequirement: string
+      type: string
     }>
   >
 }
@@ -50,14 +50,14 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
   setDataSearch,
   resetToken
 }) => {
+  const navigate = useNavigate()
+
   const optionsProvinces = provinces.map((option) => ({ value: option, label: option }))
   const optionsExperiences = experiences.map((option) => ({ value: option, label: option }))
   const optionsJobTypes = jobTypes.map((option) => ({ value: option, label: option }))
   const optionsLevelRequirements = levelRequirements.map((option) => ({ value: option, label: option }))
   const optionsGenderRequirements = genderRequirements.map((option) => ({ value: option, label: option }))
   const optionsActivities = activities.map((option) => ({ value: option, label: option }))
-
-  const lowercase = (str: any) => str.toLowerCase()
 
   return (
     <div className='flex flex-col w-full gap-3 py-3'>
@@ -70,14 +70,14 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
             placeholder='Tìm kiếm theo tên'
             prefix={<UserCircleIcon />}
             className='w-full'
-            value={dataSearch.key}
-            onChange={(e) => setDataSearch({ ...dataSearch, key: e.target.value })}
+            value={dataSearch.name}
+            onChange={(e) => setDataSearch({ ...dataSearch, name: e.target.value })}
             type='text'
             style={{ width: '100%' }}
           />
 
           <div className='flex items-center gap-2'>
-            <Button type='primary' onClick={handleSearch} icon={<SearchOutlined />}>
+            <Button type='primary' htmlType='submit' icon={<SearchOutlined />}>
               Tìm kiếm
             </Button>
             <Button danger onClick={handleReset} style={{ backgroundColor: 'transparent' }}>
@@ -89,7 +89,7 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
         <div className={classNames('flex gap-4 mt-4')}>
           <div className={classNames('w-1/4')}>
             <Select
-              key={resetToken.toString()}
+              key={`province-${resetToken}`}
               showSearch
               style={{ width: '100%' }}
               placeholder='Tỉnh/Thành phố'
@@ -97,12 +97,13 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
                 option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
               options={optionsProvinces}
-              onChange={(value) => setDataSearch({ ...dataSearch, selectedProvince: value })}
+              onChange={(value) => setDataSearch({ ...dataSearch, province: value })}
+              value={dataSearch.province || undefined}
             />
           </div>
           <div className={classNames('w-1/4')}>
             <Select
-              key={resetToken.toString()}
+              key={`experience-${resetToken}`}
               showSearch
               style={{ width: '100%' }}
               placeholder='Kinh nghiệm'
@@ -110,12 +111,13 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
                 option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
               options={optionsExperiences}
-              onChange={(value) => setDataSearch({ ...dataSearch, selectedExperiences: value })}
+              onChange={(value) => setDataSearch({ ...dataSearch, experience: value })}
+              value={dataSearch.experience || undefined}
             />
           </div>
           <div className={classNames('w-1/4')}>
             <Select
-              key={resetToken.toString()}
+              key={`activity-${resetToken}`}
               showSearch
               style={{ width: '100%' }}
               placeholder='Lĩnh vực'
@@ -123,12 +125,13 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
                 option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
               options={optionsActivities}
-              onChange={(value) => setDataSearch({ ...dataSearch, selectedActivity: value })}
+              onChange={(value) => setDataSearch({ ...dataSearch, field: value })}
+              value={dataSearch.field || undefined}
             />
           </div>
           <div className={classNames('w-1/4')}>
             <Select
-              key={resetToken.toString()}
+              key={`level-${resetToken}`}
               showSearch
               style={{ width: '100%' }}
               placeholder='Vị trí'
@@ -136,12 +139,13 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
                 option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
               options={optionsLevelRequirements}
-              onChange={(value) => setDataSearch({ ...dataSearch, selectedLevelRequirements: value })}
+              onChange={(value) => setDataSearch({ ...dataSearch, levelRequirement: value })}
+              value={dataSearch.levelRequirement || undefined}
             />
           </div>
           <div className={classNames('w-1/4')}>
             <Select
-              key={resetToken.toString()}
+              key={`gender-${resetToken}`}
               showSearch
               style={{ width: '100%' }}
               placeholder='Yêu cầu giới tính'
@@ -149,12 +153,13 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
                 option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
               options={optionsGenderRequirements}
-              onChange={(value) => setDataSearch({ ...dataSearch, selectedGenderRequirements: value })}
+              onChange={(value) => setDataSearch({ ...dataSearch, genderRequirement: value })}
+              value={dataSearch.genderRequirement || undefined}
             />
           </div>
           <div className={classNames('w-1/4')}>
             <Select
-              key={resetToken.toString()}
+              key={`jobType-${resetToken}`}
               showSearch
               style={{ width: '100%' }}
               placeholder='Loại hình'
@@ -162,7 +167,8 @@ const FilterJobs: React.FC<FilterJobsProps> = ({
                 option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
               }
               options={optionsJobTypes}
-              onChange={(value) => setDataSearch({ ...dataSearch, selectedJobTypes: value })}
+              onChange={(value) => setDataSearch({ ...dataSearch, type: value })}
+              value={dataSearch.type || undefined}
             />
           </div>
         </div>

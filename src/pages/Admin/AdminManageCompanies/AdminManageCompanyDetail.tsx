@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 import { useParams } from 'react-router-dom'
 import { AdminService } from '../../../services/AdminService'
 import parse from 'html-react-parser'
-import { Modal, Radio } from 'antd'
+import { Modal, Radio, Spin } from 'antd'
 import { toast } from 'react-toastify'
 
 const AnyReactComponent = (props: { lat: number; lng: number; text: React.ReactNode }) => <div>{props.text}</div>
@@ -73,6 +73,8 @@ function AdminManageCompanyDetail() {
     setIsModalVisible(false)
   }
 
+  console.log(companyDetail)
+
   return (
     <>
       {companyDetail ? (
@@ -115,7 +117,13 @@ function AdminManageCompanyDetail() {
                       </div>
                     </div>
                   </div>
-                  <div>
+                  <div className='flex items-center gap-2'>
+                    <button
+                      className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
+                      onClick={showModal}
+                    >
+                      CHỈNH SỬA
+                    </button>
                     <button
                       className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
                       onClick={showModal}
@@ -148,7 +156,6 @@ function AdminManageCompanyDetail() {
           </div>
           <div className={classNames(`flex flex-col md:flex-row gap-12 mt-8 mb-8`)}>
             <div className={classNames(`w-full md:w-8/12`, `flex flex-col gap-6`)}>
-              {/* GIỚI THIỆU CÔNG TY  */}
               <div className={classNames('w-full shadow')}>
                 <div className={classNames('w-full h-[50px] rounded-t-md bg-emerald-500 p-4')}>
                   <h2 className='text-lg font-semibold text-white'>Thông tin công ty</h2>
@@ -224,7 +231,9 @@ function AdminManageCompanyDetail() {
           </div>
         </>
       ) : (
-        <div>Loading...</div>
+        <div className='flex items-center justify-center'>
+          <Spin size='large' />
+        </div>
       )}
     </>
   )

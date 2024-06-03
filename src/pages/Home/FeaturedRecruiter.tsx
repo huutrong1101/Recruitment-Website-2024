@@ -1,41 +1,57 @@
+import { useEffect } from 'react'
+import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
+import { RecruiterResponseState } from '../../types/user.type'
+import { RecService } from '../../services/RecService'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation, Autoplay } from 'swiper/modules'
+
+import 'swiper/css'
+import 'swiper/css/pagination'
+import { Link } from 'react-router-dom'
+import RecCard from '../../components/JobCard/RecCard'
+
 export default function FeaturedRecruiter() {
-  const listImg = [
-    {
-      id: 1,
-      link: 'https://cdn-new.topcv.vn/unsafe/200x/https://static.topcv.vn/company_logos/cong-ty-co-phan-dana-139c6d216ab5b2c1f012449d3c30c0ec-65fb8d6f41f1c.jpg'
-    },
-    {
-      id: 2,
-      link: 'https://cdn-new.topcv.vn/unsafe/200x/https://static.topcv.vn/company_logos/cong-ty-co-phan-dana-139c6d216ab5b2c1f012449d3c30c0ec-65fb8d6f41f1c.jpg'
-    },
-    {
-      id: 3,
-      link: 'https://cdn-new.topcv.vn/unsafe/200x/https://static.topcv.vn/company_logos/cong-ty-co-phan-dana-139c6d216ab5b2c1f012449d3c30c0ec-65fb8d6f41f1c.jpg'
-    },
-    {
-      id: 4,
-      link: 'https://cdn-new.topcv.vn/unsafe/200x/https://static.topcv.vn/company_logos/cong-ty-co-phan-dana-139c6d216ab5b2c1f012449d3c30c0ec-65fb8d6f41f1c.jpg'
-    },
-    {
-      id: 5,
-      link: 'https://cdn-new.topcv.vn/unsafe/200x/https://static.topcv.vn/company_logos/cong-ty-co-phan-dana-139c6d216ab5b2c1f012449d3c30c0ec-65fb8d6f41f1c.jpg'
-    },
-    {
-      id: 6,
-      link: 'https://cdn-new.topcv.vn/unsafe/200x/https://static.topcv.vn/company_logos/cong-ty-co-phan-dana-139c6d216ab5b2c1f012449d3c30c0ec-65fb8d6f41f1c.jpg'
-    }
-  ]
+  const dispatch = useAppDispatch()
+  const listRec: RecruiterResponseState[] = useAppSelector((state) => state.RecJobs.listRec)
+
+  useEffect(() => {
+    RecService.getListRec(dispatch)
+  }, [dispatch])
+
   return (
-    <div className='mt-[40px] md:mt-[80px]'>
+    <div className='mt-10 md:mt-20'>
       <div className='text-center'>
-        <h3 className='text-2xl font-bold tracking-wider text-center'>NHÀ TUYỂN DỤNG NỔI BẬT</h3>
+        <h3 className='text-2xl font-bold tracking-wider'>NHÀ TUYỂN DỤNG NỔI BẬT</h3>
       </div>
-      <div className='flex flex-wrap items-center justify-center -mx-4 mt-[10px]'>
-        {listImg.slice(0, 6).map((item) => (
-          <div className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/4' key={item.id}>
-            <img src={item.link} alt='' />
-          </div>
-        ))}
+      <div className='mt-2'>
+        <Swiper
+          slidesPerView={4}
+          spaceBetween={30}
+          pagination={{ clickable: true }}
+          navigation={true}
+          autoplay={{
+            delay: 2500,
+            disableOnInteraction: false
+          }}
+          loop={true} // Thêm dòng này
+          modules={[Autoplay, Navigation]}
+        >
+          {listRec.map((item) => (
+            <>
+              <SwiperSlide key={item._id}>
+                <RecCard rec={item} />
+              </SwiperSlide>
+
+              <SwiperSlide key={item._id}>
+                <RecCard rec={item} />
+              </SwiperSlide>
+
+              <SwiperSlide key={item._id}>
+                <RecCard rec={item} />
+              </SwiperSlide>
+            </>
+          ))}
+        </Swiper>
       </div>
     </div>
   )

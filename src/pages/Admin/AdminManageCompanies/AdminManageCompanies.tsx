@@ -3,11 +3,11 @@ import { Button, Select, Input, Tabs, Table, Tooltip } from 'antd'
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 import { RecruiterResponseState } from '../../../types/user.type'
 import { AdminService } from '../../../services/AdminService'
-import { SearchOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined } from '@ant-design/icons'
 import { JobService } from '../../../services/JobService'
 import { ColumnType } from 'antd/es/table'
 import { Cog6ToothIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import FilterPanelCompany from './FilterPanelCompany'
 import CompanyTableComponent from './CompanyTableComponent'
 
@@ -94,6 +94,7 @@ const getColumns = (activeTabKey: string): Array<ColumnType<DataType>> => [
 
 function AdminManageCompanies() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const listRec = useAppSelector((state): RecruiterResponseState[] => state.AdminSlice.listRec)
   const activities = useAppSelector((state): string[] => state.Job.activities)
@@ -216,10 +217,19 @@ function AdminManageCompanies() {
     fetchDataForTab(key)
   }
 
+  const handleNavigate = () => {
+    navigate('/admin/manage_companies/addCompany')
+  }
+
   return (
     <div className='flex flex-col flex-1 gap-4'>
       <div className='w-full'>
-        <h1 className='flex-1 text-2xl font-semibold text-center md:mb-4'>Quản lí danh sách công ty trong hệ thống</h1>
+        <div className='flex items-center justify-between mb-6'>
+          <h1 className='flex-1 text-2xl font-semibold text-center'>Quản lí danh sách công ty trong hệ thống</h1>
+          <Button type='primary' icon={<PlusCircleOutlined />} onClick={handleNavigate}>
+            Tạo công ty
+          </Button>
+        </div>
         <div className='flex flex-col gap-3'>
           <div className='flex flex-col gap-2'>
             <FilterPanelCompany

@@ -11,9 +11,7 @@ export default function Footer() {
           className={classNames('flex flex-col md:flex-row md:items-center justify-between py-5 border-b border-white')}
         >
           <div>
-            <Link to='/' className={classNames(`font-bold text-3xl`, `text-zinc-900`)}>
-              <img src='https://fptjobs.com/public/img/fpt-telecom.png' alt='' className='w-56 h-14' />
-            </Link>
+            <h1 className='text-2xl font-bold uppercase'>Careerhub</h1>
           </div>
           <div className={classNames('text-zinc-300 text-base leading-6')}>
             <ul className={classNames('flex flex-col md:flex-row-reverse gap-6')}>
