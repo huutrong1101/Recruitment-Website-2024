@@ -4,13 +4,17 @@ import { Link } from 'react-router-dom'
 interface CandidateCardProps {
   jobid: string
   candidate: {
-    _id: string
-    status: string
-    name: string
     avatar: string
     educationLevel: string
+    email: string
     experience: string
+    goal: string
+    major: string
+    name: string
+    phone: string
+    status: string
     updatedAt: string
+    _id: string
   }
 }
 
@@ -20,9 +24,9 @@ interface StatusClasses {
 
 function CandidateCard({ candidate, jobid }: CandidateCardProps) {
   const statusClasses: StatusClasses = {
-    'Đã nhận': 'bg-emerald-500 text-white',
-    'Không nhận': 'bg-red-500 text-white',
-    'Đã nộp': 'bg-gray-500 text-white'
+    'Đã nhận': 'text-emerald-500',
+    'Không nhận': 'text-red-500',
+    'Đã nộp': 'text-gray-500'
   }
 
   const candidateStatusClass = statusClasses[candidate.status] || 'bg-gray-300 text-emerald-700'
@@ -45,12 +49,11 @@ function CandidateCard({ candidate, jobid }: CandidateCardProps) {
             <span className='hover:text-emerald-500'>{candidate.educationLevel}</span>
           </p>
           <p className='text-xs font-medium text-gray-600 md:text-sm '>
-            <span className='font-bold'>Ngành:</span>{' '}
-            <span className='hover:text-emerald-500'>{candidate.educationLevel}</span>
+            <span className='font-bold'>Ngành:</span> <span className='hover:text-emerald-500'>{candidate.major}</span>
           </p>
           <p className='text-xs font-medium text-gray-600 md:text-sm '>
             <span className='font-bold'>Loại hình công việc:</span>{' '}
-            <span className='hover:text-emerald-500'>{candidate.educationLevel}</span>
+            <span className='hover:text-emerald-500'>{candidate.major}</span>
           </p>
           <p className='text-xs font-medium text-gray-600 md:text-sm '>
             <span className='font-bold'>Kinh nghiệm làm việc:</span>{' '}
@@ -63,9 +66,7 @@ function CandidateCard({ candidate, jobid }: CandidateCardProps) {
         </div>
       </div>
       <div className='flex justify-end w-1/4'>
-        <div className={`block w-1/2 p-3 text-center border rounded-xl ${candidateStatusClass}`}>
-          {candidate.status}
-        </div>
+        <div className={`block w-1/2 p-3 text-center font-bold ${candidateStatusClass}`}>{candidate.status}</div>
       </div>
     </Link>
   )

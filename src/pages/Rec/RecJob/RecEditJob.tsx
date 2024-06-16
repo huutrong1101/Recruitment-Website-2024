@@ -10,6 +10,7 @@ import { toast } from 'react-toastify'
 import { RecService } from '../../../services/RecService'
 import { useNavigate, useParams } from 'react-router-dom'
 import SelectFormItem from './SelectFormItem'
+import dayjs from 'dayjs'
 
 const { Option } = Select
 
@@ -59,15 +60,13 @@ function RecEditJob() {
     }
   }, [])
 
-  console.log(jobDetail?.salary)
-
   useEffect(() => {
     form.setFieldsValue({ salary: salary })
   }, [salaryType, salary, form])
 
   useEffect(() => {
     if (jobDetail && form) {
-      const formattedDeadline = jobDetail.deadline ? moment(jobDetail.deadline) : null
+      const formattedDeadline = jobDetail.deadline ? dayjs(jobDetail.deadline) : null
 
       form.setFieldsValue({
         name: jobDetail.name,

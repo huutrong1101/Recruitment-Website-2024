@@ -4,9 +4,10 @@ import PropTypes from 'prop-types'
 import { BanknotesIcon, UserPlusIcon, UserIcon, ChartBarIcon, BriefcaseIcon } from '@heroicons/react/24/solid'
 import StatisticsCard from '../../components/Card/StatisticsCard'
 import chartsConfig from '../../configs/charts-config'
-import { ClockIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
+import { BuildingLibraryIcon, ClockIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
 import StatisticsChart from '../../components/Card/StatisticsChart'
 import axiosInstance from '../../utils/AxiosInstance'
+import { useAppSelector } from '../../hooks/hooks'
 
 const websiteViewsChart = {
   type: 'bar',
@@ -100,46 +101,50 @@ interface StatisticsData {
 }
 
 export default function AdminDashboard() {
-  const [statistics, setStatistics] = useState<StatisticsData>()
+  const totalCandidate = useAppSelector((state) => state.AdminSlice.totalCandidate)
+  const totalRecruiter = useAppSelector((state) => state.AdminSlice.totalRecruiter)
+  const totalJob = useAppSelector((state) => state.AdminSlice.totalJob)
 
   const statisticsCardsData = [
     {
       color: 'bg-blue-500',
       icon: <BriefcaseIcon className='w-6 h-6 text-white' />,
-      title: 'Total Jobs',
-      value: `${statistics?.jobCount}`
+      title: 'Số công việc',
+      value: `${totalJob}`
     },
     {
       color: 'bg-pink-500',
-      icon: <EnvelopeIcon className='w-6 h-6 text-white' />,
-      title: 'Total events',
-      value: `${statistics?.eventCount}`
+      icon: <BuildingLibraryIcon className='w-6 h-6 text-white' />,
+      title: 'Số công ty',
+      value: `${totalRecruiter}`
     },
     {
       color: 'bg-green-500',
       icon: <UserPlusIcon className='w-6 h-6 text-white' />,
-      title: 'Total blacklist',
-      value: `${statistics?.blackListCount}`
+      title: 'Số ứng viên',
+      value: `${totalCandidate}`
     },
     {
       color: 'bg-orange-500',
       icon: <ChartBarIcon className='w-6 h-6 text-white' />,
       title: 'Total candidates pass',
-      value: `${statistics?.candidatePassCount}`
+      value: `14`
     }
   ]
 
   return (
-    <div className='mt-12'>
+    <div className='mt-1'>
+      <div className='flex items-center justify-between mb-6'>
+        <h1 className='flex-1 text-2xl font-semibold text-center'>Thống kê số liệu</h1>
+      </div>
       <div className='grid mb-12 gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4'>
         {statisticsCardsData.map(({ icon, title, ...rest }) => (
           <StatisticsCard key={title} {...rest} title={title} icon={icon} />
         ))}
       </div>
-      <div className='grid grid-cols-1 mb-6 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3'>
-        {statisticsChartsData.map((props) => (
-          <StatisticsChart key={props.title} {...props} footer={props.footer} />
-        ))}
+
+      <div>
+        <StatisticsChart />
       </div>
     </div>
   )

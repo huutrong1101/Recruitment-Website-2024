@@ -31,6 +31,7 @@ interface CompanyFromApi {
   companyCoverPhoto: string
   companyLogo: string
   acceptanceStatus: string
+  premiumAccount: boolean
 }
 
 interface DataType {
@@ -39,6 +40,7 @@ interface DataType {
   companyName: string
   field: string[]
   name: string
+  premiumAccount: boolean
 }
 
 interface ActivityOption {
@@ -108,6 +110,8 @@ function AdminManageCompanies() {
   const [totalElement, setTotalElement] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
 
+  console.log(activeData)
+
   useEffect(() => {
     JobService.getActivity(dispatch)
     JobService.getProvince(dispatch)
@@ -126,19 +130,21 @@ function AdminManageCompanies() {
   const mapApiDataToTableData = (apiData: CompanyFromApi[]): DataType[] => {
     return apiData.map((company, index) => ({
       _id: company._id,
-      stt: index + 1,
+      stt: (currentPage - 1) * pageSize + index + 1,
       companyName: company.companyName,
       field: company.fieldOfActivity,
-      name: company.name
+      name: company.name,
+      premiumAccount: company.premiumAccount
     }))
   }
 
   const handleSearch = async () => {
+    setIsLoading(true)
     try {
       const acceptanceStatus = mapTabKeyToStatus[activeTabKey as keyof typeof mapTabKeyToStatus]
 
       const params = {
-        name: searchValue,
+        searchText: searchValue,
         field: selectedActivity,
         acceptanceStatus
       }
@@ -149,8 +155,9 @@ function AdminManageCompanies() {
         setActiveData(mapApiDataToTableData(response.data.metadata.listRecruiter))
       }
     } catch (error) {
-      // Xử lý lỗi ở đây
       console.error('Error searching jobs:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -160,6 +167,7 @@ function AdminManageCompanies() {
 
     const acceptanceStatus = mapTabKeyToStatus[activeTabKey as keyof typeof mapTabKeyToStatus]
 
+    setIsLoading(true)
     try {
       // Gọi API với acceptanceStatus sau khi reset và các tham số khác ở giá trị ban đầu
       const response = await AdminService.getListCompany({ acceptanceStatus: acceptanceStatus })
@@ -167,8 +175,9 @@ function AdminManageCompanies() {
         setActiveData(mapApiDataToTableData(response.data.metadata.listRecruiter))
       }
     } catch (error) {
-      // Xử lý lỗi nếu có
-      console.error('Error fetching jobs:', error)
+      console.error('Error searching jobs:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -220,6 +229,8 @@ function AdminManageCompanies() {
   const handleNavigate = () => {
     navigate('/admin/manage_companies/addCompany')
   }
+
+  console.log(activeData)
 
   return (
     <div className='flex flex-col flex-1 gap-4'>

@@ -153,7 +153,6 @@ function RecCompany() {
   }, [])
 
   useEffect(() => {
-    // Kiểm tra xem người dùng có tồn tại không và đặt giá trị ban đầu cho form
     if (recruiter) {
       const newUserFormData = {
         ...formData,

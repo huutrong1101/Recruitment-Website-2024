@@ -1,13 +1,14 @@
 import classNames from 'classnames'
 import React, { useEffect, useState } from 'react'
 import { ExclamationOutlined } from '@ant-design/icons'
-import { List, Image, Modal, message, Card } from 'antd'
+import { List, Image, Modal, message, Card, Spin, RadioChangeEvent, Radio, Input } from 'antd'
 import moment from 'moment'
 import axiosInstance from '../../../utils/AxiosInstance'
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 import { checkRecUpgrade } from '../../../redux/reducer/RecSlice'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import { RecService } from '../../../services/RecService'
 
 const { Meta } = Card
 
@@ -34,25 +35,74 @@ const benefits = [
   }
 ]
 
+const packages = [
+  { id: 1, duration: '1 tháng', durationInMonths: 1, price: '600.000đ', discountedPrice: '600.000đ' },
+  { id: 2, duration: '3 tháng', durationInMonths: 3, price: '1.800.000đ', discountedPrice: '1.500.000đ' },
+  { id: 3, duration: '6 tháng', durationInMonths: 6, price: '3.600.000đ', discountedPrice: '3.000.000đ' }
+]
+
+const cancelReasons = [
+  { id: 'Giá quá cao', text: 'Giá quá cao' },
+  { id: 'Không hài lòng với dịch vụ', text: 'Không hài lòng với dịch vụ' },
+  { id: 'Đã tìm được ứng viên', text: 'Đã tìm được ứng viên' },
+  { id: 4, text: 'Khác' }
+]
+
+interface ServiceInfor {
+  validTo: string
+  remainDate: number
+  refundAmount: string
+}
+
 function RecMyService() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const { recruiter, loading } = useAppSelector((app) => app.Auth)
+  const { recruiter } = useAppSelector((app) => app.Auth)
+  const [selectedPackage, setSelectedPackage] = useState<number>(1) // Giả sử gói mặc định là 1 tháng
+  const [startDate, setStartDate] = useState(moment())
+  const [endDate, setEndDate] = useState(moment().add(1, 'month'))
+
   const [selectedBenefit, setSelectedBenefit] = useState<string>(benefits[0].img)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const { isUpgrade } = useAppSelector((state) => state.RecJobs)
 
   const [isCancelModalVisible, setIsCancelModalVisible] = useState(false)
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [otherReasonError, setOtherReasonError] = useState(false)
+
+  const [selectedCancelReason, setSelectedCancelReason] = useState<number | null>(null)
+  const [otherCancelReason, setOtherCancelReason] = useState<string>('')
+
+  const [serviceInfo, setServiceInfo] = useState<ServiceInfor>()
 
   useEffect(() => {
-    if (recruiter) {
-      dispatch(checkRecUpgrade())
-        .unwrap()
-        .catch((message) => toast.error(message))
+    const fetchData = async () => {
+      if (!recruiter) {
+        return
+      }
+
+      setLoading(true)
+
+      try {
+        await dispatch(checkRecUpgrade()).unwrap()
+
+        if (isUpgrade) {
+          const response = await RecService.viewOrder()
+          setServiceInfo(response.data.metadata)
+        }
+      } catch (error) {
+        toast.error('Loading failed')
+        console.error('Error loading data:', error)
+      } finally {
+        // Đảm bảo setLoading false ở đây để ngăn chặn hiện tượng loading quay vô tận
+        setLoading(false)
+      }
     }
-  }, [])
+
+    fetchData()
+  }, [recruiter, dispatch])
 
   const handleMouseEnter = (img: string) => {
     setSelectedBenefit(img)
@@ -64,11 +114,13 @@ function RecMyService() {
 
   const handleOk = async () => {
     try {
-      const response = await axiosInstance.post('/recruiter/create_payment_url', {
+      const values = {
         orderType: 'billpayment',
-        language: 'vn'
-      })
-      console.log(response.data.metadata)
+        language: 'vn',
+        premiumPackage: packages[selectedPackage - 1].duration
+      }
+      const response = await RecService.createPayment(values)
+
       const { vpnUrl } = response.data.metadata
       if (vpnUrl) {
         setIsModalVisible(false)
@@ -87,20 +139,39 @@ function RecMyService() {
   }
 
   const showCancelModal = () => setIsCancelModalVisible(true)
+
   const handleCancelOk = () => {
-    // Xử lý logic khi nhấn Ok trong Modal hủy dịch vụ
-    setIsCancelModalVisible(false)
+    const reasonCancel = selectedCancelReason === 4 ? otherCancelReason : selectedCancelReason
+
+    if (selectedCancelReason === 4 && !otherCancelReason.trim()) {
+      setOtherReasonError(true)
+    } else {
+      if (reasonCancel !== null) {
+        const reason = String(reasonCancel)
+        toast
+          .promise(RecService.cancelOrder(reason), {
+            pending: `Gói dịch vụ đang được hủy`,
+            success: `Đã hủy gói dịch vụ thành công`,
+            error: 'Có lỗi xảy ra trong quá trình hủy gói dịch vụ'
+          })
+          .then(() => {
+            setIsCancelModalVisible(false)
+
+            dispatch(checkRecUpgrade()).unwrap()
+          })
+          .catch((error) => {
+            toast.error(error.response.data.message)
+          })
+      } else {
+        toast.error('Vui lòng chọn lý do hủy gói dịch vụ')
+      }
+    }
   }
+
   const handleCancelCancel = () => setIsCancelModalVisible(false)
 
   const showDetailModal = () => setIsDetailModalVisible(true)
   const handleDetailClose = () => setIsDetailModalVisible(false)
-
-  // Tính toán thời gian sử dụng gói
-  const startDate = moment()
-  const endDate = moment().add(1, 'month')
-  const formattedStartDate = startDate.format('DD/MM/YYYY')
-  const formattedEndDate = endDate.format('DD/MM/YYYY')
 
   const handleFindCandidate = () => {
     navigate('/recruiter/profile/service/findCandidate')
@@ -108,6 +179,29 @@ function RecMyService() {
 
   const handleStatistical = () => {
     navigate('/recruiter/profile/service/statistical')
+  }
+
+  const handlePackageChange = (e: RadioChangeEvent) => {
+    const pkgId = e.target.value
+    const selectedPkg = packages.find((pkg) => pkg.id === pkgId)
+
+    if (selectedPkg) {
+      setSelectedPackage(pkgId)
+
+      setEndDate(moment().add(selectedPkg.durationInMonths, 'months'))
+    }
+  }
+
+  const handleCancelReasonChange = (e: RadioChangeEvent) => {
+    setSelectedCancelReason(e.target.value)
+    if (e.target.value !== 4) {
+      setOtherCancelReason('')
+    }
+  }
+
+  const handleOtherCancelReasonChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setOtherReasonError(false)
+    setOtherCancelReason(event.target.value)
   }
 
   return (
@@ -134,14 +228,52 @@ function RecMyService() {
                 visible={isCancelModalVisible}
                 onOk={handleCancelOk}
                 onCancel={handleCancelCancel}
+                okText='Xác nhận'
+                cancelText='Hủy'
               >
-                <p>Bạn có chắc chắn muốn hủy gói dịch vụ không?</p>
+                <div className='flex flex-col gap-2'>
+                  <p>
+                    Gói dịch vụ của bạn còn hạn đến <span className='font-bold'>{serviceInfo?.validTo}</span>.
+                  </p>
+                  <p>
+                    Nếu hủy gỏi dịch vụ bạn sẽ được hoàn lại số tiền là{' '}
+                    <span className='font-bold'>{serviceInfo?.refundAmount}đ</span> trong thời gian sớm nhất.
+                  </p>
+                </div>
+                <p className='mt-2'>
+                  Hãy cho chúng tôi biết lý do hủy gói dịch vụ để chúng tôi có thể cải thiện hơn trong tương lai nhé !
+                </p>
+                <Radio.Group
+                  onChange={handleCancelReasonChange}
+                  value={selectedCancelReason}
+                  className='flex flex-col gap-2 mt-3 ml-7'
+                >
+                  {cancelReasons.map((reason) => (
+                    <Radio key={reason.id} value={reason.id}>
+                      {reason.text}
+                    </Radio>
+                  ))}
+                </Radio.Group>
+                {selectedCancelReason === 4 && (
+                  <div className='flex flex-col items-center justify-center w-full'>
+                    <Input.TextArea
+                      style={{ minHeight: '200px', width: '90%', marginTop: '10px' }}
+                      value={otherCancelReason}
+                      onChange={handleOtherCancelReasonChange}
+                      placeholder='Nhập lý do khác'
+                    />
+                    {otherReasonError && (
+                      <p className='mt-2 text-red-500 ml-7'>Vui lòng điền nội dung cho lý do khác.</p>
+                    )}
+                  </div>
+                )}
               </Modal>
+
               <Modal
                 title='Chi tiết gói dịch vụ'
                 visible={isDetailModalVisible}
                 onCancel={handleDetailClose}
-                footer={null} // Loại bỏ phần footer nếu không cần thiết
+                footer={null}
                 width={700}
               >
                 <div className='flex flex-col items-center justify-center gap-2'>
@@ -186,8 +318,12 @@ function RecMyService() {
           </div>
         </div>
 
+        {serviceInfo && <p className='my-2'>Hạn sử dụng gói dịch vụ của bạn còn đến ngày: {serviceInfo.validTo}</p>}
+
         <div className='flex flex-col items-center justify-center'>
-          {isUpgrade ? (
+          {loading ? (
+            <Spin size='large' className='mt-3' />
+          ) : isUpgrade ? (
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <Card
                 hoverable
@@ -258,17 +394,22 @@ function RecMyService() {
         cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
       >
         <div className='flex flex-col gap-2'>
-          <p className='text-center'>
-            <strong>Thông tin chi tiết gói dịch vụ</strong>
-          </p>
-          <ul>
-            <li>
-              <strong>Chi phí:</strong> 600.000đ/tháng
-            </li>
-            <li>
-              <strong>Thời gian sử dụng:</strong> 1 tháng kể từ ngày đăng ký ({formattedStartDate} - {formattedEndDate})
-            </li>
-          </ul>
+          <div className='flex flex-col gap-1'>
+            <p>Chọn gói sản phẩm: </p>
+            <Radio.Group onChange={handlePackageChange} value={selectedPackage} className='flex flex-col ml-5'>
+              {packages.map((pkg) => (
+                <Radio value={pkg.id} key={pkg.id}>
+                  Gói {pkg.duration}: {pkg.discountedPrice}{' '}
+                  <del style={{ marginLeft: '10px', color: 'red' }}>
+                    {pkg.price !== pkg.discountedPrice ? pkg.price : ''}
+                  </del>
+                </Radio>
+              ))}
+            </Radio.Group>
+            <p>
+              Thời gian ước tính: {startDate.format('DD/MM/YYYY')} - {endDate.format('DD/MM/YYYY')}
+            </p>
+          </div>
           <p>
             Sau khi nhấn vào <strong>Thanh toán</strong>, bạn sẽ được chuyển đến trang thanh toán VNPay để hoàn tất.
           </p>

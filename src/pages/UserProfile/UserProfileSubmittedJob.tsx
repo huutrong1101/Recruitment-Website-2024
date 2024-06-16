@@ -18,6 +18,7 @@ interface DataType {
   companyName: string
   date: string
   status: string
+  reason: string
 }
 
 const statusClasses: { [key: string]: string } = {
@@ -38,6 +39,9 @@ const UserProfileSubmittedJob = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [selectedJob, setSelectedJob] = useState<DataType | null>(null)
 
+  const [isReasonModalVisible, setIsReasonModalVisible] = useState(false)
+  const [selectedRejectReason, setSelectedRejectReason] = useState('')
+
   useEffect(() => {
     fetchJobs(currentPage, pageSize, searchTerm, selectedStatus)
   }, [currentPage, pageSize])
@@ -50,7 +54,6 @@ const UserProfileSubmittedJob = () => {
       if (response && response.data) {
         const data = response.data.metadata.listApplication
         const total = response.data.metadata.totalElement
-        console.log(data)
 
         setActiveData(convertJobsToTableData(data))
         setTotalElement(total)
@@ -66,12 +69,13 @@ const UserProfileSubmittedJob = () => {
   const convertJobsToTableData = (jobs: any[]): DataType[] => {
     return jobs.map((job, index) => ({
       key: job.jobId,
-      index: job.STT,
+      index: index + 1,
       jobName: job.name,
       jobPosition: job.levelRequirement,
       companyName: job.companyName,
-      date: job.deadline,
-      status: job.status
+      date: job.updatedAt,
+      status: job.status,
+      reason: job.reasonDecline
     }))
   }
 
@@ -96,6 +100,9 @@ const UserProfileSubmittedJob = () => {
     if (record.status === 'Đã nộp') {
       setSelectedJob(record)
       setIsModalVisible(true)
+    } else if (record.status === 'Không nhận') {
+      setSelectedRejectReason(record.reason)
+      setIsReasonModalVisible(true)
     }
   }
 
@@ -103,7 +110,7 @@ const UserProfileSubmittedJob = () => {
     if (selectedJob) {
       toast
         .promise(AuthService.withdrawJobApplication(selectedJob.key), {
-          pending: `việc thu hồi hồ sơ đang được diễn ra`,
+          pending: `Thu hồi hồ sơ đang được diễn ra`,
           success: `Hồ sơ của bạn đã được thu hồi`
         })
         .then(() => {
@@ -140,7 +147,7 @@ const UserProfileSubmittedJob = () => {
       className: 'border border-gray-200'
     },
     {
-      title: 'NGÀY HẾT HẠN',
+      title: 'THỜI GIAN CẬP NHẬT',
       dataIndex: 'date',
       className: 'border border-gray-200'
     },
@@ -150,12 +157,14 @@ const UserProfileSubmittedJob = () => {
       render: (_, record) => (
         <div className='w-full'>
           <div
-            className={classNames(
-              'flex items-center justify-center p-1',
-              statusClasses[record.status],
-              { 'cursor-pointer': record.status === 'Đã nộp' } // Điều kiện cho cursor-pointer
-            )}
-            onClick={() => record.status === 'Đã nộp' && handleStatusClick(record)} // Kiểm tra trạng thái trước khi gọi hàm
+            className={classNames('flex items-center justify-center p-1', statusClasses[record.status], {
+              'cursor-pointer': record.status === 'Đã nộp' || record.status === 'Không nhận'
+            })}
+            onClick={() => {
+              if (record.status === 'Đã nộp' || record.status === 'Không nhận') {
+                handleStatusClick(record)
+              }
+            }}
           >
             {record.status}
           </div>
@@ -164,6 +173,8 @@ const UserProfileSubmittedJob = () => {
       className: 'border border-gray-200'
     }
   ]
+
+  console.log(activeData)
 
   return (
     <div className={`px-4 py-4 bg-zinc-100 mt-2 rounded-xl flex flex-col gap-2 flex-1`}>
@@ -193,8 +204,22 @@ const UserProfileSubmittedJob = () => {
           </div>
         </div>
         <p className='flex items-center gap-2'>
-          <ExclamationCircleIcon className='w-4 h-4' /> Lưu ý: Bạn có thể rút hồ sơ ứng tuyển ở những công việc có trạng
-          thái "Đã nộp" bằng cách nhấn vào trạng thái đó.
+          <div className='flex flex-col'>
+            <div className='flex items-center gap-3'>
+              <ExclamationCircleIcon className='w-4 h-4' />
+              <p className='font-bold'>Lưu ý: </p>
+            </div>
+            <ul>
+              <li>
+                Bạn có thể <span className='text-emerald-500'>rút hồ sơ ứng tuyển</span> ở những công việc có trạng thái
+                <span className='text-emerald-500'> "Đã nộp"</span> bằng cách nhấn vào trạng thái đó.
+              </li>
+              <li>
+                Bạn có thể <span className='text-emerald-500'>xem lý do</span> ở những công việc có trạng thái{' '}
+                <span className='text-emerald-500'> "Không nhận"</span> bằng cách nhấn vào trạng thái đó.
+              </li>
+            </ul>
+          </div>
         </p>
         <div>
           <Table
@@ -203,7 +228,16 @@ const UserProfileSubmittedJob = () => {
             dataSource={activeData}
             size='middle'
             loading={loading}
-            pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
+            pagination={{
+              current: currentPage,
+              pageSize: pageSize,
+              onChange: handlePageChange,
+              onShowSizeChange: handlePageChange,
+              total: totalElement,
+              showSizeChanger: true,
+              pageSizeOptions: ['5', '10', '20', '30', '50'],
+              locale: { items_per_page: ' / trang' }
+            }}
           />
         </div>
         <Modal
@@ -219,6 +253,18 @@ const UserProfileSubmittedJob = () => {
             Bạn có chắc chắn muốn rút hồ sơ ứng tuyển cho công việc "{selectedJob?.jobName}" tại công ty "
             {selectedJob?.companyName}" không?
           </p>
+        </Modal>
+
+        <Modal
+          title='Lý do không được nhận'
+          visible={isReasonModalVisible}
+          onOk={() => setIsReasonModalVisible(false)}
+          onCancel={() => setIsReasonModalVisible(false)}
+          okText='Đóng'
+          cancelText='Hủy'
+          cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
+        >
+          <p>{selectedRejectReason}</p>
         </Modal>
       </div>
     </div>

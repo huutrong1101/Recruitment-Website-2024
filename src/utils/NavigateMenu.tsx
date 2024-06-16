@@ -3,14 +3,9 @@ import {
   HiBriefcase,
   HiCog6Tooth,
   HiEnvelope,
+  HiHeart,
   HiHome,
-  HiInformationCircle,
-  HiOutlineCalendarDays,
-  HiOutlineChartPie,
-  HiOutlineClipboardDocument,
-  HiOutlineClipboardDocumentList,
-  HiOutlineFolder,
-  HiOutlineUser,
+  HiMiniBookOpen,
   HiPlusCircle,
   HiQuestionMarkCircle,
   HiUserCircle
@@ -36,7 +31,8 @@ export const prepareMenuItem = (data: any) => [
   {
     url: '/profile',
     icon: <HiUserCircle />,
-    text: 'Thông tin cá nhân'
+    text: 'Thông tin cá nhân',
+    exactMatch: true
   },
   ...data,
   {
@@ -50,18 +46,26 @@ const candidateProvider = [
   {
     url: '/profile/resume',
     icon: <HiEnvelope />,
-    text: 'Hồ sơ'
+    text: 'Hồ sơ',
+    exactMatch: false
   },
-
+  {
+    url: '/profile/interest-companies',
+    icon: <HiHome />,
+    text: 'Công ty theo dõi',
+    exactMatch: false
+  },
   {
     url: '/profile/interest-jobs',
-    icon: <HiCog6Tooth />,
-    text: 'Công việc quan tâm'
+    icon: <HiHeart />,
+    text: 'Công việc quan tâm',
+    exactMatch: false
   },
   {
     url: '/profile/submitted-jobs',
-    icon: <HiQuestionMarkCircle />,
-    text: 'Công việc ứng tuyển'
+    icon: <HiBriefcase />,
+    text: 'Công việc ứng tuyển',
+    exactMatch: false
   }
 ]
 
@@ -69,27 +73,32 @@ const recInformationProviderConfirm = [
   {
     url: '/recruiter/profile',
     icon: <HiUserCircle />,
-    text: 'Thông tin tài khoản'
+    text: 'Thông tin tài khoản',
+    exactMatch: true
   },
   {
     url: '/recruiter/profile/service',
-    icon: <HiUserCircle />,
-    text: 'Dịch vụ của tôi'
+    icon: <HiMiniBookOpen />,
+    text: 'Dịch vụ của tôi',
+    exactMatch: false
   },
   {
     url: '/recruiter/profile/company',
     icon: <HiHome />,
-    text: 'Thông tin công ty'
+    text: 'Thông tin công ty',
+    exactMatch: false
   },
   {
     url: '/recruiter/profile/jobsPosted',
     icon: <HiBriefcase />,
-    text: 'Việc làm đã đăng tuyển'
+    text: 'Việc làm đã đăng tuyển',
+    exactMatch: false
   },
   {
     url: '/recruiter/profile/createJob',
     icon: <HiPlusCircle />,
-    text: 'Đăng tin tuyển dụng'
+    text: 'Đăng tin tuyển dụng',
+    exactMatch: false
   },
   {
     url: '/logout',

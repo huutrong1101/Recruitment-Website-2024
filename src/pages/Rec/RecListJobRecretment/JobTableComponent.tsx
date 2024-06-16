@@ -41,8 +41,8 @@ function JobTableComponent({
   fetchDataForTab,
   fetchDataByTab
 }: JobTableProps) {
-  const handlePageChange = (page: number, size?: number) => {
-    const newPageSize = size || pageSize // Sử dụng pageSize hiện tại nếu size không được cung cấp
+  const handlePageChange = (page: number, size: number | undefined) => {
+    const newPageSize = size ?? pageSize // Sử dụng pageSize hiện tại nếu size không được cung cấp
     setCurrentPage(page)
     setPageSize(newPageSize)
     fetchDataByTab(activeTabKey, page, newPageSize) // Gọi fetchDataByTab với các tham số được update
@@ -60,7 +60,11 @@ function JobTableComponent({
             current: currentPage,
             pageSize: pageSize,
             onChange: handlePageChange,
-            total: totalElement
+            total: totalElement,
+            showSizeChanger: true,
+            onShowSizeChange: handlePageChange,
+            pageSizeOptions: ['5', '10', '20', '30', '50'],
+            locale: { items_per_page: ' / trang' }
           }}
         />
       </TabPane>
@@ -74,7 +78,11 @@ function JobTableComponent({
             current: currentPage,
             pageSize: pageSize,
             onChange: handlePageChange,
-            total: totalElement
+            total: totalElement,
+            showSizeChanger: true,
+            onShowSizeChange: handlePageChange,
+            pageSizeOptions: ['5', '10', '20', '30', '50'],
+            locale: { items_per_page: ' / trang' }
           }}
         />
       </TabPane>
@@ -88,7 +96,11 @@ function JobTableComponent({
             current: currentPage,
             pageSize: pageSize,
             onChange: handlePageChange,
-            total: totalElement
+            total: totalElement,
+            showSizeChanger: true,
+            onShowSizeChange: handlePageChange,
+            pageSizeOptions: ['5', '10', '20', '30', '50'],
+            locale: { items_per_page: ' / trang' }
           }}
         />
       </TabPane>
@@ -102,7 +114,11 @@ function JobTableComponent({
             current: currentPage,
             pageSize: pageSize,
             onChange: handlePageChange,
-            total: totalElement
+            total: totalElement,
+            showSizeChanger: true,
+            onShowSizeChange: handlePageChange,
+            pageSizeOptions: ['5', '10', '20', '30', '50'],
+            locale: { items_per_page: ' / trang' }
           }}
         />
       </TabPane>
@@ -116,7 +132,11 @@ function JobTableComponent({
             current: currentPage,
             pageSize: pageSize,
             onChange: handlePageChange,
-            total: totalElement
+            total: totalElement,
+            showSizeChanger: true,
+            onShowSizeChange: handlePageChange,
+            pageSizeOptions: ['5', '10', '20', '30', '50'],
+            locale: { items_per_page: ' / trang' }
           }}
         />
       </TabPane>

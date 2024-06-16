@@ -5,7 +5,8 @@ import {
   ComputerDesktopIcon,
   CurrencyDollarIcon,
   MapPinIcon,
-  UserIcon
+  UserIcon,
+  UsersIcon
 } from '@heroicons/react/24/outline'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
@@ -28,6 +29,7 @@ export default function JobDetail() {
   const jobDetail = useAppSelector((state) => state.JobDetail.response.job)
   const { user } = useAppSelector((state) => state.Auth)
   const [relatedJobs, setRelatedJobs] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const [jobInformation, setJobInformation] = useState([
     { icon: <UserIcon />, name: 'Loại hình công việc', value: '' },
@@ -70,9 +72,9 @@ export default function JobDetail() {
           value: jobDetail.levelRequirement
         },
         {
-          icon: <CurrencyDollarIcon />,
-          name: 'Mức lương',
-          value: jobDetail.salary
+          icon: <UsersIcon />,
+          name: 'Số lượng',
+          value: jobDetail.quantity.toString()
         },
         {
           icon: <ClockIcon />,
@@ -100,30 +102,40 @@ export default function JobDetail() {
   }, [jobDetail])
 
   useEffect(() => {
-    if (!jobId) {
-      throw new Error(`The parameter jobId is undefined`)
+    const fetchDetails = async () => {
+      setIsLoading(true) // bắt đầu loading
+
+      try {
+        if (!jobId) {
+          throw new Error(`The parameter jobId is undefined`)
+        }
+
+        await dispatch(fetchJobDetail({ jobId })).unwrap()
+
+        if (user) {
+          await Promise.all([
+            // Đồng bộ kiểm tra
+            dispatch(checkApplyJob({ jobId })).unwrap(),
+            dispatch(checkFavoriteJob({ jobId })).unwrap()
+          ])
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    dispatch(fetchJobDetail({ jobId }))
-      .unwrap()
-      .catch((message) => toast.error(message))
-
-    if (user) {
-      dispatch(checkApplyJob({ jobId }))
-        .unwrap()
-        .catch((message) => toast.error(message))
-
-      dispatch(checkFavoriteJob({ jobId }))
-        .unwrap()
-        .catch((message) => toast.error(message))
-    }
-
-    return () => {}
-  }, [jobId])
+    fetchDetails()
+  }, [jobId, dispatch, user])
 
   return (
     <Container>
-      {jobDetail ? (
+      {isLoading ? (
+        <div className='flex justify-center items-center my-4 min-h-[70vh]'>
+          <Spin size='large' />
+        </div>
+      ) : jobDetail ? (
         <>
           <JobDescriptionWidget job={jobDetail} role='user' />
           <JobDetailWidget job={jobDetail} jobInformation={jobInformation} />
@@ -147,8 +159,8 @@ export default function JobDetail() {
           </div>
         </>
       ) : (
-        <div className='flex justify-center items-center my-4 min-h-[70vh]'>
-          <Spin size='large' />
+        <div className='flex items-center justify-center w-full'>
+          <p>Không tìm thấy công việc phù hợp</p>
         </div>
       )}
     </Container>

@@ -48,7 +48,7 @@ function FilterPanelComponent({
       <div className='flex w-2/3 gap-3'>
         <Select
           showSearch
-          style={{ width: 200 }}
+          style={{ width: 400 }}
           placeholder='Chọn công ty'
           optionFilterProp='children'
           filterOption={

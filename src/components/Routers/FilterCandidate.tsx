@@ -8,7 +8,7 @@ export default function FilterCandidate() {
   useTokenAuthorize()
   const navigate = useNavigate()
 
-  const { isLoggedIn, loading, token } = useAppSelector((app) => app.Auth)
+  const { isLoggedIn, loading, token, user } = useAppSelector((app) => app.Auth)
 
   if (!token && loading === 'idle') {
     navigate('/auth/login')
@@ -20,14 +20,8 @@ export default function FilterCandidate() {
     return <FilterLoadingLayout />
   }
 
-  // Something occurred while verifying
-  if (loading === 'failed') {
-    return <>Failed to verify account</>
-  }
-
-  // If the token is logged in
-  if (!isLoggedIn && loading === 'success') {
-    return <>Not logged in</>
+  if (loading === 'failed' || !isLoggedIn || !user) {
+    return <NotFound />
   }
 
   return <Outlet />

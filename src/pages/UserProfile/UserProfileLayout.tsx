@@ -44,6 +44,7 @@ export default function UserProfileLayout() {
             )}
           >
             {asideMenuItems.map((item) => {
+              const isActive = item.exactMatch ? pathname === item.url : pathname.startsWith(item.url)
               return (
                 <Link
                   to={item.url}
@@ -51,7 +52,7 @@ export default function UserProfileLayout() {
                   className={classNames(
                     `px-2 py-2 flex flex-row items-center gap-4 text-base group`,
                     `transition-colors ease-in-out duration-100 rounded-xl`,
-                    { 'bg-black/10 text-emerald-500': item.url === pathname }
+                    { 'bg-black/10 text-emerald-500': isActive }
                   )}
                 >
                   <span

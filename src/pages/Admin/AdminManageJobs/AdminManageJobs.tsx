@@ -116,10 +116,20 @@ function AdminManageJobs() {
   const [totalElement, setTotalElement] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
 
+  const optionsActivity: ActivityOption[] = activities.map((activity) => ({
+    value: activity,
+    label: activity
+  }))
+
+  const optionsLevels: ActivityOption[] = levels.map((level) => ({
+    value: level,
+    label: level
+  }))
+
   const mapApiDataToTableData = (apiData: JobFromApi[]): DataType[] => {
     return apiData.map((job, index) => ({
       _id: job._id,
-      stt: index + 1,
+      stt: (currentPage - 1) * pageSize + index + 1,
       companyName: job.companyName,
       jobName: job.name,
       field: job.field,
@@ -128,6 +138,7 @@ function AdminManageJobs() {
       premiumAccount: job.premiumAccount // Thêm thuộc tính này
     }))
   }
+
   useEffect(() => {
     JobService.getActivity(dispatch)
     JobService.getType(dispatch)
@@ -150,16 +161,6 @@ function AdminManageJobs() {
   useEffect(() => {
     fetchDataByTab(activeTabKey, currentPage, pageSize)
   }, [activeTabKey, currentPage, pageSize])
-
-  const optionsActivity: ActivityOption[] = activities.map((activity) => ({
-    value: activity,
-    label: activity
-  }))
-
-  const optionsLevels: ActivityOption[] = levels.map((level) => ({
-    value: level,
-    label: level
-  }))
 
   const fetchDataByTab = async (key: string, page: number, size: number) => {
     setIsLoading(true)
@@ -189,7 +190,7 @@ function AdminManageJobs() {
 
   const fetchDataForTab = (key: string) => {
     setActiveTabKey(key)
-    setCurrentPage(1) // Reset lại trang đầu tiên mỗi khi thay đổi tab
+    setCurrentPage(1)
     fetchDataForTab(key)
   }
 

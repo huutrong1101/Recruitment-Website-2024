@@ -12,6 +12,7 @@ import { JobService } from '../../../../services/JobService'
 import { UserService } from '../../../../services/UserService'
 import AddCompanyStep1 from './AddCompanyStep1'
 import AddCompanyStep2 from './AddCompanyStep2'
+import { AdminService } from '../../../../services/AdminService'
 
 const { Step } = Steps
 const { Option } = Select
@@ -219,9 +220,11 @@ function AdminManageAddCompany() {
 
     // Thêm các giá trị từ formData (không phải là files) vào formDataObj
     Object.keys(mergedValues).forEach((key) => {
-      if (key === 'emailLogin') {
-        // Nếu là emailLogin thì bỏ qua và không thêm vào formDataObj
-        return
+      const value = mergedValues[key]
+
+      if (key !== 'companyLogo' && key !== 'companyCoverPhoto') {
+        // Nếu không phải là fieldOfActivity, logo, hoặc ảnh bìa, thêm bình thường.
+        formDataObj.append(key, typeof value === 'string' ? value : JSON.stringify(value))
       }
     })
 
@@ -234,9 +237,17 @@ function AdminManageAddCompany() {
       formDataObj.append('companyCoverPhoto', mergedValues.companyCoverPhoto.slice(-1)[0].originFileObj)
     }
 
-    formDataObj.forEach((value, key) => {
-      console.log(key, value)
-    })
+    toast
+      .promise(AdminService.createCompany(formDataObj), {
+        pending: `Công ty đang được khởi tạo`,
+        success: `Công ty đã được khởi tạo thành công.`
+      })
+      .then((response) => {
+        navigate('/admin/manage_companies')
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message)
+      })
   }
 
   return (

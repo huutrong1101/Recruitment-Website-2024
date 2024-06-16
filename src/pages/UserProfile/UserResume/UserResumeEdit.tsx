@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Form, Input, Button, Upload, Select, DatePicker, message, Modal } from 'antd'
+import { Form, Input, Button, Upload, Select, DatePicker, message, Modal, AutoComplete, Spin } from 'antd'
 import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
@@ -8,7 +8,7 @@ import { Table } from 'antd'
 const { Option } = Select
 import type { TableColumnsType } from 'antd'
 import { TrashIcon } from '@heroicons/react/24/outline'
-import moment from 'moment'
+import moment, { Moment } from 'moment'
 import dayjs, { Dayjs } from 'dayjs'
 import { toast } from 'react-toastify'
 import { UserService } from '../../../services/UserService'
@@ -34,6 +34,9 @@ import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-im
 import { useDebounceEffect } from '../AvatarCrop/useDebounceEffect'
 import { canvasPreview } from '../AvatarCrop/canvasPreview'
 import { validateEmail, validateGPA, validatePhone } from '../../../utils/validation'
+import { useAppSelector } from '../../../hooks/hooks'
+import { educationLevels, experiences, jobTypes } from '../../../utils/contanst'
+import PreviewResume from './UserResumeAdd/PreviewResume/PreviewResume'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js`
 
@@ -71,6 +74,33 @@ interface DataWorkExperienceType {
   }
 }
 
+interface FormValues {
+  title?: string
+  name?: string
+  GPA?: string
+  dateOfBirth?: Moment
+  phone?: string
+  email?: string
+  major?: string
+  homeTown?: string
+  experience?: string
+  jobType?: string
+  educationLevel?: string
+  english?: string
+  goal?: string
+  activity?: string
+  avatar?: UploadFile[]
+  certifications?: DataType[]
+  educations?: DataEducationType[]
+  workHistories?: DataWorkExperienceType[]
+  themeId?: string
+}
+
+interface MajorOption {
+  value: string
+  label: string
+}
+
 function centerAspectCrop(mediaWidth: number, mediaHeight: number, aspect: number) {
   return centerCrop(
     makeAspectCrop(
@@ -93,6 +123,16 @@ function UserResumeEdit() {
 
   const { resumeId } = useParams()
 
+  const [formValues, setFormValues] = useState<FormValues | undefined>(undefined)
+
+  const provinces = useAppSelector((state) => state.Job.province)
+  const majors = useAppSelector((state) => state.Job.majors)
+  const optionsProvinces = provinces.map((option) => ({ value: option, label: option }))
+  const optionsMajors: MajorOption[] = majors.map((option) => ({
+    value: option,
+    label: option
+  }))
+
   const previewCanvasRef = useRef<HTMLCanvasElement>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [imgSrc, setImgSrc] = useState('')
@@ -104,7 +144,7 @@ function UserResumeEdit() {
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
   const [aspect, setAspect] = useState<number | undefined>(16 / 9)
-  const [croppedImage, setCroppedImage] = useState<string>('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const [resumeDetail, setResumeDetail] = useState<ResumeResponse | null>(null)
   const [previewAvatar, setPreviewAvatar] = useState('')
@@ -112,9 +152,7 @@ function UserResumeEdit() {
   const [educations, setEducations] = useState<DataEducationType[]>([])
   const [workExperiences, setWorkExperiences] = useState<DataWorkExperienceType[]>([])
   const [fileList, setFileList] = useState<UploadFile[]>([])
-  const [uploadStates, setUploadStates] = useState<
-    Record<string | number | symbol, { isUploaded: boolean; isUploading: boolean }>
-  >({})
+
   const [shown, setShown] = useState(false)
   const [previewPDF, setPreviewPDF] = useState('')
   const zoomPluginInstance = zoomPlugin()
@@ -132,83 +170,110 @@ function UserResumeEdit() {
   }, [resumeId])
 
   const fetchResumeDetail = async (resumeId: string) => {
-    const response = await AuthService.getResumeDetail(resumeId)
-    if (response && response.data) {
-      const data = response.data.metadata
-      setResumeDetail(data)
+    setIsLoading(true)
+    try {
+      const response = await AuthService.getResumeDetail(resumeId)
+      if (response && response.data) {
+        const data = response.data.metadata
+        setResumeDetail(data)
 
-      // Chuẩn bị dữ liệu để set giá trị cho form
-      const formattedEducations = data.educations.map((edu: any, index: number) => ({
-        key: index + 1,
-        stt: index + 1,
-        major: edu.major,
-        dateRange: [moment(edu.from), moment(edu.to)]
-      }))
+        const formattedEducations = data.educations.map((edu: any, index: number) => ({
+          key: index + 1,
+          stt: index + 1,
+          major: edu.major,
+          dateRange: [moment(edu.from), moment(edu.to)]
+        }))
 
-      const formattedCertifications = data.certifications.map((cert: any, index: number) => ({
-        key: index + 1,
-        stt: index + 1,
-        name: cert.name,
-        upload: cert.uploadFile,
-        isUploaded: true,
-        isUploading: false
-      }))
+        const formattedCertifications = data.certifications.map((cert: any, index: number) => ({
+          key: index + 1,
+          stt: index + 1,
+          name: cert.name,
+          upload: cert.uploadFile,
+          isUploaded: true,
+          isUploading: false
+        }))
 
-      const formattedWorkExperiences = data.workHistories.map((edu: any, index: number) => ({
-        key: index + 1,
-        stt: index + 1,
-        jobDescription: {
-          dateRange: [moment(edu.from), moment(edu.to)],
-          company: edu.workUnit,
-          jobDescription: edu.description
-        }
-      }))
-
-      if (data.avatar) {
-        const avatarUrl = data.avatar
-        setPreviewAvatar(avatarUrl)
-
-        const avatarFileList: UploadFile<any>[] = [
-          {
-            uid: '-1',
-            name: 'avatar.png',
-            status: 'done',
-            url: avatarUrl
+        const formattedWorkExperiences = data.workHistories.map((edu: any, index: number) => ({
+          key: index + 1,
+          stt: index + 1,
+          jobDescription: {
+            dateRange: [moment(edu.from), moment(edu.to)],
+            company: edu.workUnit,
+            jobDescription: edu.description
           }
-        ]
+        }))
 
-        setFileList(avatarFileList)
+        if (data.avatar) {
+          const avatarUrl = data.avatar
+          setPreviewAvatar(avatarUrl)
 
+          const avatarFileList: UploadFile<any>[] = [
+            {
+              uid: '-1',
+              name: 'avatar.png',
+              status: 'done',
+              url: avatarUrl
+            }
+          ]
+
+          setFileList(avatarFileList)
+
+          form.setFieldsValue({
+            avatar: avatarFileList
+          })
+        }
+
+        // Đảm bảo rằng giá trị của `certifications` cũng được set cho form ở đây
         form.setFieldsValue({
-          avatar: avatarFileList
+          name: data.name,
+          title: data.title,
+          GPA: data.GPA,
+          phone: data.phone,
+          dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
+          homeTown: data.homeTown || '',
+          experience: data.experience || '',
+          jobType: data.jobType || '',
+          educationLevel: data.educationLevel || '',
+          english: data.english || '',
+          goal: data.goal || '',
+          activity: data.activity || '',
+          email: data.email || '',
+          major: data.major || '',
+          certifications: formattedCertifications,
+          educations: formattedEducations,
+          workHistories: formattedWorkExperiences
         })
+
+        setFormValues({
+          name: data.name,
+          title: data.title,
+          GPA: data.GPA,
+          phone: data.phone,
+          dateOfBirth: data.dateOfBirth ? moment(dayjs(data.dateOfBirth).toISOString()) : undefined,
+          homeTown: data.homeTown || '',
+          experience: data.experience || '',
+          jobType: data.jobType || '',
+          educationLevel: data.educationLevel || '',
+          english: data.english || '',
+          goal: data.goal || '',
+          activity: data.activity || '',
+          email: data.email || '',
+          major: data.major || '',
+          certifications: formattedCertifications,
+          educations: formattedEducations,
+          workHistories: formattedWorkExperiences,
+          themeId: data.themeId
+        })
+
+        // Cập nhật state với dữ liệu đã được format
+        setEducations(formattedEducations)
+        setDataSource(formattedCertifications)
+        setWorkExperiences(formattedWorkExperiences)
       }
-
-      // Đảm bảo rằng giá trị của `certifications` cũng được set cho form ở đây
-      form.setFieldsValue({
-        name: data.name,
-        title: data.title,
-        GPA: data.GPA,
-        phone: data.phone,
-        dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
-        homeTown: data.homeTown || '',
-        experience: data.experience || '',
-        jobType: data.jobType || '',
-        educationLevel: data.educationLevel || '',
-        english: data.english || '',
-        goal: data.goal || '',
-        activity: data.activity || '',
-        email: data.email || '',
-        major: data.major || '',
-        certifications: formattedCertifications,
-        educations: formattedEducations,
-        workHistories: formattedWorkExperiences
-      })
-
-      // Cập nhật state với dữ liệu đã được format
-      setEducations(formattedEducations)
-      setDataSource(formattedCertifications)
-      setWorkExperiences(formattedWorkExperiences)
+    } catch (error) {
+      console.error('Error fetching resume detail:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -334,11 +399,16 @@ function UserResumeEdit() {
       width: 200,
       align: 'center',
       render: (_, record) => (
-        <Input
+        <AutoComplete
+          options={optionsMajors}
           placeholder='Chuyên ngành'
           value={record.major}
-          onChange={(e) => handleChangeMajor(record.key, e.target.value)}
-          style={{ textAlign: 'center' }}
+          onChange={(value) => handleChangeMajor(record.key, value)}
+          style={{ width: '100%', textAlign: 'left' }}
+          filterOption={(inputValue, option) =>
+            // Đảm bảo rằng giá trị trả về luôn là boolean bằng cách sử dụng toán tử && (Logical AND)
+            !!option && option.label.toUpperCase().includes(inputValue.toUpperCase())
+          }
         />
       )
     },
@@ -671,15 +741,14 @@ function UserResumeEdit() {
     formData.append('workHistories', JSON.stringify(workHistories))
 
     if (values.avatar && values.avatar.length > 0) {
-      // Đủ điều kiện để thêm vào FormData
-      const file = values.avatar[0].originFileObj
-
-      // Thêm file vào formData với key là 'avatar'
-      formData.append('avatar', file)
+      const avatarHasChanged = !fileList.length || fileList[0].url !== previewAvatar
+      if (avatarHasChanged) {
+        formData.append('avatar', values.avatar[0].originFileObj, values.avatar[0].name)
+      }
     }
 
-    for (let pair of formData.entries()) {
-      console.log(`${pair[0]}: ${pair[1]}`)
+    if (typeof formValues?.themeId !== 'undefined') {
+      formData.append('themeId', formValues.themeId)
     }
 
     if (resumeDetail) {
@@ -765,309 +834,403 @@ function UserResumeEdit() {
   )
 
   return (
-    <div className='flex flex-col flex-1 gap-4'>
-      <div className='w-full border rounded-xl border-zinc-100'>
-        <div className='flex items-center justify-center gap-5 p-2 rounded-tl-lg bg-emerald-500 rounded-tr-xl'>
-          <ArrowLeftOutlined onClick={handleBack} style={{ cursor: 'pointer' }} className='font-bold text-white' />
-          <h6 className='flex-1 text-lg font-semibold text-white uppercase'>CV cá nhân</h6>
+    <div className='flex items-start justify-start gap-4 mb-8'>
+      {isLoading ? (
+        <div className='flex justify-center items-center my-4 min-h-[70vh] w-full'>
+          <Spin size='large' />
         </div>
-        <div className='flex flex-col gap-2 p-4'>
-          <Form form={form} layout='vertical' onFinish={handleFormSubmit}>
-            <div className='flex items-start justify-center gap-5'>
-              <div className='w-1/4'>
-                <Form.Item
-                  name='avatar'
-                  label='Ảnh đại diện (3x4)'
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Vui lòng tải ảnh đại diện',
-                      validator: (_, value) => (value && value.length > 0 ? Promise.resolve() : Promise.reject())
-                    }
-                  ]}
-                  valuePropName='fileList'
-                  getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
-                  className='flex-grow w-full'
-                >
-                  {previewAvatar ? (
-                    <img
-                      src={previewAvatar}
-                      alt='Avatar'
-                      style={{ width: '100%', height: '250px', marginTop: '10px', cursor: 'pointer' }}
-                      onClick={showModal}
-                    />
-                  ) : (
-                    <>
-                      <div
-                        onClick={showModal}
-                        className='w-full h-[250px] flex items-center justify-center border-dashed border-2 border-black cursor-pointer'
+      ) : resumeDetail ? (
+        <>
+          <div className='flex flex-col flex-1 w-1/2 gap-4 shadow-lg'>
+            <div className='w-full border rounded-xl border-zinc-100'>
+              <div className='flex items-center justify-center gap-5 p-2 rounded-tl-lg bg-emerald-500 rounded-tr-xl'>
+                <ArrowLeftOutlined
+                  onClick={handleBack}
+                  style={{ cursor: 'pointer' }}
+                  className='font-bold text-white'
+                />
+                <h6 className='flex-1 text-lg font-semibold text-white uppercase'>CV cá nhân</h6>
+              </div>
+              <div className='flex flex-col gap-2 p-4'>
+                <Form form={form} layout='vertical' onFinish={handleFormSubmit}>
+                  <div className='flex items-start justify-center gap-5'>
+                    <div className='w-1/4'>
+                      <Form.Item
+                        name='avatar'
+                        label='Ảnh đại diện (3x4)'
+                        rules={[
+                          {
+                            required: true,
+                            message: 'Vui lòng tải ảnh đại diện',
+                            validator: (_, value) => (value && value.length > 0 ? Promise.resolve() : Promise.reject())
+                          }
+                        ]}
+                        valuePropName='fileList'
+                        getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
+                        className='flex-grow w-full'
                       >
-                        Chọn ảnh đại diện
-                      </div>
-                    </>
-                  )}
-                  <Modal
-                    title='Cập nhật avatar'
-                    visible={isModalOpen}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                    okText='Cập nhật avatar'
-                    cancelText='Hủy'
-                    cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
-                    width={650}
-                  >
-                    <div className='mb-3 Crop-Controls'>
-                      <input
-                        type='file'
-                        id='fileInput'
-                        accept='image/*'
-                        onChange={onSelectFile}
-                        style={{ display: 'none' }}
-                      />
-                      <label
-                        htmlFor='fileInput'
-                        className='px-3 py-2 border w-[100px] rounded-md bg-emerald-500 text-white text-center cursor-pointer'
-                      >
-                        Chọn Ảnh
-                      </label>
-                    </div>
-                    <div className='flex flex-col items-center Crop-Container'>
-                      {!!imgSrc && (
-                        <ReactCrop
-                          crop={crop}
-                          onChange={(newCrop) => setCrop(newCrop)}
-                          onComplete={(c) => setCompletedCrop(c)}
-                          aspect={aspect}
-                          locked
-                        >
+                        {previewAvatar ? (
                           <img
-                            ref={imgRef}
-                            alt='Crop me'
-                            src={imgSrc}
-                            onLoad={onImageLoad}
-                            style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
+                            src={previewAvatar}
+                            alt='Avatar'
+                            style={{ width: '100%', height: '200px', marginTop: '10px', cursor: 'pointer' }}
+                            onClick={showModal}
                           />
-                        </ReactCrop>
-                      )}
-                      {!!completedCrop && (
-                        <canvas
-                          ref={previewCanvasRef}
-                          style={{
-                            objectFit: 'contain',
-                            width: completedCrop.width,
-                            height: completedCrop.height
+                        ) : (
+                          <>
+                            <div
+                              onClick={showModal}
+                              className='w-full h-[200px] flex items-center justify-center border-dashed border-2 border-black cursor-pointer'
+                            >
+                              Chọn ảnh đại diện
+                            </div>
+                          </>
+                        )}
+                        <Modal
+                          title='Cập nhật avatar'
+                          visible={isModalOpen}
+                          onOk={handleOk}
+                          onCancel={handleCancel}
+                          okText='Cập nhật avatar'
+                          cancelText='Hủy'
+                          cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
+                          width={650}
+                        >
+                          <div className='mb-3 Crop-Controls'>
+                            <input
+                              type='file'
+                              id='fileInput'
+                              accept='image/*'
+                              onChange={onSelectFile}
+                              style={{ display: 'none' }}
+                            />
+                            <label
+                              htmlFor='fileInput'
+                              className='px-3 py-2 border w-[100px] rounded-md bg-emerald-500 text-white text-center cursor-pointer'
+                            >
+                              Chọn Ảnh
+                            </label>
+                          </div>
+                          <div className='flex flex-col items-center Crop-Container'>
+                            {!!imgSrc && (
+                              <ReactCrop
+                                crop={crop}
+                                onChange={(newCrop) => setCrop(newCrop)}
+                                onComplete={(c) => setCompletedCrop(c)}
+                                aspect={aspect}
+                                locked
+                              >
+                                <img
+                                  ref={imgRef}
+                                  alt='Crop me'
+                                  src={imgSrc}
+                                  onLoad={onImageLoad}
+                                  style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
+                                />
+                              </ReactCrop>
+                            )}
+                            {!!completedCrop && (
+                              <canvas
+                                ref={previewCanvasRef}
+                                style={{
+                                  objectFit: 'contain',
+                                  width: completedCrop.width,
+                                  height: completedCrop.height
+                                }}
+                              />
+                            )}
+                          </div>
+                        </Modal>
+                      </Form.Item>
+                    </div>
+                    <div className='w-3/4'>
+                      <div className='flex items-center justify-center gap-2'>
+                        <Form.Item
+                          name='title'
+                          label='Tiêu đề CV'
+                          rules={[{ required: true, message: 'Vui lòng nhập tiêu đề CV' }]}
+                          className='w-1/2'
+                        >
+                          <Input placeholder='Nhập tiêu đề CV' />
+                        </Form.Item>
+                        <Form.Item
+                          name='name'
+                          label='Tên'
+                          rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                          className='w-1/2'
+                        >
+                          <Input placeholder='Nhập tên của bạn' />
+                        </Form.Item>
+                      </div>
+
+                      <div className='flex items-center justify-center gap-2'>
+                        <Form.Item name='GPA' label='GPA' className='w-1/2' rules={[{ validator: validateGPA }]}>
+                          <Input placeholder='Nhập GPA' />
+                        </Form.Item>
+                        <Form.Item
+                          label='Ngày sinh'
+                          name='dateOfBirth'
+                          className='w-1/2'
+                          rules={[{ required: true, message: 'Không được để trống' }]}
+                        >
+                          <DatePicker
+                            format='DD/MM/YYYY'
+                            style={{ width: '100%' }}
+                            inputReadOnly={true} // Thêm thuộc tính này
+                            placeholder='Chọn ngày'
+                          />
+                        </Form.Item>
+                      </div>
+
+                      <div className='flex items-center justify-center gap-2'>
+                        <Form.Item
+                          name='phone'
+                          label='Số điện thoại'
+                          rules={[{ validator: validatePhone }]}
+                          className='w-1/2'
+                        >
+                          <Input placeholder='Nhập số điện thoại' />
+                        </Form.Item>
+                        <Form.Item name='email' label='Email' rules={[{ validator: validateEmail }]} className='w-1/2'>
+                          <Input placeholder='Nhập email' />
+                        </Form.Item>
+                      </div>
+
+                      <div className='flex items-center justify-center gap-2'>
+                        <Form.Item
+                          name='major'
+                          label='Ngành học'
+                          rules={[{ required: true, message: 'Vui lòng chọn ngành học' }]}
+                          className='w-1/2'
+                        >
+                          <Select
+                            showSearch
+                            placeholder='Chọn ngành học'
+                            optionFilterProp='children'
+                            filterOption={(input, option) =>
+                              (option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) ?? -1) >= 0
+                            }
+                          >
+                            {optionsMajors.map((option) => (
+                              <Option key={option.label} value={option.value}>
+                                {option.value}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                        <Form.Item
+                          name='homeTown'
+                          label='Quê quán'
+                          rules={[{ required: true, message: 'Vui lòng chọn quê quán' }]}
+                          className='w-1/2'
+                        >
+                          <Select
+                            showSearch
+                            placeholder='Chọn quê quán'
+                            optionFilterProp='children'
+                            filterOption={(input, option) =>
+                              (option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) ?? -1) >= 0
+                            }
+                          >
+                            {optionsProvinces.map((option) => (
+                              <Option key={option.label} value={option.value}>
+                                {option.value}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                      </div>
+
+                      <div className='flex items-center justify-center gap-2'>
+                        <Form.Item
+                          name='experience'
+                          label='Kinh nghiệm làm việc'
+                          rules={[{ required: true, message: 'Vui lòng chọn kinh nghiệm làm việc' }]}
+                          className='w-1/2'
+                        >
+                          <Select
+                            showSearch
+                            placeholder='Chọn kinh nghiệm làm việc'
+                            optionFilterProp='children'
+                            filterOption={(input, option) =>
+                              (option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) ?? -1) >= 0
+                            }
+                          >
+                            {experiences.map((experience) => (
+                              <Option key={experience.id} value={experience.name}>
+                                {experience.name}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+
+                        <Form.Item
+                          name='jobType'
+                          label='Loại hình công việc mong muốn'
+                          rules={[{ required: true, message: 'Vui lòng chọn loại hình công việc' }]}
+                          className='w-1/2'
+                        >
+                          <Select
+                            showSearch
+                            placeholder='Chọn loại hình công việc'
+                            optionFilterProp='children'
+                            filterOption={(input, option) =>
+                              (option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) ?? -1) >= 0
+                            }
+                          >
+                            {jobTypes.map((jobType) => (
+                              <Option key={jobType.id} value={jobType.name}>
+                                {jobType.name}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                      </div>
+
+                      <div className='flex items-center justify-center gap-2'>
+                        <Form.Item
+                          name='educationLevel'
+                          label='Trình độ học vấn'
+                          rules={[{ required: true, message: 'Vui lòng chọn học vấn' }]}
+                          className='w-1/2'
+                        >
+                          <Select
+                            showSearch
+                            placeholder='Chọn trình độ học vấn'
+                            optionFilterProp='children'
+                            filterOption={(input, option) =>
+                              (option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) ?? -1) >= 0
+                            }
+                          >
+                            {educationLevels.map((level) => (
+                              <Option key={level.id} value={level.name}>
+                                {level.name}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+
+                        <Form.Item
+                          name='english'
+                          label='Trình độ ngoại ngữ'
+                          rules={[{ required: true, message: 'Vui lòng nhập trình độ ngoại ngữ' }]}
+                          className='w-1/2'
+                        >
+                          <Input placeholder='Nhập trình độ ngoại ngữ' />
+                        </Form.Item>
+                      </div>
+                    </div>
+                  </div>
+                  <div className='flex flex-col gap-2'>
+                    <Form.Item
+                      name='goal'
+                      label='Mục tiêu nghề nghiệp'
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Vui lòng nhập giới thiệu về công ty!'
+                        }
+                      ]}
+                    >
+                      <div style={{ minHeight: '200px', maxHeight: '600px' }}>
+                        <CKEditor
+                          editor={ClassicEditor}
+                          data={form.getFieldValue('goal') || ''}
+                          onChange={(_: any, editor: any) => {
+                            const data = editor.getData()
+                            form.setFieldsValue({ goal: data })
                           }}
                         />
-                      )}
-                    </div>
-                  </Modal>
-                </Form.Item>
-              </div>
-              <div className='w-3/4'>
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='title'
-                    label='Tiêu đề CV'
-                    rules={[{ required: true, message: 'Vui lòng nhập tiêu đề CV' }]}
-                    className='w-1/2'
-                  >
-                    <Input placeholder='Nhập tiêu đề CV' />
-                  </Form.Item>
-                  <Form.Item
-                    name='name'
-                    label='Tên'
-                    rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
-                    className='w-1/2'
-                  >
-                    <Input placeholder='Nhập tên của bạn' />
-                  </Form.Item>
-                </div>
+                      </div>
+                    </Form.Item>
 
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item name='GPA' label='GPA' className='w-1/2' rules={[{ validator: validateGPA }]}>
-                    <Input placeholder='Nhập GPA' />
-                  </Form.Item>
-                  <Form.Item
-                    label='Ngày sinh'
-                    name='dateOfBirth'
-                    className='w-1/2'
-                    rules={[{ required: true, message: 'Không được để trống' }]}
-                  >
-                    <DatePicker
-                      format='DD/MM/YYYY'
-                      style={{ width: '100%' }}
-                      inputReadOnly={true} // Thêm thuộc tính này
-                      placeholder='Chọn ngày'
-                    />
-                  </Form.Item>
-                </div>
+                    <Form.Item
+                      name='certifications'
+                      label={
+                        <div className='flex items-center justify-center gap-2'>
+                          <p>Chứng chỉ/CV/Portfolio</p>
+                          <Button type='primary' onClick={() => handleAdd('certifications')}>
+                            Thêm
+                          </Button>
+                        </div>
+                      }
+                    >
+                      <Table columns={certificationColumns} dataSource={dataSource} size='middle' pagination={false} />
+                    </Form.Item>
 
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='phone'
-                    label='Số điện thoại'
-                    rules={[{ validator: validatePhone }]}
-                    className='w-1/2'
-                  >
-                    <Input placeholder='Nhập số điện thoại' />
-                  </Form.Item>
-                  <Form.Item name='email' label='Email' rules={[{ validator: validateEmail }]} className='w-1/2'>
-                    <Input placeholder='Nhập email' />
-                  </Form.Item>
-                </div>
+                    <Form.Item
+                      name='educations'
+                      label={
+                        <div className='flex items-center justify-center gap-2'>
+                          <p>Quá trình học tập</p>
+                          <Button type='primary' onClick={() => handleAdd('educations')}>
+                            Thêm
+                          </Button>
+                        </div>
+                      }
+                    >
+                      <Table columns={educationColumns} dataSource={educations} size='middle' pagination={false} />
+                    </Form.Item>
 
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='major'
-                    label='Ngành học'
-                    rules={[{ required: true, message: 'Vui lòng nhập ngành học' }]}
-                    className='w-1/2'
-                  >
-                    <Input placeholder='Nhập ngành học' />
-                  </Form.Item>
-                  <Form.Item
-                    name='homeTown'
-                    label='Quê quán'
-                    rules={[{ required: true, message: 'Vui lòng quê quán' }]}
-                    className='w-1/2'
-                  >
-                    <Input placeholder='Nhập quê quán' />
-                  </Form.Item>
-                </div>
+                    <Form.Item
+                      name='workHistories'
+                      label={
+                        <div className='flex items-center justify-center gap-2'>
+                          <p>Quá trình làm việc</p>
+                          <Button type='primary' onClick={() => handleAddWorkExperience()}>
+                            Thêm
+                          </Button>
+                        </div>
+                      }
+                    >
+                      <Table
+                        columns={workExperienceColumns}
+                        dataSource={workExperiences}
+                        size='middle'
+                        pagination={false}
+                      />
+                    </Form.Item>
 
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='experience'
-                    label='Kinh nghiệm làm việc'
-                    rules={[{ required: true, message: 'Vui lòng nhập kinh nghiệm làm việc' }]}
-                    className='w-1/2'
-                  >
-                    <Input placeholder='Nhập kinh nghiệm làm việc' />
+                    <Form.Item name='activity' label='Giải thưởng / Hoạt động ngoại khoá / Sở thích / Khác...'>
+                      <div style={{ minHeight: '200px', maxHeight: '600px' }}>
+                        <CKEditor
+                          editor={ClassicEditor}
+                          data={form.getFieldValue('activity') || ''}
+                          onChange={(_: any, editor: any) => {
+                            const data = editor.getData()
+                            form.setFieldsValue({ activity: data })
+                          }}
+                        />
+                      </div>
+                    </Form.Item>
+                  </div>
+                  <Form.Item className='flex justify-end'>
+                    <Button type='primary' htmlType='submit'>
+                      CHỈNH SỬA
+                    </Button>
                   </Form.Item>
-
-                  <Form.Item
-                    name='jobType'
-                    label='Loại hình công việc mong muốn'
-                    rules={[{ required: true, message: 'Vui lòng chọn loại hình công việc' }]}
-                    className='w-1/2'
-                  >
-                    <Select placeholder='Chọn loại hình công việc'>
-                      <Option value='Bán thời gian'>Bán thời gian</Option>
-                      <Option value='Toàn thời gian'>Toàn thời gian</Option>
-                      <Option value='Thực tập'>Thực tập</Option>
-                      <Option value='Làm từ xa'>Làm từ xa</Option>
-                    </Select>
-                  </Form.Item>
-                </div>
-
-                <div className='flex items-center justify-center gap-2'>
-                  <Form.Item
-                    name='educationLevel'
-                    label='Học vấn'
-                    rules={[{ required: true, message: 'Vui lòng nhập học vấn' }]}
-                    className='w-1/2'
-                  >
-                    <Input placeholder='Nhập học vấn' />
-                  </Form.Item>
-
-                  <Form.Item
-                    name='english'
-                    label='Trình độ ngoại ngữ'
-                    rules={[{ required: true, message: 'Vui lòng nhập trình độ ngoại ngữ' }]}
-                    className='w-1/2'
-                  >
-                    <Input placeholder='Nhập trình độ ngoại ngữ' />
-                  </Form.Item>
-                </div>
+                </Form>
               </div>
             </div>
-            <div className='flex flex-col gap-2'>
-              <Form.Item
-                name='goal'
-                label='Mục tiêu nghề nghiệp'
-                rules={[
-                  {
-                    required: true,
-                    message: 'Vui lòng nhập giới thiệu về công ty!'
-                  }
-                ]}
-              >
-                <div style={{ minHeight: '200px', maxHeight: '600px' }}>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={form.getFieldValue('goal') || ''}
-                    onChange={(_: any, editor: any) => {
-                      const data = editor.getData()
-                      form.setFieldsValue({ goal: data })
-                    }}
-                  />
-                </div>
-              </Form.Item>
-
-              <Form.Item
-                name='certifications'
-                label={
-                  <div className='flex items-center justify-center gap-2'>
-                    <p>Chứng chỉ/CV/Portfolio</p>
-                    <Button type='primary' onClick={() => handleAdd('certifications')}>
-                      Thêm
-                    </Button>
-                  </div>
-                }
-              >
-                <Table columns={certificationColumns} dataSource={dataSource} size='middle' pagination={false} />
-              </Form.Item>
-
-              <Form.Item
-                name='educations'
-                label={
-                  <div className='flex items-center justify-center gap-2'>
-                    <p>Quá trình học tập</p>
-                    <Button type='primary' onClick={() => handleAdd('educations')}>
-                      Thêm
-                    </Button>
-                  </div>
-                }
-              >
-                <Table columns={educationColumns} dataSource={educations} size='middle' pagination={false} />
-              </Form.Item>
-
-              <Form.Item
-                name='workHistories'
-                label={
-                  <div className='flex items-center justify-center gap-2'>
-                    <p>Quá trình làm việc</p>
-                    <Button type='primary' onClick={() => handleAddWorkExperience()}>
-                      Thêm
-                    </Button>
-                  </div>
-                }
-              >
-                <Table columns={workExperienceColumns} dataSource={workExperiences} size='middle' pagination={false} />
-              </Form.Item>
-
-              <Form.Item name='activity' label='Giải thưởng / Hoạt động ngoại khoá / Sở thích / Khác...'>
-                <div style={{ minHeight: '200px', maxHeight: '600px' }}>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={form.getFieldValue('activity') || ''}
-                    onChange={(_: any, editor: any) => {
-                      const data = editor.getData()
-                      form.setFieldsValue({ activity: data })
-                    }}
-                  />
-                </div>
-              </Form.Item>
-            </div>
-            <Form.Item className='flex justify-end'>
-              <Button type='primary' htmlType='submit'>
-                CHỈNH SỬA
-              </Button>
-            </Form.Item>
-          </Form>
+            {shown && ReactDOM.createPortal(modalBody(), document.body)}
+          </div>
+          <div className='sticky flex flex-col flex-1 w-1/2 gap-4 h-fit top-4'>
+            {formValues && resumeDetail?.themeId && (
+              <PreviewResume
+                values={formValues}
+                previewAvatar={previewAvatar}
+                templateId={resumeDetail?.themeId}
+                type='edit'
+                setFormValues={setFormValues}
+              />
+            )}
+          </div>
+        </>
+      ) : (
+        <div className='flex items-center justify-center w-full'>
+          <p>Không tìm thấy hồ sơ phù hợp</p>
         </div>
-      </div>
-      {shown && ReactDOM.createPortal(modalBody(), document.body)}
+      )}
     </div>
   )
 }

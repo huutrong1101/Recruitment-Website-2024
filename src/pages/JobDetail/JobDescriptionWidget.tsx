@@ -33,10 +33,6 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
     setVisibleApplyDialog((isVisible) => !isVisible)
   }
 
-  const handleSaveJob = () => {
-    console.log(job.quantity)
-  }
-
   const handleOnApplySucceeded = () => {
     dispatch(setJobIsApplied(true))
 
@@ -118,7 +114,9 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
     return (number / 1000000).toLocaleString('vi-VN')
   }
 
-  console.log(job)
+  const handleNavigateEdit = () => {
+    navigate(`/admin/manage_jobs/editJob/${job?._id}`)
+  }
 
   return (
     <>
@@ -176,9 +174,21 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                       `font-semibold`,
                       `rounded-xl`
                     )}
+                    onClick={handleNavigateEdit}
+                  >
+                    CHỈNH SỬA
+                  </button>
+
+                  <button
+                    className={classNames(
+                      `px-3 py-2 w-1/4`,
+                      `border-emerald-500 border text-emerald-500 text-center`,
+                      `font-semibold`,
+                      `rounded-xl`
+                    )}
                     onClick={showModal} // Gọi hàm này để hiển thị modal
                   >
-                    XỬ LÍ CÔNG VIỆC
+                    XỬ LÍ
                   </button>
                 </div>
                 <Modal
@@ -213,7 +223,7 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                 <div className='flex flex-col gap-2'>
                   <div className='flex items-center gap-3'>
                     <p className='font-medium'>Quy mô:</p>
-                    <p>10-24 nhân viên</p>
+                    <p>{job.employeeNumber} nhân viên</p>
                   </div>
                   <div className='flex gap-3'>
                     {/* Đặt flex-shrink-0 để ngăn không cho "Địa điểm" co lại */}
@@ -222,7 +232,10 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                     <p className='break-words line-clamp-2'>{job.companyAddress}</p>
                   </div>
                 </div>
-                <Link to='/jobs' className={classNames('text-center text-emerald-500 mt-1')}>
+                <Link
+                  to={`/admin/manage_companies/${job.companySlug}`}
+                  className={classNames('text-center text-emerald-500 mt-1')}
+                >
                   Xem chi tiết công ty
                 </Link>
               </div>
@@ -288,7 +301,7 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                         )}
                         onClick={handleNavigateToSignIn}
                       >
-                        {isApplied ? <p>ĐÃ ỨNG TUYỂN</p> : <p> ỨNG TUYỂN NGAY</p>}
+                        <p> ỨNG TUYỂN NGAY</p>
                       </button>
                       <button
                         className={classNames(
@@ -366,7 +379,7 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                 <div className='flex flex-col gap-2'>
                   <div className='flex items-center gap-3'>
                     <p className='font-medium'>Quy mô:</p>
-                    <p>{job.quantity} nhân viên</p>
+                    <p>{job.employeeNumber} nhân viên</p>
                   </div>
                   <div className='flex gap-3'>
                     {/* Đặt flex-shrink-0 để ngăn không cho "Địa điểm" co lại */}

@@ -45,7 +45,6 @@ function AdminManageAddJob() {
   const [form] = Form.useForm()
   const [salaryType, setSalaryType] = useState('')
   const [salary, setSalary] = useState('')
-  const [companyOptions, setCompanyOptions] = useState<string[]>([])
 
   const provinces = useAppSelector((state) => state.Job.province)
   const experiences = useAppSelector((state) => state.Job.experience)
@@ -54,6 +53,11 @@ function AdminManageAddJob() {
   const genderRequirement = useAppSelector((state) => state.Job.genderRequirement)
   const activities = useAppSelector((state) => state.Job.activities)
   const listRec = useAppSelector((state): RecruiterResponseState[] => state.AdminSlice.listRec)
+
+  const optionsRec: ActivityOption[] = listRec.map((rec) => ({
+    value: rec._id,
+    label: rec.companyName
+  }))
 
   useEffect(() => {
     JobService.getProvince(dispatch)
@@ -67,13 +71,6 @@ function AdminManageAddJob() {
   useEffect(() => {
     form.setFieldsValue({ salary: salary })
   }, [salaryType, salary, form])
-
-  useEffect(() => {
-    const companyNames = listRec.map((item) => item.companyName)
-
-    // Set the unique company options as the companyOptions state
-    setCompanyOptions(companyNames)
-  }, [listRec])
 
   // Hàm xử lý khi giá trị của Radio.Group thay đổi
   const handleSalaryTypeChange = (e: any) => {
@@ -112,31 +109,6 @@ function AdminManageAddJob() {
       return Promise.resolve()
     }
     return Promise.reject('Số lượng phải là số nguyên dương hoặc chữ o')
-  }
-
-  const onFinish = () => {
-    let formValues = form.getFieldsValue(true)
-
-    if (formValues.salaryRange) {
-      delete formValues.salaryRange
-    }
-
-    if (formValues.startingSalary) {
-      delete formValues.startingSalary
-    }
-
-    console.log(formValues)
-    // toast
-    //   .promise(RecService.createJob(formValues), {
-    //     pending: `Công việc của bạn đang được khởi tạo`,
-    //     success: `Công việc đã được khởi tạo thành công. Hãy chờ đợi để admin xét duyệt`
-    //   })
-    //   .then((response) => {
-    //     navigate('/recruiter/profile/jobsPosted')
-    //   })
-    //   .catch((error) => {
-    //     toast.error(error.response.data.message)
-    //   })
   }
 
   const validateSalary = (_: any, value: string) => {
@@ -183,6 +155,30 @@ function AdminManageAddJob() {
     setSalary(`${min}-${numericValue}`)
   }
 
+  const onFinish = () => {
+    let formValues = form.getFieldsValue(true)
+
+    if (formValues.salaryRange) {
+      delete formValues.salaryRange
+    }
+
+    if (formValues.startingSalary) {
+      delete formValues.startingSalary
+    }
+
+    toast
+      .promise(AdminService.createJob(formValues), {
+        pending: `Công việc đang được khởi tạo`,
+        success: `Công việc đã được khởi tạo thành công.`
+      })
+      .then((response) => {
+        navigate('/admin/manage_jobs')
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message)
+      })
+  }
+
   return (
     <div className='flex flex-col flex-1 gap-4'>
       <div className='w-full p-4'>
@@ -197,13 +193,29 @@ function AdminManageAddJob() {
             onValuesChange={handleFormChange}
             labelCol={{ span: 24 }}
           >
-            <SelectFormItem
-              name='companyName'
-              label='Công ty'
-              requiredMessage='Vui lòng chọn lĩnh vực!'
-              options={companyOptions}
+            <Form.Item
+              name='recruiterId'
+              label='Chọn công ty'
+              rules={[{ required: true, message: 'Vui lòng chọn công ty' }]}
               className='w-full'
-            />
+            >
+              <Select
+                showSearch
+                style={{ width: '100%' }}
+                placeholder={`Chọn tên công ty`}
+                optionFilterProp='children'
+                filterOption={(input, option) =>
+                  option?.children?.toString().toLowerCase().includes(input.toLowerCase()) || false
+                }
+              >
+                {optionsRec.map((option) => (
+                  <Option value={option.value} key={option.value}>
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
             <div className='flex items-center justify-center gap-2'>
               <Form.Item
                 name='name'

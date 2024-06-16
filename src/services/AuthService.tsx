@@ -145,6 +145,33 @@ const withdrawJobApplication = async (jobId: string) => {
   return await axiosInstance.delete(`/candidate/jobs/cancel/${jobId}`)
 }
 
+const getCompanyFavorite = async ({ name = '', page = 1, limit = 10 } = {}) => {
+  const params = new URLSearchParams()
+  if (name) params.append('name', name)
+
+  params.append('page', page.toString())
+  params.append('limit', limit.toString())
+
+  // Chuyển params thành chuỗi để gắn vào URL
+  const queryParams = params.toString()
+
+  return await axiosInstance.get(`/candidate/favorite_recruiters?${queryParams}`)
+}
+
+const deleteFavoriteCompany = async (companyId: any) => {
+  return await axiosInstance.delete(`/candidate/favorite_recruiters/remove/${companyId}`)
+}
+
+const deleteListFavoriteCompany = async (listRecruiterId: any) => {
+  return await axiosInstance.delete('/candidate/favorite_recruiters/remove', {
+    data: { listRecruiterId: listRecruiterId }
+  })
+}
+
+const deleteAllFavoriteCompany = async () => {
+  return await axiosInstance.delete(`/candidate/favorite_recruiters/remove_all`)
+}
+
 export const AuthService = {
   register,
   recRegister,
@@ -161,5 +188,9 @@ export const AuthService = {
   getListResume,
   getResumeDetail,
   getJobApply,
-  withdrawJobApplication
+  withdrawJobApplication,
+  getCompanyFavorite,
+  deleteFavoriteCompany,
+  deleteAllFavoriteCompany,
+  deleteListFavoriteCompany
 }

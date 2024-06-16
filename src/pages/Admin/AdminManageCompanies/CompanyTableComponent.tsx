@@ -10,6 +10,7 @@ interface DataType {
   companyName: string
   field: string[]
   name: string
+  premiumAccount: boolean
 }
 
 interface JobTableProps {
@@ -45,6 +46,9 @@ function CompanyTableComponent({
     setPageSize(newPageSize)
     fetchDataByTab(activeTabKey, page, newPageSize) // Gọi fetchDataByTab với các tham số được update
   }
+
+  const rowClassName = (record: DataType) => (record.premiumAccount ? 'bg-yellow-100 font-bold ' : '')
+
   return (
     <Tabs defaultActiveKey='1' onChange={(activeKey) => fetchDataForTab(activeKey, currentPage, pageSize)}>
       <TabPane tab='Công ty đang hiển thị' key='1'>
@@ -53,6 +57,7 @@ function CompanyTableComponent({
           columns={columns}
           dataSource={activeData}
           size='middle'
+          rowClassName={rowClassName}
           pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
         />
       </TabPane>
@@ -62,6 +67,7 @@ function CompanyTableComponent({
           columns={columns}
           dataSource={activeData}
           size='middle'
+          rowClassName={rowClassName}
           pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
         />
       </TabPane>
@@ -71,6 +77,7 @@ function CompanyTableComponent({
           columns={columns}
           dataSource={activeData}
           size='middle'
+          rowClassName={rowClassName}
           pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
         />
       </TabPane>

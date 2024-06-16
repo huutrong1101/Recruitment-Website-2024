@@ -19,7 +19,7 @@ function RecCard({ rec }: RecCardProps) {
         </div>
       )}
       <img src={rec.companyLogo} alt='' className='object-contain w-16 h-16 mb-2' />
-      <p className='text-center text-base font-semibold min-h-[3rem] flex items-center justify-center'>
+      <p className='text-center text-sm font-semibold min-h-[3rem] flex items-center justify-center limited-lines'>
         {rec.companyName}
       </p>
     </Link>

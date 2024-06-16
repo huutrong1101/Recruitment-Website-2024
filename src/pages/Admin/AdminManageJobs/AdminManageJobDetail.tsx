@@ -20,6 +20,7 @@ function AdminManageJobDetail() {
   const { jobId } = useParams()
 
   const { jobDetail } = useAppSelector((state) => state.AdminSlice)
+  const [isLoading, setIsLoading] = useState(true)
 
   const [jobInformation, setJobInformation] = useState([
     { icon: <UserIcon />, name: 'Loại hình công việc', value: '' },
@@ -44,9 +45,19 @@ function AdminManageJobDetail() {
   ])
 
   useEffect(() => {
-    if (jobId) {
-      AdminService.getJobDetail(dispatch, jobId)
+    const fetchDetails = async () => {
+      setIsLoading(true)
+      try {
+        if (jobId) {
+          await AdminService.getJobDetail(dispatch, jobId)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
+    fetchDetails()
   }, [dispatch, jobId])
 
   useEffect(() => {
@@ -81,18 +92,20 @@ function AdminManageJobDetail() {
     }
   }, [jobDetail])
 
-  console.log(jobDetail)
-
   return (
     <>
-      {jobDetail ? (
+      {isLoading ? (
+        <div className='flex justify-center items-center my-4 min-h-[70vh]'>
+          <Spin size='large' />
+        </div>
+      ) : jobDetail ? (
         <>
           <JobDescriptionWidget job={jobDetail} role='admin' />
           <JobDetailWidget job={jobDetail} jobInformation={jobInformation} />
         </>
       ) : (
-        <div className='flex justify-center items-center my-4 min-h-[70vh]'>
-          <Spin size='large' />
+        <div className='flex items-center justify-center w-full'>
+          <p>Không tìm thấy công việc phù hợp</p>
         </div>
       )}
     </>

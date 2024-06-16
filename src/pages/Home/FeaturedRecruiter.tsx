@@ -41,14 +41,6 @@ export default function FeaturedRecruiter() {
               <SwiperSlide key={item._id}>
                 <RecCard rec={item} />
               </SwiperSlide>
-
-              <SwiperSlide key={item._id}>
-                <RecCard rec={item} />
-              </SwiperSlide>
-
-              <SwiperSlide key={item._id}>
-                <RecCard rec={item} />
-              </SwiperSlide>
             </>
           ))}
         </Swiper>

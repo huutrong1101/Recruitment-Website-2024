@@ -12,6 +12,7 @@ import { Avatar, Breadcrumb, Layout, Menu, theme } from 'antd'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { authLogout } from '../../redux/reducer/AuthSlice'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
+import { AdminService } from '../../services/AdminService'
 
 const { Header, Content, Footer, Sider } = Layout
 
@@ -36,6 +37,12 @@ function ManagementAppLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    AdminService.getTotalCandidate(dispatch)
+    AdminService.getTotalRecruiter(dispatch)
+    AdminService.getTotalJob(dispatch)
+  }, [])
 
   const handleLogout = () => {
     dispatch(authLogout())
@@ -98,7 +105,7 @@ function ManagementAppLayout() {
               <Outlet />
             </div>
           </Content>
-          <Footer style={{ textAlign: 'center' }}>Ant Design ©{new Date().getFullYear()} Created by Ant UED</Footer>
+          <Footer style={{ textAlign: 'center' }}>HỆ THỐNG TUYỂN DỤNG CAREERHUB</Footer>
         </Layout>
       </Layout>
     </div>

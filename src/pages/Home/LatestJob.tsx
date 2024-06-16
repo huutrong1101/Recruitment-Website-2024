@@ -14,7 +14,6 @@ export default function LatestJob() {
       </div>
 
       <div className='flex flex-wrap -mx-4 mt-[10px]'>
-        {/* <!-- Card --> */}
         {jobs &&
           jobs.slice(0, 6).map((job) => (
             <div key={job._id} className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
@@ -25,7 +24,7 @@ export default function LatestJob() {
 
       <div className={classNames('flex items-center justify-center')}>
         <Link to='/jobs' className={classNames('bg-emerald-500 text-white p-3 rounded-md flex')}>
-          Xem thêm
+          Xem thêm việc làm mới nhất
         </Link>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { ArrowPathIcon, Cog6ToothIcon, PencilSquareIcon } from '@heroicons/react
 import { Modal, Tooltip } from 'antd'
 import { toast } from 'react-toastify'
 import { UserService } from '../../services/UserService'
+import classNames from 'classnames'
 
 interface ResumeCardProps {
   resume: ResumeResponse
@@ -41,7 +42,12 @@ function CandidateCardCV({ resume }: ResumeCardProps) {
   }
 
   return (
-    <div className='flex flex-col border rounded-xl'>
+    <div
+      className={classNames('flex flex-col border rounded-xl', {
+        'border-2 border-yellow-400 bg-yellow-50': resumeData.allowSearch,
+        'border hover:border-emerald-500': !resumeData.allowSearch
+      })}
+    >
       <div className='flex items-center justify-end gap-2 px-4 py-2 border-b border-b-zinc-200'>
         <Tooltip title='Đổi trạng thái'>
           <button className='flex items-center gap-1 p-2 border rounded-md' onClick={showModal}>

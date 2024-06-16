@@ -98,6 +98,7 @@ export default function JobInformationApplyModal({
   const handlePageChange = (page: number, pageSize?: number) => {
     setCurrentPage(page)
     setPageSize(pageSize || 5)
+    setLoading(true)
   }
 
   return (
@@ -147,7 +148,7 @@ export default function JobInformationApplyModal({
         </div>
 
         <div>
-          {resumeListLoadingState ? (
+          {loading ? (
             <div className={`flex flex-row items-center justify-center text-3xl`}>
               <LoadSpinner />
             </div>

@@ -16,7 +16,7 @@ function ListCandidateApply() {
 
   const [candidateName, setCandidateName] = useState('')
   const [workExperience, setWorkExperience] = useState<string | undefined>(undefined)
-  const [careerGoal, setCareerGoal] = useState('')
+  const [timeSubmit, setTimeSubmit] = useState<string | undefined>(undefined)
   const [fieldOfStudy, setFieldOfStudy] = useState<string | undefined>(undefined)
   const [resumeStatusSeleted, setResumeStatusSeleted] = useState<string | undefined>(undefined)
   const [currentPage, setCurrentPage] = useState(1)
@@ -25,14 +25,16 @@ function ListCandidateApply() {
   const [loading, setLoading] = useState(false)
   const [name, setName] = useState('')
   const [levelRequirement, setLevelRequirement] = useState('')
-  const [numOfCVs, setNumOfCVs] = useState(0)
 
   const resumeStatus = useAppSelector((state) => state.RecJobs.listResumeStatus)
   const resumeExperience = useAppSelector((state) => state.RecJobs.listExperienceJobApplication)
+  const majors = useAppSelector((state) => state.Job.majors)
+
   const [listResume, setListResume] = useState([])
 
   const optionsResumeExperience = resumeExperience.map((option) => ({ value: option, label: option }))
   const optionsResumeStatus = resumeStatus.map((option) => ({ value: option, label: option }))
+  const optionsMajors = majors.map((option) => ({ value: option, label: option }))
 
   useEffect(() => {
     if (jobid) {
@@ -40,8 +42,6 @@ function ListCandidateApply() {
       RecService.getListExperienceJobApplication(dispatch, jobid)
     }
   }, [])
-
-  console.log(listResume)
 
   useEffect(() => {
     fetchListResume(currentPage, pageSize)
@@ -83,17 +83,12 @@ function ListCandidateApply() {
   }
 
   const handleSearch = () => {
-    console.log('Họ tên ứng viên:', candidateName)
-    console.log('Kinh nghiệm làm việc:', workExperience)
-    console.log('Mục tiêu nghề nghiệp:', careerGoal)
-    console.log('Ngành học:', fieldOfStudy)
-
     const searchParams = {
       candidateName,
       experience: workExperience,
       status: resumeStatusSeleted,
       major: fieldOfStudy,
-      goal: careerGoal
+      timeSubmit: timeSubmit
     }
 
     fetchListResume(currentPage, pageSize, searchParams)
@@ -102,8 +97,8 @@ function ListCandidateApply() {
   const handleResetFilters = () => {
     setFieldOfStudy(undefined)
     setCandidateName('')
-    setWorkExperience('')
-    setCareerGoal('')
+    setWorkExperience(undefined)
+    setTimeSubmit(undefined)
     setResumeStatusSeleted(undefined)
 
     fetchListResume(currentPage, pageSize, {})
@@ -125,8 +120,6 @@ function ListCandidateApply() {
     XLSX.utils.book_append_sheet(wb, ws, 'Ứng viên')
     XLSX.writeFile(wb, 'danh_sach_ung_vien.xlsx')
   }
-
-  console.log(listResume)
 
   return (
     <div className='flex flex-col flex-1 gap-4'>
@@ -153,15 +146,15 @@ function ListCandidateApply() {
               setCandidateName={setCandidateName}
               workExperience={workExperience}
               setWorkExperience={setWorkExperience}
-              careerGoal={careerGoal}
-              setCareerGoal={setCareerGoal}
+              timeSubmit={timeSubmit}
+              setTimeSubmit={setTimeSubmit}
               fieldOfStudy={fieldOfStudy}
               setFieldOfStudy={setFieldOfStudy}
               resumeStatusSeleted={resumeStatusSeleted}
               setResumeStatusSeleted={setResumeStatusSeleted}
               handleSearch={handleSearch}
               handleResetFilters={handleResetFilters}
-              optionsResumeExperience={optionsResumeExperience}
+              optionsMajors={optionsMajors}
               optionsResumeStatus={optionsResumeStatus}
             />
           </div>
@@ -183,6 +176,14 @@ function ListCandidateApply() {
                 setPageSize(pageSize)
                 fetchListResume(page, pageSize)
               }}
+              showSizeChanger
+              onShowSizeChange={(page, pageSize) => {
+                setCurrentPage(page)
+                setPageSize(pageSize)
+                fetchListResume(page, pageSize)
+              }}
+              pageSizeOptions={['5', '10', '20', '30', '50']}
+              locale={{ items_per_page: ' / trang' }}
             />
           </div>
         </div>

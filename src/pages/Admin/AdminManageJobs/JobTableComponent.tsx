@@ -49,7 +49,6 @@ function JobTableComponent({
     fetchDataByTab(activeTabKey, page, newPageSize)
   }
 
-  // Thêm class TailwindCSS để làm nổi bật các job với trạng thái premiumAccount
   const rowClassName = (record: DataType) => (record.premiumAccount ? 'bg-yellow-100 font-bold ' : '')
 
   return (

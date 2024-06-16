@@ -4,20 +4,24 @@ import { set } from 'lodash'
 
 const initialState = {
   jobs: [],
+  highlightedJobs: [],
   jobDetail: null,
   jobFavorite: [],
   postion: [],
   location: [],
   workStatus: [],
 
+  majors: [],
   activities: [],
   type: [],
   province: [],
   experience: [],
   levelRequirement: [],
   genderRequirement: [],
+  english: [],
 
   totalJobs: 0,
+  totalHighlightedJobs: 0,
   jobsStatus: STATUS.IDLE
 }
 
@@ -31,11 +35,20 @@ const JobSlice = createSlice({
     setTotalJobs(state, action) {
       state.totalJobs = action.payload
     },
+    setHighlightedJobs(state, action) {
+      state.highlightedJobs = action.payload
+    },
+    setTotalHighlightedJobs(state, action) {
+      state.totalHighlightedJobs = action.payload
+    },
     setJobsStatus(state, action) {
       state.jobsStatus = action.payload
     },
     setPosition(state, action) {
       state.postion = action.payload
+    },
+    setMojors(state, action) {
+      state.majors = action.payload
     },
     setType(state, action) {
       state.type = action.payload
@@ -66,6 +79,9 @@ const JobSlice = createSlice({
     },
     setJobFavorite(state, action) {
       state.jobFavorite = action.payload
+    },
+    setEnglish(state, action) {
+      state.english = action.payload
     }
   }
 })
@@ -84,7 +100,11 @@ export const {
   setGenderRequirement,
   setJobDetail,
   setWorkStatus,
-  setJobFavorite
+  setJobFavorite,
+  setHighlightedJobs,
+  setTotalHighlightedJobs,
+  setMojors,
+  setEnglish
 } = JobSlice.actions
 
 export default JobSlice.reducer

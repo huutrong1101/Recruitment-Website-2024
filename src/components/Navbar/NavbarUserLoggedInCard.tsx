@@ -187,7 +187,7 @@ export default function NavbarUserLoggedInCard() {
             <div className='flex items-center justify-center rounded-full cursor-pointer w-14 h-14 bg-slate-100'>
               <BellOutlined className='text-xl text-emerald-500' />
               {unreadNotificationsCount > 0 && (
-                <span className='absolute flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-600 rounded-full -top-2 -right-2'>
+                <span className='absolute flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-600 rounded-full -top-1 -right-1'>
                   {unreadNotificationsCount}
                 </span>
               )}

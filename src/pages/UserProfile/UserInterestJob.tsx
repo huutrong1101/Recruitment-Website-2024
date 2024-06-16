@@ -1,5 +1,5 @@
 import { ArrowRightIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { Button, Table, TableColumnsType } from 'antd'
+import { Button, Table, TableColumnsType, Tooltip } from 'antd'
 import Search, { SearchProps } from 'antd/es/input/Search'
 import classnames from 'classnames'
 import React, { useEffect, useState } from 'react'
@@ -25,54 +25,6 @@ interface Props {
   handleNavigateToJobPage: (key: React.Key) => void
 }
 
-const columns = (props: Props): TableColumnsType<DataType> => [
-  {
-    title: 'STT',
-    dataIndex: 'index',
-    className: 'border border-gray-200'
-  },
-  {
-    title: 'TÊN CÔNG VIỆC',
-    dataIndex: 'jobName',
-    className: 'border border-gray-200'
-  },
-  {
-    title: 'VỊ TRÍ CÔNG VIỆC',
-    dataIndex: 'jobPosition',
-    className: 'border border-gray-200'
-  },
-  {
-    title: 'TÊN CÔNG TY',
-    dataIndex: 'companyName',
-    className: 'border border-gray-200'
-  },
-  {
-    title: 'NGÀY HẾT HẠN',
-    dataIndex: 'date',
-    className: 'border border-gray-200'
-  },
-  {
-    title: 'HÀNH ĐỘNG',
-    render: (_, record) => (
-      <div className='flex items-center gap-2 '>
-        <button
-          className='p-1 text-white bg-red-500 rounded-md hover:bg-red-700'
-          onClick={() => props.handleDeleteFavorite(record.key)}
-        >
-          <TrashIcon className='w-5 h-5' />
-        </button>
-        <button
-          className='p-1 text-white rounded-md bg-emerald-500 hover:bg-emerald-700'
-          onClick={() => props.handleNavigateToJobPage(record.key)}
-        >
-          <ArrowRightIcon className='w-5 h-5' />
-        </button>
-      </div>
-    ),
-    className: 'border border-gray-200'
-  }
-]
-
 function UserInterestJob() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
@@ -82,11 +34,13 @@ function UserInterestJob() {
   const [isModalDeleteAllVisible, setIsModalDeleteAllVisible] = useState(false)
   const [deleteJobKey, setDeleteJobKey] = useState<React.Key | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(5) // Giả sử mỗi trang có 10 công việc
+  const [pageSize, setPageSize] = useState(5)
   const [activeData, setActiveData] = useState<DataType[]>([])
   const [totalElement, setTotalElement] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
   useEffect(() => {
     fetchJobs(currentPage, pageSize, searchTerm)
@@ -110,6 +64,41 @@ function UserInterestJob() {
       setLoading(false) // Khi hoàn thành hoặc có lỗi, dừng spinner loading
     }
   }
+
+  const columns = (props: Props): TableColumnsType<DataType> => [
+    {
+      title: 'STT',
+      dataIndex: 'index',
+      className: 'border border-gray-200'
+    },
+    {
+      title: 'TÊN CÔNG VIỆC',
+      dataIndex: 'jobName',
+      className: 'border border-gray-200',
+      render: (text: string, record: DataType) => (
+        <Tooltip title='Xem chi tiết'>
+          <a className='font-medium' onClick={() => handleNavigateToJobPage(record.key)}>
+            {text}
+          </a>
+        </Tooltip>
+      )
+    },
+    {
+      title: 'VỊ TRÍ CÔNG VIỆC',
+      dataIndex: 'jobPosition',
+      className: 'border border-gray-200'
+    },
+    {
+      title: 'TÊN CÔNG TY',
+      dataIndex: 'companyName',
+      className: 'border border-gray-200'
+    },
+    {
+      title: 'NGÀY HẾT HẠN',
+      dataIndex: 'date',
+      className: 'border border-gray-200'
+    }
+  ]
 
   const showModal = (key: React.Key) => {
     setDeleteJobKey(key)
@@ -165,7 +154,7 @@ function UserInterestJob() {
   const convertJobsToTableData = (jobs: JobInterface[]): DataType[] => {
     return jobs.map((job, index) => ({
       key: job._id,
-      index: index + 1, // Hoặc một số thứ tự tùy chỉnh nếu bạn muốn
+      index: (currentPage - 1) * pageSize + index + 1,
       jobName: job.name,
       jobPosition: job.levelRequirement, // Hoặc trường thông tin trí vị trí công việc nếu có
       companyName: job.companyName,
@@ -185,6 +174,26 @@ function UserInterestJob() {
     fetchJobs(currentPage, pageSize, value)
   }
 
+  const handleBatchDelete = () => {
+    const jobIdsAsString = selectedRowKeys.map((key) => String(key))
+    toast
+      .promise(UserService.deleteListFavoriteJob(jobIdsAsString), {
+        pending: `Các công việc đang được xóa khỏi danh sách`,
+        success: `Xóa công việc thành công`
+      })
+      .then(() => {
+        fetchJobs(currentPage, pageSize, searchTerm)
+      })
+      .catch((error) => toast.error(error.response.data.message))
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedKeys: React.Key[]) => {
+      setSelectedRowKeys(selectedKeys)
+    }
+  }
+
   return (
     <div className={`px-4 py-4 bg-zinc-100 mt-2 rounded-xl flex flex-col gap-2 flex-1`}>
       <div className={classnames(`flex flex-col gap-4`)}>
@@ -200,13 +209,42 @@ function UserInterestJob() {
           </div>
         </div>
         <div>
+          {selectedRowKeys.length > 0 ? (
+            <div className='flex items-center justify-between w-full mb-3'>
+              {selectedRowKeys.length > 0 && (
+                <p>
+                  Bạn đã chọn <span className='font-bold text-red-500'>{selectedRowKeys.length}</span> công việc
+                </p>
+              )}
+
+              <Button type='primary' disabled={!selectedRowKeys.length} onClick={handleBatchDelete}>
+                Xóa những mục đã chọn
+              </Button>
+            </div>
+          ) : (
+            <div className='flex items-center justify-end w-full mb-3'>
+              <Button type='primary' disabled={!selectedRowKeys.length} onClick={handleBatchDelete}>
+                Xóa những mục đã chọn
+              </Button>
+            </div>
+          )}
           <Table
             className='border border-gray-200'
             columns={columns({ handleDeleteFavorite, handleNavigateToJobPage })}
             dataSource={activeData}
             size='middle'
             loading={loading}
-            pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
+            rowSelection={rowSelection}
+            pagination={{
+              current: currentPage,
+              pageSize: pageSize,
+              onChange: handlePageChange,
+              onShowSizeChange: handlePageChange,
+              total: totalElement,
+              showSizeChanger: true,
+              pageSizeOptions: ['5', '10', '20', '30', '50'],
+              locale: { items_per_page: ' / trang' }
+            }}
           />
         </div>
       </div>

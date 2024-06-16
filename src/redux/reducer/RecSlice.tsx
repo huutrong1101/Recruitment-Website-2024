@@ -94,9 +94,9 @@ export const fetchListWatingJobs = createAsyncThunk('listJobs/fetchListWatingJob
   return response.data.metadata.listWaitingJob
 })
 
-export const checkFavoriteRec = createAsyncThunk('JobDetail/checkFavoriteJob', async ({ recId }: any, thunkAPI) => {
+export const checkFavoriteRec = createAsyncThunk('JobDetail/checkFavoriteJob', async ({ slug }: any, thunkAPI) => {
   try {
-    const isUserFavoritedToTheRec = await RecService.getIfUserFavoriteTheRec(recId)
+    const isUserFavoritedToTheRec = await RecService.getIfUserFavoriteTheRec(slug)
     thunkAPI.dispatch(setIsRecFavorite(isUserFavoritedToTheRec.data.metadata.exist))
   } catch (e) {
     thunkAPI.rejectWithValue(`Failed to fetch a job`)

@@ -1,42 +1,25 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { Typography, Card, CardHeader, CardBody, CardFooter } from '@material-tailwind/react'
-import Chart from 'react-apexcharts'
+import { Line } from '@ant-design/charts'
 
-const StatisticsChart = ({ color, chart, title, description }: any) => {
-  return (
-    <Card>
-      <CardHeader variant='gradient' className={color}>
-        <Chart {...chart} />
-      </CardHeader>
-      <CardBody className='p-6'>
-        <Typography variant='h6' color='blue-gray'>
-          {title}
-        </Typography>
-        <Typography variant='small' className='font-normal text-blue-gray-600'>
-          {description}
-        </Typography>
-      </CardBody>
-    </Card>
-  )
-}
+const StatisticsChart = () => {
+  const data = [
+    { year: '1991', value: 3 },
+    { year: '1992', value: 4 },
+    { year: '1993', value: 3.5 },
+    { year: '1994', value: 5 },
+    { year: '1995', value: 4.9 },
+    { year: '1996', value: 6 },
+    { year: '1997', value: 7 },
+    { year: '1998', value: 9 },
+    { year: '1999', value: 13 }
+  ]
 
-StatisticsChart.propTypes = {
-  color: PropTypes.string.isRequired,
-  chart: PropTypes.shape({
-    type: PropTypes.string.isRequired,
-    height: PropTypes.number.isRequired,
-    series: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        data: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired
-      }).isRequired
-    ).isRequired,
-    options: PropTypes.object.isRequired
-  }).isRequired,
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  footer: PropTypes.string
+  const props = {
+    data,
+    xField: 'year',
+    yField: 'value'
+  }
+
+  return <Line {...props} />
 }
 
 export default StatisticsChart

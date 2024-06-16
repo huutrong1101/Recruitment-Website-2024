@@ -143,7 +143,7 @@ export default function JobCard({ job, isShow }: JobCardProps) {
                       </div>
                     </Tooltip>
                   </div>
-                  <p className='text-xs font-medium text-gray-600 md:text-sm '>
+                  <p className='text-xs font-medium text-gray-600 truncate md:text-sm'>
                     <span className='font-bold'>Tên công ty:</span>{' '}
                     <span className='hover:text-emerald-500'>{job.companyName}</span>
                   </p>
@@ -174,7 +174,7 @@ export default function JobCard({ job, isShow }: JobCardProps) {
                     </h3>
                   </Link>
 
-                  <p className='text-xs font-medium text-gray-600 md:text-sm'>CÔNG TY TNHH TUỆ LINH</p>
+                  <p className='text-xs font-medium text-gray-600 truncate md:text-sm'>{job.companyName}</p>
                   <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-2'>
                       <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>

@@ -8,14 +8,13 @@ import Container from '../Container/Container'
 import LoadSpinner from '../LoadSpinner/LoadSpinner'
 import MobileNavbar from './MobileNavbar'
 import NavbarUserLoggedInCard from './NavbarUserLoggedInCard'
-import { DownOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
-import { Dropdown, Space } from 'antd'
+import { Dropdown, Space, Spin } from 'antd'
 import './styles/Navbar.css'
 import { AcademicCapIcon, UserIcon } from '@heroicons/react/24/outline'
 
 export default function Navbar() {
-  useTokenAuthorize()
+  // useTokenAuthorize()
 
   const { items } = useAppSelector((app) => app.Navbar)
   const { isLoggedIn, loading, user } = useAppSelector((app) => app.Auth)
@@ -101,7 +100,7 @@ export default function Navbar() {
 
           {/* Right items */}
           {loading === 'pending' ? (
-            <LoadSpinner className='text-zinc-400' />
+            <Spin className='text-zinc-400' />
           ) : loading === `success` ? (
             !isLoggedIn ? (
               <div className={classNames(`flex flex-row gap-4`)}>

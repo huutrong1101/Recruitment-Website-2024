@@ -4,9 +4,9 @@ import Container from '../../components/Container/Container'
 import InterestJobs from './InterestJobs'
 import LatestJob from './LatestJob'
 import FeaturedRecruiter from './FeaturedRecruiter'
-import Blog from './Blog'
 import Select from './Select'
 import { useAppSelector } from '../../hooks/hooks'
+import Blog from './Blog'
 
 export default function Home() {
   const { isLoggedIn } = useAppSelector((state) => state.Auth)

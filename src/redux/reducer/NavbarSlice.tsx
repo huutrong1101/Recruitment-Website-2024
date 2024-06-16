@@ -12,8 +12,8 @@ const initialState = {
       url: '/recruiters'
     },
     {
-      name: 'Blog',
-      url: '/events'
+      name: 'Cẩm nang nghề nghiệp',
+      url: '/news'
     }
   ],
   menu: {

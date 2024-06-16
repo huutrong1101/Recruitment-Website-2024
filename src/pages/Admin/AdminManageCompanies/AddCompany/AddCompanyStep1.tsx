@@ -129,7 +129,7 @@ function AddCompanyStep1({ form, onFormChange, nextStep, onFieldOfActivityChange
       <div className='flex items-center justify-center gap-2'>
         <Form.Item
           label='Email đăng nhập'
-          name='emailLogin'
+          name='email'
           rules={[
             {
               type: 'email',

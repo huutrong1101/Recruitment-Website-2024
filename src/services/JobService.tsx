@@ -6,13 +6,16 @@ import {
   setActivity,
   setExperience,
   setGenderRequirement,
+  setHighlightedJobs,
   setJobDetail,
   setJobs,
   setJobsStatus,
   setLevelRequirement,
   setLocation,
+  setMojors,
   setPosition,
   setProvince,
+  setTotalHighlightedJobs,
   setTotalJobs,
   setType
 } from '../redux/reducer/JobSlice'
@@ -56,6 +59,63 @@ async function getJobs(
     const totalJobs = response.data.metadata.totalElement
     dispatch(setJobs(data))
     dispatch(setTotalJobs(totalJobs))
+    dispatch(setJobsStatus(STATUS.IDLE))
+  } catch (error) {
+    dispatch(setJobsStatus(STATUS.ERROR))
+  }
+}
+
+async function getHighlightedJobs(
+  dispatch: Dispatch,
+  {
+    name = '',
+    province = '',
+    type = '',
+    levelRequirement = '',
+    experience = '',
+    field = '',
+    genderRequirement = '',
+    page = 1,
+    limit = 10
+  } = {}
+) {
+  dispatch(setJobsStatus(STATUS.LOADING))
+  try {
+    const params = new URLSearchParams()
+
+    if (name) params.append('name', name)
+    if (province) params.append('province', province)
+    if (type) params.append('type', type)
+    if (levelRequirement) params.append('levelRequirement', levelRequirement)
+    if (experience) params.append('experience', experience)
+    if (field) params.append('field', field)
+    if (genderRequirement) params.append('genderRequirement', genderRequirement)
+
+    params.append('page', page.toString())
+    params.append('limit', limit.toString())
+
+    const queryParams = params.toString()
+
+    const response = await axiosInstance.get(`/highlighted_jobs?${queryParams}`, {
+      headers: { Authorization: null }
+    })
+
+    const data = response.data.metadata.listJob
+    const totalJobs = response.data.metadata.totalElement
+    dispatch(setHighlightedJobs(data))
+    dispatch(setTotalHighlightedJobs(totalJobs))
+    dispatch(setJobsStatus(STATUS.IDLE))
+  } catch (error) {
+    dispatch(setJobsStatus(STATUS.ERROR))
+  }
+}
+
+async function getMajor(dispatch: Dispatch) {
+  dispatch(setJobsStatus(STATUS.LOADING))
+  try {
+    const response = await axiosInstance.get('majors')
+    const data = response.data.metadata.ListMajor
+    dispatch(setMojors(data))
     dispatch(setJobsStatus(STATUS.IDLE))
   } catch (error) {
     dispatch(setJobsStatus(STATUS.ERROR))
@@ -178,5 +238,7 @@ export const JobService = {
   getExperience,
   getLevelRequirement,
   getGenderRequirement,
-  getIfUserFavoriteTheJob
+  getIfUserFavoriteTheJob,
+  getHighlightedJobs,
+  getMajor
 }

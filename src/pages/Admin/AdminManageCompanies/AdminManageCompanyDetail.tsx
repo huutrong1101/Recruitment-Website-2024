@@ -12,22 +12,28 @@ import {
 import GoogleMapReact from 'google-map-react'
 import GooglePlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-google-places-autocomplete'
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { AdminService } from '../../../services/AdminService'
 import parse from 'html-react-parser'
 import { Modal, Radio, Spin } from 'antd'
 import { toast } from 'react-toastify'
+import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
 
 const AnyReactComponent = (props: { lat: number; lng: number; text: React.ReactNode }) => <div>{props.text}</div>
 
 function AdminManageCompanyDetail() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const { companyId } = useParams()
 
   const { companyDetail } = useAppSelector((state) => state.AdminSlice)
   const [coords, setCoords] = useState({ lat: 0, lng: 0 })
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [approvalStatus, setApprovalStatus] = useState('approve')
+  const [showFullDescription, setShowFullDescription] = useState(false)
+  const [shortenedDescription, setShortenedDescription] = useState('')
+  const [showMoreButton, setShowMoreButton] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchCoords = async () => {
@@ -42,17 +48,43 @@ function AdminManageCompanyDetail() {
       }
     }
 
+    if (companyDetail && companyDetail.about) {
+      const fullDescription = companyDetail.about
+      const shortened = truncate(fullDescription, 167)
+      setShortenedDescription(shortened)
+      setShowMoreButton(fullDescription.length > 167)
+    }
+
     fetchCoords()
   }, [companyDetail])
 
   useEffect(() => {
-    if (companyId) {
-      AdminService.getCompanyDetail(dispatch, companyId)
+    const fetchDetails = async () => {
+      setIsLoading(true)
+      try {
+        if (companyId) {
+          await AdminService.getCompanyDetail(dispatch, companyId)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
+    fetchDetails()
   }, [dispatch, companyId])
 
   const showModal = () => {
     setIsModalVisible(true)
+  }
+
+  const truncate = (text: string, maxLength: number) => {
+    const words = text.split(' ')
+    if (words.length > maxLength) {
+      return words.slice(0, maxLength).join(' ') + '...'
+    } else {
+      return text
+    }
   }
 
   const handleOk = () => {
@@ -73,11 +105,21 @@ function AdminManageCompanyDetail() {
     setIsModalVisible(false)
   }
 
-  console.log(companyDetail)
+  const handleNavigateEdit = () => {
+    navigate(`/admin/manage_companies/editCompany/${companyDetail?._id}`)
+  }
+
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription)
+  }
 
   return (
     <>
-      {companyDetail ? (
+      {isLoading ? (
+        <div className='flex justify-center items-center my-4 min-h-[70vh]'>
+          <Spin size='large' />
+        </div>
+      ) : companyDetail ? (
         <>
           <div className='flex flex-col gap-12 md:flex-row'>
             <div
@@ -120,7 +162,7 @@ function AdminManageCompanyDetail() {
                   <div className='flex items-center gap-2'>
                     <button
                       className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
-                      onClick={showModal}
+                      onClick={handleNavigateEdit}
                     >
                       CHỈNH SỬA
                     </button>
@@ -163,7 +205,28 @@ function AdminManageCompanyDetail() {
                 <div className='flex flex-col gap-8 p-6'>
                   <div>
                     <h1 className='text-xl font-semibold capitalize'>Giới thiệu công ty</h1>
-                    <p className='pl-3 mt-2 whitespace-pre-line'>{parse(companyDetail.about)}</p>
+                    <div>
+                      {showFullDescription ? (
+                        <div>{companyDetail && parse(companyDetail.about)}</div>
+                      ) : (
+                        <div>{parse(shortenedDescription)}</div>
+                      )}
+                      {showMoreButton && (
+                        <button onClick={toggleDescription} className='mt-2 text-emerald-500'>
+                          {showFullDescription ? (
+                            <div className='flex items-center gap-1'>
+                              <p>Rút gọn</p>
+                              <ArrowUpOutlined />
+                            </div>
+                          ) : (
+                            <div className='flex items-center gap-1'>
+                              <p>Xem thêm</p>
+                              <ArrowDownOutlined />
+                            </div>
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <h1 className='text-xl font-semibold capitalize'>Lĩnh vực hoạt động</h1>
@@ -231,8 +294,8 @@ function AdminManageCompanyDetail() {
           </div>
         </>
       ) : (
-        <div className='flex items-center justify-center'>
-          <Spin size='large' />
+        <div className='flex items-center justify-center w-full'>
+          <p>Không tìm thấy công ty phù hợp</p>
         </div>
       )}
     </>

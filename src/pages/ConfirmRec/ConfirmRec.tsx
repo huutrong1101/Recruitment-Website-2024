@@ -195,6 +195,7 @@ function ConfirmRec() {
     reader.readAsDataURL(file)
     reader.onload = () => callback(reader.result as string)
   }
+
   const handleLogoChange = (info: UploadChangeParam<UploadFile>) => {
     setLogoList(info.fileList) // Update the logoList state
     onUploadChange(info, 'logo') // Handle base64 conversion and preview update
@@ -249,13 +250,7 @@ function ConfirmRec() {
 
       const value = mergedValues[key]
 
-      console.log({ key, value })
-
-      if (key === 'fieldOfActivity' && Array.isArray(value)) {
-        // Chuyển mảng fieldOfActivity thành chuỗi với các phần tử cách nhau bởi dấu phẩy
-        const fieldOfActivityText = value.join(', ')
-        formDataObj.append('fieldOfActivity', fieldOfActivityText)
-      } else if (key !== 'companyLogo' && key !== 'companyCoverPhoto') {
+      if (key !== 'companyLogo' && key !== 'companyCoverPhoto') {
         // Nếu không phải là fieldOfActivity, logo, hoặc ảnh bìa, thêm bình thường.
         formDataObj.append(key, typeof value === 'string' ? value : JSON.stringify(value))
       }

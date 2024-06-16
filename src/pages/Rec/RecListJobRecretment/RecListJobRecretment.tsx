@@ -67,7 +67,14 @@ function RecListJobRecruitment(): JSX.Element {
     {
       title: 'TÊN VIỆC LÀM',
       dataIndex: 'jobName', // Tên trường dữ liệu mà bạn muốn hiển thị
-      key: 'jobName'
+      key: 'jobName',
+      render: (text, record) => (
+        <Tooltip title='Xem chi tiết'>
+          <Link to={`/recruiter/profile/editJob/${record.key}`}>
+            <p className='font-medium'>{record.jobName}</p>
+          </Link>
+        </Tooltip>
+      )
     },
     {
       title: 'VỊ TRÍ CÔNG VIỆC',
@@ -105,30 +112,32 @@ function RecListJobRecruitment(): JSX.Element {
       key: 'status',
       align: 'center',
       render: (text, record) => (
-        <div
-          className={
-            text === 'Kích hoạt'
-              ? 'p-1 text-white bg-emerald-500 cursor-pointer'
-              : 'p-1 text-white bg-red-500 cursor-pointer'
-          }
-          onClick={() => showModal(record)}
-        >
-          {text}
-        </div>
-      )
-    },
-    {
-      title: <Cog6ToothIcon className='w-6 h-6' />,
-      dataIndex: 'action',
-      key: 'action',
-      render: (text, record) => (
-        <Tooltip title='Xem chi tiết'>
-          <Link to={`/recruiter/profile/editJob/${record.key}`}>
-            <Button type='primary' icon={<PencilSquareIcon className='w-4 h-4' />} />
-          </Link>
+        <Tooltip title='Đổi trạng thái'>
+          <div
+            className={
+              text === 'Kích hoạt'
+                ? 'p-1 text-white bg-emerald-500 cursor-pointer'
+                : 'p-1 text-white bg-red-500 cursor-pointer'
+            }
+            onClick={() => showModal(record)}
+          >
+            {text}
+          </div>
         </Tooltip>
       )
     }
+    // {
+    //   title: <Cog6ToothIcon className='w-6 h-6' />,
+    //   dataIndex: 'action',
+    //   key: 'action',
+    //   render: (text, record) => (
+    //     <Tooltip title='Xem chi tiết'>
+    //       <Link to={`/recruiter/profile/editJob/${record.key}`}>
+    //         <Button type='primary' icon={<PencilSquareIcon className='w-4 h-4' />} />
+    //       </Link>
+    //     </Tooltip>
+    //   )
+    // }
   ]
   // Function để chuyển đổi dữ liệu từ API
   const mapApiDataToTableData = (apiData: JobFromApi[]): DataType[] => {
@@ -293,7 +302,6 @@ function RecListJobRecruitment(): JSX.Element {
     setSelectedType(undefined)
     setSearchValue('')
 
-    // Gọi lại hàm lấy dữ liệu ban đầu dựa trên tab hiện tại sau khi đã xóa bộ lọc
     fetchDataByTab(activeTabKey, currentPage, pageSize)
   }
 

@@ -87,32 +87,34 @@ function Recruiters() {
         </button>
       </div>
 
-      {isLoading ? (
-        <div className='flex justify-center my-4 min-h-[70vh] flex-col items-center'>
-          <Spin size='large' />
-        </div>
-      ) : (
-        <div className='flex flex-wrap mt-5 -mx-4'>
-          {listRec && listRec.length > 0 ? (
-            <>
-              {listRec.map((recruiter) => (
-                <div className='flex w-full px-4 mb-8 md:w-1/3' key={recruiter._id}>
-                  <RecuiterCard recruiter={recruiter} />
-                </div>
-              ))}
-            </>
-          ) : (
-            <div className='flex flex-col justify-center w-full mb-10 min-h-[70vh] items-center text-3xl gap-4'>
-              <img
-                src='https://cdni.iconscout.com/illustration/premium/thumb/error-404-4344461-3613889.png'
-                alt=''
-                className='h-[300px]'
-              />
-              <span>Không tìm thấy công ty phù hợp.</span>
-            </div>
-          )}
-        </div>
-      )}
+      <div className='w-full'>
+        {isLoading ? (
+          <div className='flex justify-center my-4 min-h-[70vh]'>
+            <Spin size='large' />
+          </div>
+        ) : (
+          <div className='flex flex-wrap mt-5 -mx-4'>
+            {listRec && listRec.length > 0 ? (
+              <>
+                {listRec.map((recruiter) => (
+                  <div className='flex w-full px-4 mb-8 md:w-1/3' key={recruiter._id}>
+                    <RecuiterCard recruiter={recruiter} />
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className='flex flex-col justify-center w-full mb-10 min-h-[70vh] items-center text-3xl gap-4'>
+                <img
+                  src='https://cdni.iconscout.com/illustration/premium/thumb/error-404-4344461-3613889.png'
+                  alt=''
+                  className='h-[300px]'
+                />
+                <span>Không tìm thấy công ty phù hợp.</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       <div className='flex justify-center mt-2 mb-5'>
         <Pagination current={currentPage} pageSize={pageSize} total={totalRec} onChange={handlePageChange} />

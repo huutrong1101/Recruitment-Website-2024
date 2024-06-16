@@ -26,6 +26,7 @@ import 'react-image-crop/dist/ReactCrop.css'
 import { useDebounceEffect } from './AvatarCrop/useDebounceEffect'
 import { canvasPreview } from './AvatarCrop/canvasPreview'
 import { validatePhone } from '../../utils/validation'
+import dayjs from 'dayjs'
 
 const { Option } = Select
 
@@ -54,6 +55,7 @@ function UserProfileInformation() {
   } = useForm()
 
   const { user, loading } = useAppSelector((app) => app.Auth)
+
   const workStatus = useAppSelector((state) => state.Job.workStatus)
   const dispatch = useAppDispatch()
   const [isUploading, setUploading] = useState<boolean>(false)
@@ -233,7 +235,7 @@ function UserProfileInformation() {
           const result = response.data.metadata
           dispatch(setUser({ ...user, avatar: result.avatar }))
           setUploading(false)
-          setIsModalUploadImage(false) // Đóng modal sau khi cập nhật thành công
+          setIsModalUploadImage(false)
         })
         .catch((error) => {
           toast.error(error.response.data.message)
@@ -309,7 +311,7 @@ function UserProfileInformation() {
               <Form.Item
                 label='Ngày sinh'
                 name='dateOfBirth'
-                initialValue={user && user.dateOfBirth ? moment(user.dateOfBirth) : undefined}
+                initialValue={user && user.dateOfBirth ? dayjs(user.dateOfBirth) : null}
                 rules={[{ required: true, message: 'Không được để trống' }]}
               >
                 <DatePicker

@@ -53,6 +53,7 @@ export interface RecruiterResponseState {
   role: string
   likeNumber: string
   premiumAccount: boolean
+  activeJobCount: number
 }
 
 export interface AdminResponseState {

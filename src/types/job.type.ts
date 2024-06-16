@@ -71,6 +71,18 @@ export interface AdminCompanyInterface {
   companyWebsite: string
   employeeNumber: number
   role: string
+  slug: string
+}
+
+export interface NewInterface {
+  _id: string
+  thumbnail: string
+  name: string
+  type: string
+  content: string
+  status: 'active' | 'inactive'
+  createdAt: string // Consider using Date type if you're parsing these dates
+  updatedAt: string // Consider using Date type if you're parsing these dates
 }
 
 export interface JobListConfig {

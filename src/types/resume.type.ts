@@ -40,4 +40,6 @@ export interface ResumeResponse {
   updatedAt: string
   email: string
   major: string
+  allowSearch: boolean
+  themeId: string
 }

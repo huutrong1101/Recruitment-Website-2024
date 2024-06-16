@@ -112,6 +112,9 @@ const deleteFavoriteJob = async (jobId: any) => {
   return await axiosInstance.delete(`/candidate/favorite_jobs/remove/${jobId}`)
 }
 
+const deleteListFavoriteJob = async (listJobId: string[]) => {
+  return await axiosInstance.delete('/candidate/favorite_jobs/remove', { data: { listJobId: listJobId } })
+}
 const deleteAllFavoriteJob = async () => {
   return await axiosInstance.delete(`/candidate/favorite_jobs/remove_all`)
 }
@@ -149,11 +152,11 @@ const deleteCertification = async (uploadFileUrl: string) => {
 }
 
 const getListNotification = async () => {
-  return await axiosInstance.get(`/candidate/notifications`)
+  return await axiosInstance.get(`/candidate/notifications/list_notification`)
 }
 
 const markNotificationAsRead = async (notiId: string) => {
-  return await axiosInstance.patch(`/candidate/notifications/${notiId}`)
+  return await axiosInstance.patch(`/candidate/notifications/read/${notiId}`)
 }
 
 const changeResumeStatus = async (resumeId: string, status: string) => {
@@ -187,5 +190,6 @@ export const UserService = {
   updateResume,
   getListNotification,
   changeResumeStatus,
-  markNotificationAsRead
+  markNotificationAsRead,
+  deleteListFavoriteJob
 }

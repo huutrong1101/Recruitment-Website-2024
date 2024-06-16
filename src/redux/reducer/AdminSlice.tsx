@@ -1,6 +1,6 @@
 import { Dispatch, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { AdminService } from '../../services/AdminService'
-import { AdminCompanyInterface, AdminJobInterface, JobInterface } from '../../types/job.type'
+import { AdminCompanyInterface, AdminJobInterface, JobInterface, NewInterface } from '../../types/job.type'
 
 interface AdminState {
   listRec: any[]
@@ -11,6 +11,11 @@ interface AdminState {
   jobDetailStatus: string
   companyDetail: AdminCompanyInterface | null
   companyDetailStatus: string
+  newDetail: NewInterface | null
+  newDetailStatus: string
+  totalCandidate: number
+  totalRecruiter: number
+  totalJob: number
 }
 
 const initialState: AdminState = {
@@ -18,10 +23,15 @@ const initialState: AdminState = {
   listRecStatus: 'idle',
   listJobs: [],
   listJobsStatus: 'idle',
-  jobDetail: null, // Ban đầu jobDetail không có dữ liệu
+  jobDetail: null,
   jobDetailStatus: 'idle',
   companyDetail: null,
-  companyDetailStatus: 'idle'
+  companyDetailStatus: 'idle',
+  newDetail: null,
+  newDetailStatus: 'idle',
+  totalCandidate: 0,
+  totalRecruiter: 0,
+  totalJob: 0
 }
 
 const AdminSlice = createSlice({
@@ -39,6 +49,18 @@ const AdminSlice = createSlice({
     },
     setCompanyDetail(state, action) {
       state.companyDetail = action.payload
+    },
+    setNewDetail(state, action) {
+      state.newDetail = action.payload
+    },
+    setTotalCandidate(state, action) {
+      state.totalCandidate = action.payload
+    },
+    setTotalRecruiter(state, action) {
+      state.totalRecruiter = action.payload
+    },
+    setTotalJob(state, action) {
+      state.totalJob = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -64,4 +86,13 @@ export const fetchListJobs = createAsyncThunk(
 )
 
 export default AdminSlice.reducer
-export const { setListRec, setListJobs, setJobDetail, setCompanyDetail } = AdminSlice.actions
+export const {
+  setListRec,
+  setListJobs,
+  setJobDetail,
+  setCompanyDetail,
+  setNewDetail,
+  setTotalCandidate,
+  setTotalRecruiter,
+  setTotalJob
+} = AdminSlice.actions
