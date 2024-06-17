@@ -12,7 +12,7 @@ import axiosInstance from '../utils/AxiosInstance'
 
 const getListRec = async (dispatch: Dispatch) => {
   // No Content-Type header is manually set here
-  const response = await axiosInstance.get(`/admin/recruiters`)
+  const response = await axiosInstance.get(`/admin/recruiters/list_recruiter`)
   const data = response.data.metadata.listRecruiter
   dispatch(setListRec(data))
 }
@@ -42,7 +42,7 @@ const getListJobs = async ({
   // Chuyển params thành chuỗi để gắn vào URL
   const queryParams = params.toString()
 
-  return await axiosInstance.get(`/admin/jobs?${queryParams}`)
+  return await axiosInstance.get(`/admin/jobs/list_job?${queryParams}`)
 }
 
 const getJobDetail = async (dispatch: Dispatch, id: string) => {
@@ -72,7 +72,7 @@ const getListCompany = async ({
   // Chuyển params thành chuỗi để gắn vào URL
   const queryParams = params.toString()
 
-  return await axiosInstance.get(`/admin/recruiters?${queryParams}`)
+  return await axiosInstance.get(`/admin/recruiters/list_recruiter?${queryParams}`)
 }
 
 const getCompanyDetail = async (dispatch: Dispatch, id: string) => {
@@ -160,7 +160,7 @@ const getListNews = async ({ name = '', type = '', status = '', page = 1, limit 
   // Chuyển params thành chuỗi để gắn vào URL
   const queryParams = params.toString()
 
-  return await axiosInstance.get(`/admin/blogs?${params}`)
+  return await axiosInstance.get(`/admin/blogs/list_blog?${params}`)
 }
 
 export const AdminService = {
