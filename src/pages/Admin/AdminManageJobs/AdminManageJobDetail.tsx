@@ -81,7 +81,7 @@ function AdminManageJobDetail() {
         {
           icon: <CurrencyDollarIcon />,
           name: 'Mức lương',
-          value: jobDetail.salary
+          value: formatSalary(jobDetail.salary)
         },
         {
           icon: <ClockIcon />,
@@ -91,6 +91,22 @@ function AdminManageJobDetail() {
       ])
     }
   }, [jobDetail])
+
+  const formatNumber = (number: number): string => {
+    return (number / 1000000).toLocaleString('vi-VN')
+  }
+
+  const formatSalary = (salary: string): string => {
+    if (salary.toLowerCase() === 'thỏa thuận') {
+      return 'Thỏa thuận'
+    } else if (salary.includes('-')) {
+      const [min, max] = salary.split('-').map((s) => parseInt(s, 10))
+      return `${formatNumber(min)} triệu - ${formatNumber(max)} triệu`
+    } else {
+      const amount = parseInt(salary, 10)
+      return `${formatNumber(amount)} triệu`
+    }
+  }
 
   return (
     <>

@@ -23,7 +23,7 @@ const getListJobs = async ({
   levelRequirement = '',
   acceptanceStatus = '',
   companyName = '',
-  page = 1, // mặc định là trang đầu tiên nếu không được cung cấp
+  page = 1,
   limit = 10
 } = {}) => {
   // Tạo đối tượng URLSearchParams mới
@@ -91,7 +91,7 @@ const approveJob = async (id: string, acceptanceStatus: string) => {
   const values = {
     acceptanceStatus: acceptanceStatus
   }
-  return await axiosInstance.patch(`admin/jobs/${id}/approve`, values)
+  return await axiosInstance.patch(`admin/jobs/approve/${id}`, values)
 }
 
 const approveCompany = async (id: string, acceptanceStatus: string) => {

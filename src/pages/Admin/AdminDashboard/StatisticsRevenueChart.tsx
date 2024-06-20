@@ -65,7 +65,7 @@ const StatisticsRevenueChart: React.FC = () => {
   }
 
   return (
-    <div className={`flex flex-col border rounded-xl shadow-md p-4 w-full`}>
+    <div className={`flex flex-col w-full`}>
       <h1 className='font-medium text-center'>Thống kê doanh thu</h1>
       <div className='flex justify-end'>
         <Select defaultValue={selectedYear} onChange={(value) => setSelectedYear(value)}>
