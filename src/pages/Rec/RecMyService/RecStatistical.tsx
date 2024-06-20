@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
-import { Card, Statistic, Row, Col, DatePicker, Spin } from 'antd'
+import { Card, Statistic, Row, Col, DatePicker, Spin, Empty } from 'antd'
 import { RecService } from '../../../services/RecService'
-import { Line } from '@ant-design/charts'
+import { Column, DualAxes } from '@ant-design/charts'
+import dayjs from 'dayjs'
 
-const { RangePicker } = DatePicker
+const { MonthPicker } = DatePicker
 
 interface Statistics {
   totalApplications: number
@@ -22,27 +23,13 @@ interface DailyDetail {
   rejected: number
 }
 
-interface StatisticResponse {
-  message: string
-  status: string
-  statusCode: number
-  metadata: {
-    startDate: string
-    endDate: string
-    totalApplications: number
-    totalSubmitted: number
-    totalAccepted: number
-    totalRejected: number
-    dailyDetails: DailyDetail[]
-  }
-  options: any
+interface DualAxesData {
+  time: string
+  value: number
+  type: 'CV tiếp nhận' | 'CV được chấp nhận' | 'CV bị từ chối'
 }
 
-interface ChartData {
-  day: string
-  category: 'Total Applications' | 'Submitted' | 'Accepted' | 'Rejected'
-  value: number
-}
+type CvStatus = 'CV tiếp nhận' | 'CV được chấp nhận' | 'CV bị từ chối'
 
 function RecStatistical() {
   const navigate = useNavigate()
@@ -52,34 +39,67 @@ function RecStatistical() {
     totalAccepted: 0,
     totalRejected: 0
   })
-  const [chartData, setChartData] = useState<ChartData[]>([])
+  const [chartData, setChartData] = useState<DualAxesData[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs>(dayjs())
 
-  const transformDataForChart = (dailyDetails: DailyDetail[]): ChartData[] => {
-    return dailyDetails.flatMap((detail) => [
-      { day: detail.day, category: 'Total Applications', value: detail.totalApplications },
-      { day: detail.day, category: 'Submitted', value: detail.submitted },
-      { day: detail.day, category: 'Accepted', value: detail.accepted },
-      { day: detail.day, category: 'Rejected', value: detail.rejected }
-    ])
+  const colorMapping: Record<CvStatus, string> = {
+    'CV tiếp nhận': '#68D391',
+    'CV được chấp nhận': '#63B3ED',
+    'CV bị từ chối': '#FC8181'
+  }
+
+  const maxValue = chartData.reduce((max, item) => Math.max(max, item.value), 0)
+  const domainMax = Math.ceil(maxValue + maxValue * 0.1) + 1
+
+  const transformDataForChart = (dailyDetails: DailyDetail[], month: string, year: string): DualAxesData[] => {
+    const submitted = dailyDetails
+      .filter((detail) => detail.submitted !== 0)
+      .map((detail) => ({
+        time: `${year}-${month}-${detail.day.toString().padStart(2, '0')}`,
+        value: detail.submitted,
+        type: 'CV tiếp nhận' as 'CV tiếp nhận'
+      }))
+
+    const accepted = dailyDetails
+      .filter((detail) => detail.accepted !== 0)
+      .map((detail) => ({
+        time: `${year}-${month}-${detail.day.toString().padStart(2, '0')}`,
+        value: detail.accepted,
+        type: 'CV được chấp nhận' as 'CV được chấp nhận'
+      }))
+
+    const rejected = dailyDetails
+      .filter((detail) => detail.rejected !== 0)
+      .map((detail) => ({
+        time: `${year}-${month}-${detail.day.toString().padStart(2, '0')}`,
+        value: detail.rejected,
+        type: 'CV bị từ chối' as 'CV bị từ chối'
+      }))
+
+    const combinedData = [...submitted, ...accepted, ...rejected]
+    return combinedData.sort((a, b) => dayjs(a.time).diff(dayjs(b.time)))
   }
 
   useEffect(() => {
-    fetchData('2024-05-10T17:00:00.000Z', '2024-06-15T17:00:00.000Z')
+    const initialDate = dayjs()
+    fetchData(initialDate.month() + 1, initialDate.year())
+    setSelectedDate(initialDate)
   }, [])
 
-  const handleDateChange = (dates: any, dateStrings: [string, string]) => {
-    const [startDate, endDate] = dateStrings
-    if (startDate && endDate) {
-      setLoading(true)
-      fetchData(startDate, endDate)
+  const handleDateChange = (date: dayjs.Dayjs | null) => {
+    if (date) {
+      const month = date.month() + 1
+      const year = date.year()
+      setSelectedDate(date)
+      fetchData(month, year)
     }
   }
 
-  const fetchData = async (startDate: string, endDate: string) => {
+  const fetchData = async (month: number, year: number) => {
     setLoading(true)
     try {
-      const res = await RecService.getApplicationStatistic(startDate, endDate)
+      const res = await RecService.getApplicationStatisticByMonth(month.toString(), year.toString())
       const response = res.data
 
       if (
@@ -88,7 +108,11 @@ function RecStatistical() {
         response.metadata
       ) {
         setStatistics(response.metadata)
-        const formattedData = transformDataForChart(response.metadata.dailyDetails)
+        const formattedData = transformDataForChart(
+          response.metadata.monthlyDetails,
+          response.metadata.month,
+          response.metadata.year
+        )
         setChartData(formattedData)
       } else {
         console.error('Failed to fetch statistics')
@@ -101,27 +125,49 @@ function RecStatistical() {
   }
 
   const config = {
-    data: chartData,
-    xField: 'day',
-    yField: 'value',
-    seriesField: 'category',
-    legend: { position: 'top-left' },
-    smooth: true,
-    color: (name: string) => {
-      // Định cấu hình màu sắc cụ thể cho từng 'category'
-      switch (name) {
-        case 'Total Applications':
-          return '#3399FF' // Màu xanh dương cho Tổng số ứng tuyển
-        case 'Submitted':
-          return '#33CC33' // Màu xanh lá cho CV tiếp nhận
-        case 'Accepted':
-          return '#9966FF' // Màu tím cho CV được chấp nhận
-        case 'Rejected':
-          return '#FF5050' // Màu đỏ cho CV bị từ chối
-        default:
-          return '#D9D9D9' // Màu mặc định
+    xField: 'time',
+    legend: {
+      color: {
+        itemMarker: 'round',
+        itemMarkerSize: 14,
+        position: 'top',
+        layout: 'horizontal'
       }
-    }
+    },
+    children: [
+      {
+        data: chartData,
+        type: 'interval',
+        yField: 'value',
+        stack: true,
+        colorField: 'type',
+        style: { maxWidth: 80 },
+        label: { position: 'inside' },
+        scale: { y: { domainMax: domainMax } },
+        interaction: {
+          elementHighlight: true,
+          elementHighlightByColor: { background: true }
+        }
+      }
+    ],
+    tooltip: {
+      formatter: (datum: DualAxesData) => ({
+        name: datum.type,
+        value: datum.value
+      })
+    },
+    theme: { category10: ['#63B3ED', '#68D391', '#FC8181'] },
+    geometryOptions: [
+      {
+        geometry: 'column',
+        colorField: 'type',
+        color: ({ type }: { type: string }) => {
+          if (type === 'CV tiếp nhận') return '#68D391'
+          if (type === 'CV được chấp nhận') return '#63B3ED'
+          return '#FC8181'
+        }
+      }
+    ]
   }
 
   const handleBack = () => {
@@ -139,7 +185,12 @@ function RecStatistical() {
           <Spin spinning={loading}>
             <div className='flex flex-col gap-3'>
               <div className='w-full'>
-                <RangePicker onChange={handleDateChange} format='YYYY-MM-DD' className='float-right w-1/2 ' />
+                <MonthPicker
+                  onChange={handleDateChange}
+                  format='YYYY-MM'
+                  className='float-right w-1/2'
+                  value={selectedDate}
+                />
               </div>
               <Row gutter={16}>
                 <Col span={6}>
@@ -175,7 +226,9 @@ function RecStatistical() {
                   </Card>
                 </Col>
               </Row>
-              <Line {...config} />
+              <div className='mt-2'>
+                {chartData.length > 0 ? <DualAxes {...config} /> : <Empty description='Không có dữ liệu để hiển thị' />}
+              </div>
             </div>
           </Spin>
         </div>

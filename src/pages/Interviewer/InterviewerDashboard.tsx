@@ -5,7 +5,7 @@ import { BanknotesIcon, UserPlusIcon, UserIcon, ChartBarIcon } from '@heroicons/
 import StatisticsCard from '../../components/Card/StatisticsCard'
 import chartsConfig from '../../configs/charts-config'
 import { BriefcaseIcon, ClockIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
-import StatisticsChart from '../../components/Card/StatisticsChart'
+import StatisticsChart from '../Admin/AdminDashboard/StatisticsRevenueChart'
 import { useState, useEffect } from 'react'
 import axiosInstance from '../../utils/AxiosInstance'
 

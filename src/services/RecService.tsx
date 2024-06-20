@@ -344,6 +344,10 @@ const getApplicationStatistic = async (startDate: string, endDate: string) => {
   return await axiosInstance.get(`/recruiter/statistic/application_statistic?startDate=${startDate}&endDate=${endDate}`)
 }
 
+const getApplicationStatisticByMonth = async (month: string, year: string) => {
+  return await axiosInstance.get(`/recruiter/statistic/application_statistic_by_month?month=${month}&year=${year}`)
+}
+
 export const RecService = {
   createJob,
   getListWaitingJob,
@@ -380,5 +384,6 @@ export const RecService = {
   createPayment,
   cancelOrder,
   getEnglish,
-  getApplicationStatistic
+  getApplicationStatistic,
+  getApplicationStatisticByMonth
 }

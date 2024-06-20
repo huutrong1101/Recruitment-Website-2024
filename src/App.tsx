@@ -23,7 +23,7 @@ import UserProfileSubmittedJob from './pages/UserProfile/UserProfileSubmittedJob
 import OneTimePasswordVerify from './pages/OneTimePasswordVerify/OneTimePasswordVerify'
 import PrintResume from './pages/PrintResume/PrintResume'
 import ManagementAppLayOut from './layouts/ManagementAppLayOut/ManagementAppLayOut'
-import AdminDashboard from './pages/Admin/AdminDashboard'
+import AdminDashboard from './pages/Admin/AdminDashboard/AdminDashboard'
 import Logout from './pages/Logout/Logout'
 import { useAppDispatch } from './hooks/hooks'
 import { JobService } from './services/JobService'

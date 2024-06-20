@@ -46,7 +46,7 @@ const getListJobs = async ({
 }
 
 const getJobDetail = async (dispatch: Dispatch, id: string) => {
-  const response = await axiosInstance.get(`/admin/jobs/${id}`)
+  const response = await axiosInstance.get(`/admin/jobs/detail/${id}`)
   const data = response.data.metadata
   dispatch(setJobDetail(data))
 }
@@ -76,13 +76,13 @@ const getListCompany = async ({
 }
 
 const getCompanyDetail = async (dispatch: Dispatch, id: string) => {
-  const response = await axiosInstance.get(`/admin/recruiters/${id}`)
+  const response = await axiosInstance.get(`/admin/recruiters/information/${id}`)
   const data = response.data.metadata
   dispatch(setCompanyDetail(data))
 }
 
 const getNewDetail = async (dispatch: Dispatch, id: string) => {
-  const response = await axiosInstance.get(`/admin/blogs/${id}`)
+  const response = await axiosInstance.get(`/admin/blogs/detail/${id}`)
   const data = response.data.metadata
   dispatch(setNewDetail(data))
 }
@@ -163,6 +163,10 @@ const getListNews = async ({ name = '', type = '', status = '', page = 1, limit 
   return await axiosInstance.get(`/admin/blogs/list_blog?${params}`)
 }
 
+const getCaculateRevenueByYear = async (year: number) => {
+  return await axiosInstance.get(`/admin/statistic/revenue_by_year?year=${year}`)
+}
+
 export const AdminService = {
   getListRec,
   getListJobs,
@@ -181,5 +185,6 @@ export const AdminService = {
   getTotalRecruiter,
   getTotalJob,
   getListNews,
-  getNewDetail
+  getNewDetail,
+  getCaculateRevenueByYear
 }
