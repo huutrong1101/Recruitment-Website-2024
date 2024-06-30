@@ -46,8 +46,6 @@ export default function NavbarUserLoggedInCard() {
 
   const loggedInUser = user || recruiter
 
-  console.log(user)
-
   useEffect(() => {
     const socket = io(SOCKET_SERVER_URL, {
       extraHeaders: {

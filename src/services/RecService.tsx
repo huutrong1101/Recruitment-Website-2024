@@ -251,7 +251,7 @@ const changeJobStatus = async (jobId: string, status: string) => {
 }
 
 const markNotificationAsRead = async (notiId: string) => {
-  return await axiosInstance.patch(`/recruiter/notifications/${notiId}`)
+  return await axiosInstance.patch(`/recruiter/notifications/read/${notiId}`)
 }
 
 async function getIfUserFavoriteTheRec(slug: string) {
