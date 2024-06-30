@@ -15,11 +15,20 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AdminService } from '../../../services/AdminService'
 import parse from 'html-react-parser'
-import { Modal, Radio, Spin } from 'antd'
+import { Button, Checkbox, Input, Modal, Radio, Spin, Tag, Tooltip } from 'antd'
 import { toast } from 'react-toastify'
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
+import { CheckboxChangeEvent } from 'antd/es/checkbox'
+import { setCompanyDetail } from '../../../redux/reducer/AdminSlice'
 
 const AnyReactComponent = (props: { lat: number; lng: number; text: React.ReactNode }) => <div>{props.text}</div>
+
+const declineReasons = [
+  { id: '1', reason: 'Không đáp ứng tiêu chuẩn chất lượng' },
+  { id: '2', reason: 'Nội dung không phù hợp' },
+  { id: '3', reason: 'Yêu cầu công việc không hợp lý' },
+  { id: '4', reason: 'Công việc không phù hợp với ngành nghề' }
+]
 
 function AdminManageCompanyDetail() {
   const dispatch = useAppDispatch()
@@ -34,6 +43,12 @@ function AdminManageCompanyDetail() {
   const [shortenedDescription, setShortenedDescription] = useState('')
   const [showMoreButton, setShowMoreButton] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
+
+  const [checkAll, setCheckAll] = useState(false)
+  const [selectedDeclineReasons, setSelectedDeclineReasons] = useState<string[]>([])
+  const [declineReason, setDeclineReason] = useState('')
+  const [isReasonEmpty, setIsReasonEmpty] = useState(false)
+  const [isModalReason, setIsModalReason] = useState(false)
 
   useEffect(() => {
     const fetchCoords = async () => {
@@ -87,18 +102,50 @@ function AdminManageCompanyDetail() {
     }
   }
 
-  const handleOk = () => {
+  const handleOk = async () => {
     if (approvalStatus === 'approve' && companyDetail) {
-      AdminService.approveCompany(companyDetail._id, 'accept').then(() => {
-        toast.success(`Công ty đã được duyệt thành công`)
-        console.log('check')
-      })
+      try {
+        toast
+          .promise(AdminService.approveCompany(companyDetail._id, 'accept', ''), {
+            pending: `Quá trình xử lí đang diễn ra`,
+            success: `Công ty đã được duyệt thành công`
+          })
+          .then((response) => {
+            const updatedJob = { ...companyDetail, acceptanceStatus: 'accept' }
+            dispatch(setCompanyDetail(updatedJob))
+            setIsModalVisible(false)
+          })
+          .catch((error) => {
+            toast.error(error.response.data.message)
+          })
+      } catch (error) {
+        toast.error('Có lỗi xảy ra khi duyệt công ty')
+        console.error(error)
+      }
     } else if (approvalStatus === 'decline' && companyDetail) {
-      AdminService.approveCompany(companyDetail._id, 'decline').then(() =>
-        toast.success(`Công ty đã được thêm vào danh sách không duyệt`)
-      )
+      if (!declineReason.trim()) {
+        toast.error('Vui lòng nhập lý do khi không duyệt công ty.')
+        return
+      }
+      try {
+        toast
+          .promise(AdminService.approveCompany(companyDetail._id, 'decline', declineReason), {
+            pending: `Quá trình xử lí đang diễn ra`,
+            success: `Công ty đã được thêm vào danh sách không duyệt`
+          })
+          .then((response) => {
+            const updatedJob = { ...companyDetail, acceptanceStatus: 'decline', declineReason: declineReason }
+            dispatch(setCompanyDetail(updatedJob))
+            setIsModalVisible(false)
+          })
+          .catch((error) => {
+            toast.error(error.response.data.message)
+          })
+      } catch (error) {
+        toast.error('Có lỗi xảy ra khi từ chối công ty')
+        console.error(error)
+      }
     }
-    setIsModalVisible(false)
   }
 
   const handleCancel = () => {
@@ -111,6 +158,34 @@ function AdminManageCompanyDetail() {
 
   const toggleDescription = () => {
     setShowFullDescription(!showFullDescription)
+  }
+
+  const handleCheckAllChange = (e: CheckboxChangeEvent) => {
+    const checked = e.target.checked
+    setCheckAll(checked)
+    if (checked) {
+      const allReasons = declineReasons.map((reason) => reason.reason)
+      setSelectedDeclineReasons(allReasons)
+      setDeclineReason(allReasons.join(', '))
+    } else {
+      setSelectedDeclineReasons([])
+      setDeclineReason('')
+    }
+  }
+
+  const handleCheckboxChange = (checkedValues: string[]) => {
+    setSelectedDeclineReasons(checkedValues)
+    const selectedReasonTexts = checkedValues.join(', ') // Tạo chuỗi từ các lý do được chọn
+    setDeclineReason(selectedReasonTexts) // Cập nhật state declineReason
+    setCheckAll(checkedValues.length === declineReasons.length)
+  }
+
+  const showModalReason = () => {
+    setIsModalReason(true)
+  }
+
+  const handleCancelReason = () => {
+    setIsModalReason(false)
   }
 
   return (
@@ -172,7 +247,7 @@ function AdminManageCompanyDetail() {
                     >
                       XỬ LÍ
                     </button>
-                    <Modal
+                    {/* <Modal
                       title='Xác nhận công ty'
                       visible={isModalVisible}
                       onOk={handleOk}
@@ -190,6 +265,63 @@ function AdminManageCompanyDetail() {
                           <Radio value='decline'>Không duyệt công ty</Radio>
                         </Radio.Group>
                       </div>
+                    </Modal> */}
+                    <Modal
+                      title='Xác nhận công ty'
+                      visible={isModalVisible}
+                      onOk={handleOk}
+                      onCancel={handleCancel}
+                      okText='Xử lý'
+                      cancelText='Hủy'
+                      cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
+                    >
+                      <div className='flex flex-col gap-1'>
+                        <p className='font-bold'>Chọn trạng thái xử lí công ty</p>
+                        <Radio.Group onChange={(e) => setApprovalStatus(e.target.value)} value={approvalStatus}>
+                          <Radio value='approve'>Duyệt công ty</Radio>
+                          <Radio value='decline'>Không duyệt công ty</Radio>
+                        </Radio.Group>
+                        {/* Hiển thị ô nhập lý do nếu chọn "Không nhận hồ sơ" */}
+                        {approvalStatus === 'decline' && (
+                          <>
+                            <div className='flex items-center gap-2'>
+                              <div className='font-bold'>Chọn lý do không duyệt công việc:</div>
+                            </div>
+                            <Checkbox onChange={handleCheckAllChange} checked={checkAll}>
+                              Chọn tất cả
+                            </Checkbox>
+                            <Checkbox.Group value={selectedDeclineReasons} onChange={handleCheckboxChange}>
+                              <div className='flex flex-col gap-2'>
+                                {declineReasons.map((reason) => (
+                                  <Checkbox key={reason.id} value={reason.reason}>
+                                    {reason.reason}
+                                  </Checkbox>
+                                ))}
+                              </div>
+                            </Checkbox.Group>
+
+                            <div>
+                              <div className='font-bold'>Lý do không duyệt công việc:</div>
+                              <Input.TextArea
+                                style={{ minHeight: '200px', borderColor: isReasonEmpty ? '#ff4d4f' : '' }}
+                                value={declineReason}
+                                onChange={(e) => {
+                                  setDeclineReason(e.target.value)
+                                  if (e.target.value.trim()) {
+                                    setIsReasonEmpty(false) // Nếu người dùng bắt đầu nhập, ẩn cảnh báo
+                                  }
+                                }}
+                                placeholder='Nhập lý do không nhận hồ sơ'
+                              />
+                              {isReasonEmpty && (
+                                <div style={{ color: '#ff4d4f', marginTop: '5px' }}>
+                                  Vui lòng nhập lý do khi không duyệt công việc.
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </Modal>
                   </div>
                 </div>
@@ -203,6 +335,36 @@ function AdminManageCompanyDetail() {
                   <h2 className='text-lg font-semibold text-white'>Thông tin công ty</h2>
                 </div>
                 <div className='flex flex-col gap-8 p-6'>
+                  {companyDetail.acceptanceStatus === 'decline' ? (
+                    <Tooltip placement='top' title={'Xem lí do'} arrow={true}>
+                      <Tag
+                        color={'error'}
+                        className='w-1/5 py-1 font-medium text-center uppercase cursor-pointer'
+                        onClick={showModalReason}
+                      >
+                        Không được duyệt
+                      </Tag>
+                    </Tooltip>
+                  ) : (
+                    <Tag
+                      color={`${companyDetail.acceptanceStatus === 'accept' ? 'success' : 'default'}`}
+                      className='w-1/5 py-1 font-medium text-center uppercase'
+                    >
+                      {companyDetail.acceptanceStatus === 'accept' ? 'Đã duyệt' : 'Đang chờ duyệt'}
+                    </Tag>
+                  )}
+                  <Modal
+                    title='Lý do không được duyệt'
+                    visible={isModalReason}
+                    onCancel={handleCancelReason}
+                    footer={[
+                      <Button key='ok' type='primary' onClick={handleCancelReason}>
+                        OK
+                      </Button>
+                    ]}
+                  >
+                    <p>{companyDetail?.reasonDecline}</p>
+                  </Modal>
                   <div>
                     <h1 className='text-xl font-semibold capitalize'>Giới thiệu công ty</h1>
                     <div>

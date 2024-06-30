@@ -23,6 +23,7 @@ const getListRec = async (dispatch: Dispatch, { searchText = '', page = 1, limit
   const queryParams = params.toString()
 
   const response = await axiosInstance.get(`recruiters?${queryParams}`)
+
   const data = response.data.metadata
 
   dispatch(setListRecs(data.listRecruiter))
@@ -340,12 +341,16 @@ async function getEnglish(dispatch: Dispatch) {
   dispatch(setEnglish(data))
 }
 
-const getApplicationStatistic = async (startDate: string, endDate: string) => {
+const getApplicationStatisticByRange = async (startDate: string, endDate: string) => {
   return await axiosInstance.get(`/recruiter/statistic/application_statistic?startDate=${startDate}&endDate=${endDate}`)
 }
 
 const getApplicationStatisticByMonth = async (month: string, year: string) => {
   return await axiosInstance.get(`/recruiter/statistic/application_statistic_by_month?month=${month}&year=${year}`)
+}
+
+const getApplicationStatisticByYear = async (year: string) => {
+  return await axiosInstance.get(`/recruiter/statistic/application_statistic_by_year?year=${year}`)
 }
 
 export const RecService = {
@@ -384,6 +389,7 @@ export const RecService = {
   createPayment,
   cancelOrder,
   getEnglish,
-  getApplicationStatistic,
-  getApplicationStatisticByMonth
+  getApplicationStatisticByRange,
+  getApplicationStatisticByMonth,
+  getApplicationStatisticByYear
 }

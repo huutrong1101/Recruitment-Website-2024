@@ -9,6 +9,10 @@ import ResumeTemp3 from './ResumeTemp3'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import resume_image_1 from '../../../../../../images/resume_1.png'
+import resume_image_2 from '../../../../../../images/resume_2.jpg'
+import resume_image_3 from '../../../../../../images/resume_3.png'
+
 interface DataType {
   key: number
   stt: number
@@ -83,20 +87,17 @@ export default function PreviewResume({ values, previewAvatar, templateId, type,
     {
       id: '1',
       name: 'Mẫu CV 1',
-      image:
-        'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/447867351_3675170592794878_8394816551587252930_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=5f2048&_nc_ohc=SwUSc6fKNQ4Q7kNvgExhYLx&_nc_ht=scontent.fsgn5-5.fna&oh=00_AYBK7p0Y75h0sN5Lk8-0WXehmOr7_GHuy6NlAT05WDGmxQ&oe=666CEE4E'
+      image: resume_image_1
     },
     {
       id: '2',
       name: 'Mẫu CV 2',
-      image:
-        'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/448078793_3675170606128210_5326314564501692922_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=5f2048&_nc_ohc=_uxITIpiihMQ7kNvgEBYwjI&_nc_ht=scontent.fsgn5-5.fna&oh=00_AYCX_WfLuZ068JsPw9taWq5FLBQoKd0_ggOIW6O5F2Xukw&oe=666CED4C'
+      image: resume_image_2
     },
     {
       id: '3',
       name: 'Mẫu CV 3',
-      image:
-        'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/448078793_3675170606128210_5326314564501692922_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=5f2048&_nc_ohc=_uxITIpiihMQ7kNvgEBYwjI&_nc_ht=scontent.fsgn5-5.fna&oh=00_AYCX_WfLuZ068JsPw9taWq5FLBQoKd0_ggOIW6O5F2Xukw&oe=666CED4C'
+      image: resume_image_3
     }
   ])
 
@@ -174,19 +175,6 @@ export default function PreviewResume({ values, previewAvatar, templateId, type,
     setIsModalVisible(false)
   }
 
-  const exportImage = () => {
-    const resumeContentElement = document.querySelector('#resumeContent')
-
-    if (resumeContentElement) {
-      html2canvas(resumeContentElement as HTMLElement).then((canvas) => {
-        const link = document.createElement('a')
-        link.href = canvas.toDataURL('image/png')
-        link.download = 'resume.png'
-        link.click()
-      })
-    }
-  }
-
   return (
     <>
       {type !== 'watch' && (
@@ -198,10 +186,6 @@ export default function PreviewResume({ values, previewAvatar, templateId, type,
           <Button type='primary' className='flex items-center justify-center gap-2' onClick={exportPDF}>
             <FilePdfOutlined />
             <p>Tải file</p>
-          </Button>
-          <Button type='primary' className='flex items-center justify-center gap-2' onClick={exportImage}>
-            <FileImageOutlined />
-            <p>Tải file ảnh</p>
           </Button>
         </div>
       )}

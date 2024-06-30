@@ -42,29 +42,6 @@ function UserInterestJob() {
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
-  useEffect(() => {
-    fetchJobs(currentPage, pageSize, searchTerm)
-  }, [currentPage, pageSize])
-
-  const fetchJobs = async (page: number, limit: number, searchTerm: string) => {
-    setLoading(true)
-    const params = { name: searchTerm, page, limit }
-    try {
-      const response = await AuthService.getJobFavorite(params)
-      if (response && response.data) {
-        const data = response.data.metadata.listFavoriteJob
-        const total = response.data.metadata.totalElement
-        setActiveData(convertJobsToTableData(data))
-        setTotalElement(total)
-      }
-    } catch (error) {
-      // Xử lý lỗi nếu cần...
-      console.error('Fetching jobs failed:', error)
-    } finally {
-      setLoading(false) // Khi hoàn thành hoặc có lỗi, dừng spinner loading
-    }
-  }
-
   const columns = (props: Props): TableColumnsType<DataType> => [
     {
       title: 'STT',
@@ -99,6 +76,29 @@ function UserInterestJob() {
       className: 'border border-gray-200'
     }
   ]
+
+  useEffect(() => {
+    fetchJobs(currentPage, pageSize, searchTerm)
+  }, [currentPage, pageSize])
+
+  const fetchJobs = async (page: number, limit: number, searchTerm: string) => {
+    setLoading(true)
+    const params = { name: searchTerm, page, limit }
+    try {
+      const response = await AuthService.getJobFavorite(params)
+      if (response && response.data) {
+        const data = response.data.metadata.listFavoriteJob
+        const total = response.data.metadata.totalElement
+        setActiveData(convertJobsToTableData(data))
+        setTotalElement(total)
+      }
+    } catch (error) {
+      // Xử lý lỗi nếu cần...
+      console.error('Fetching jobs failed:', error)
+    } finally {
+      setLoading(false) // Khi hoàn thành hoặc có lỗi, dừng spinner loading
+    }
+  }
 
   const showModal = (key: React.Key) => {
     setDeleteJobKey(key)
@@ -171,6 +171,7 @@ function UserInterestJob() {
 
   const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
     setSearchTerm(value)
+    setCurrentPage(1)
     fetchJobs(currentPage, pageSize, value)
   }
 
@@ -182,6 +183,7 @@ function UserInterestJob() {
         success: `Xóa công việc thành công`
       })
       .then(() => {
+        setSelectedRowKeys([])
         fetchJobs(currentPage, pageSize, searchTerm)
       })
       .catch((error) => toast.error(error.response.data.message))

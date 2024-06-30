@@ -147,7 +147,7 @@ export default function JobDetail() {
               {relatedJobs && relatedJobs.length > 0 ? (
                 relatedJobs.slice(0, 3).map((job) => (
                   <div key={job} className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
-                    <JobCard job={job} isShow={false} />
+                    <JobCard job={job} isShow={false} inNews={false} />
                   </div>
                 ))
               ) : (

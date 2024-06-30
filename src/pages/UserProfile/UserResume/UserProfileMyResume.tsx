@@ -9,6 +9,9 @@ import { AuthService } from '../../../services/AuthService'
 import { ResumeResponse } from '../../../types/resume.type'
 import { Spin } from 'antd'
 import { toast } from 'react-toastify'
+import resume_image_1 from '../../../../images/resume_1.png'
+import resume_image_2 from '../../../../images/resume_2.jpg'
+import resume_image_3 from '../../../../images/resume_3.png'
 
 interface ResumeTemp {
   id: string
@@ -32,20 +35,17 @@ export default function UserProfileMyResume() {
     {
       id: '1',
       name: 'Mẫu CV 1',
-      image:
-        'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/447867351_3675170592794878_8394816551587252930_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=5f2048&_nc_ohc=SwUSc6fKNQ4Q7kNvgExhYLx&_nc_ht=scontent.fsgn5-5.fna&oh=00_AYBK7p0Y75h0sN5Lk8-0WXehmOr7_GHuy6NlAT05WDGmxQ&oe=666CEE4E'
+      image: resume_image_1
     },
     {
       id: '2',
       name: 'Mẫu CV 2',
-      image:
-        'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/448078793_3675170606128210_5326314564501692922_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=5f2048&_nc_ohc=_uxITIpiihMQ7kNvgEBYwjI&_nc_ht=scontent.fsgn5-5.fna&oh=00_AYCX_WfLuZ068JsPw9taWq5FLBQoKd0_ggOIW6O5F2Xukw&oe=666CED4C'
+      image: resume_image_2
     },
     {
       id: '3',
       name: 'Mẫu CV 3',
-      image:
-        'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/448078793_3675170606128210_5326314564501692922_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=5f2048&_nc_ohc=_uxITIpiihMQ7kNvgEBYwjI&_nc_ht=scontent.fsgn5-5.fna&oh=00_AYCX_WfLuZ068JsPw9taWq5FLBQoKd0_ggOIW6O5F2Xukw&oe=666CED4C'
+      image: resume_image_3
     }
   ])
 
@@ -83,7 +83,8 @@ export default function UserProfileMyResume() {
 
   const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
     setSearchTerm(value)
-    fetchListResume(currentPage, pageSize, value)
+    setCurrentPage(1)
+    fetchListResume(1, pageSize, value)
   }
 
   const showModal = () => {

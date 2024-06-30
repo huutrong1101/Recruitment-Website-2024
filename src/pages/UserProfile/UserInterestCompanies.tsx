@@ -41,10 +41,6 @@ function UserInterestCompanies() {
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
-  useEffect(() => {
-    fetchCompanies(currentPage, pageSize, searchTerm)
-  }, [currentPage, pageSize])
-
   const columns = (props: Props): TableColumnsType<DataType> => [
     {
       title: 'STT',
@@ -77,6 +73,10 @@ function UserInterestCompanies() {
     }
   ]
 
+  useEffect(() => {
+    fetchCompanies(currentPage, pageSize, searchTerm)
+  }, [currentPage, pageSize])
+
   const fetchCompanies = async (page: number, limit: number, searchTerm: string) => {
     setLoading(true)
     const params = { name: searchTerm, page, limit }
@@ -89,7 +89,6 @@ function UserInterestCompanies() {
         setTotalElement(total)
       }
     } catch (error) {
-      // Xử lý lỗi nếu cần...
       console.error('Fetching jobs failed:', error)
     } finally {
       setLoading(false) // Khi hoàn thành hoặc có lỗi, dừng spinner loading
@@ -167,6 +166,7 @@ function UserInterestCompanies() {
 
   const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
     setSearchTerm(value)
+    setCurrentPage(1)
     fetchCompanies(currentPage, pageSize, value)
   }
 
@@ -178,6 +178,7 @@ function UserInterestCompanies() {
         success: `Xóa công ty thành công`
       })
       .then(() => {
+        setSelectedRowKeys([])
         fetchCompanies(currentPage, pageSize, searchTerm)
       })
       .catch((error) => toast.error(error.response.data.message))

@@ -64,6 +64,7 @@ export default function Jobs() {
       levelRequirement,
       genderRequirement
     })
+
     setCurrentPage(page)
 
     fetchJobs({
@@ -84,8 +85,8 @@ export default function Jobs() {
       setIsLoading(true)
       await JobService.getJobs(dispatch, {
         ...params,
-        page: params.page || 1, // Ensuring page is set
-        limit: pageSize // Keeping limit only in fetchJobs and not in the URL
+        page: params.page || 1,
+        limit: pageSize
       })
     } catch (error) {
       console.error(error)
@@ -109,15 +110,8 @@ export default function Jobs() {
     // Filter out empty values
     const filteredParams: any = Object.fromEntries(Object.entries(params).filter(([key, value]) => value))
 
-    if (currentPage > 1) {
-      filteredParams.page = String(currentPage) // Convert the page to a string
-    }
-
-    navigate({
-      pathname: '/jobs',
-      search: qs.stringify(filteredParams)
-    })
-    fetchJobs(filteredParams)
+    navigate({ pathname: '/jobs', search: qs.stringify(filteredParams) })
+    fetchJobs({ ...filteredParams, page: 1 })
   }
 
   const handleReset = () => {
@@ -190,11 +184,11 @@ export default function Jobs() {
             </div>
           ) : (
             <div className='flex flex-wrap -mx-4'>
-              {jobs.length > 0 ? (
+              {jobs.length > 0 || isLoading ? ( // Check for jobs or loading state
                 <>
                   {jobs.map((job) => (
                     <div className='w-full px-4 mb-8 md:w-1/2' key={job._id}>
-                      <JobCard job={job} isShow={true} />
+                      <JobCard job={job} isShow={true} inNews={false} />
                     </div>
                   ))}
                 </>
@@ -205,7 +199,7 @@ export default function Jobs() {
                     alt=''
                     className='h-[300px]'
                   />
-                  <span>Không tìm thấy công việc phù hợp.</span>
+                  <span>Không tìm thấy công việc phù hợp.</span>
                 </div>
               )}
             </div>

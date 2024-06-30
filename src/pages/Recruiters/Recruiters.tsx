@@ -9,6 +9,7 @@ import { RecService } from '../../services/RecService'
 import LoadSpinner from '../../components/LoadSpinner/LoadSpinner'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSearchParams } from 'react-router-dom'
+import qs from 'query-string'
 
 function Recruiters() {
   const dispatch = useAppDispatch()
@@ -21,35 +22,72 @@ function Recruiters() {
   const [isLoading, setIsLoading] = useState(false)
   const [searchText, setSearchText] = useState(searchParams.get('search') || '')
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1)
-  const [pageSize] = useState(6) // Keeping pageSize fixed as per requirement
+  const [pageSize] = useState(6)
 
   useEffect(() => {
-    fetchRecruiters()
-  }, [dispatch, currentPage, pageSize])
+    const searchParams = new URLSearchParams(location.search)
+    const page = parseInt(searchParams.get('page') || '1', 10)
 
-  const fetchRecruiters = async () => {
-    setIsLoading(true)
-    await RecService.getListRec(dispatch, { searchText, page: currentPage, limit: pageSize })
-    setIsLoading(false)
+    const search = searchParams.get('search') || ''
+
+    setCurrentPage(page)
+
+    fetchRecruiters({
+      search,
+      page,
+      limit: pageSize
+    })
+  }, [location.search, currentPage, pageSize])
+
+  const fetchRecruiters = async (params: any) => {
+    try {
+      setIsLoading(true)
+      await RecService.getListRec(dispatch, {
+        searchText: params.search,
+        page: params.page || 1,
+        limit: pageSize
+      })
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleSearch = () => {
-    setCurrentPage(1)
-    updateParams(searchText, 1)
-    fetchRecruiters() // Call API search after set URL params
+    const params = {
+      search: searchText
+    }
+
+    const filteredParams: any = Object.fromEntries(Object.entries(params).filter(([key, value]) => value))
+
+    navigate({
+      pathname: '/recruiters',
+      search: qs.stringify(filteredParams)
+    })
+
+    fetchRecruiters({ ...filteredParams, page: 1 })
   }
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
-    updateParams(searchText, page)
-    fetchRecruiters() // Call API search after changing page
-  }
+    const params: any = {
+      search: searchText,
+      page: String(page)
+    }
 
-  const updateParams = (searchText: string, page: number) => {
-    const params: any = {}
-    if (searchText) params.search = searchText
-    if (page > 1) params.page = page
-    setSearchParams(params)
+    const filteredParams: any = Object.fromEntries(Object.entries(params).filter(([key, value]) => value))
+
+    if (page === 1) {
+      delete filteredParams.page
+    }
+
+    navigate({
+      pathname: '/recruiters',
+      search: qs.stringify(filteredParams)
+    })
+
+    fetchRecruiters(params)
   }
 
   useEffect(() => {

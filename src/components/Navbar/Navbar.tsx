@@ -12,9 +12,10 @@ import type { MenuProps } from 'antd'
 import { Dropdown, Space, Spin } from 'antd'
 import './styles/Navbar.css'
 import { AcademicCapIcon, UserIcon } from '@heroicons/react/24/outline'
+import _ from 'lodash'
 
 export default function Navbar() {
-  // useTokenAuthorize()
+  useTokenAuthorize()
 
   const { items } = useAppSelector((app) => app.Navbar)
   const { isLoggedIn, loading, user } = useAppSelector((app) => app.Auth)

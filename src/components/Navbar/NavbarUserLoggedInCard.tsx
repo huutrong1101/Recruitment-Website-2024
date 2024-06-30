@@ -1,4 +1,3 @@
-import { Menu, Transition } from '@headlessui/react'
 import classNames from 'classnames'
 import { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -6,7 +5,6 @@ import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import {
   prepareCandidateProvider,
   prepareOtherProvider,
-  prepareRecruiterProvider,
   prepareRecruiterProviderConfirm
 } from '../../utils/NavigateMenu'
 import DummyAvatar from '../DummyAvatar/DummyAvatar'
@@ -18,6 +16,12 @@ import { UserService } from '../../services/UserService'
 import { RecService } from '../../services/RecService'
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom'
+
+import io from 'socket.io-client'
+import { getLocalToken } from '../../utils/localToken'
+import { useTokenAuthorize } from '../../hooks/useTokenAuthorize'
+
+const SOCKET_SERVER_URL = 'http://localhost:8080'
 
 interface Notification {
   _id: string
@@ -34,12 +38,35 @@ export default function NavbarUserLoggedInCard() {
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [notificationLink, setNotificationLink] = useState('')
+  const token = getLocalToken()
 
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [dropdownItemList, setDropdownItemList] = useState<any[]>([])
 
   const loggedInUser = user || recruiter
+
+  console.log(user)
+
+  useEffect(() => {
+    const socket = io(SOCKET_SERVER_URL, {
+      extraHeaders: {
+        auth: `Bearer ${token}`
+      }
+    })
+
+    socket.on('user_notification', (newNotification) => {
+      console.log('Received a new notification:', newNotification)
+      // Cập nhật state để thêm thông báo mới vào danh sách
+      setNotifications((prevNotifications) => [newNotification, ...prevNotifications])
+      // Tăng số đếm thông báo chưa đọc
+      setUnreadNotificationsCount((prevCount) => prevCount + 1)
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
 
   useEffect(() => {
     if (loading === 'success' && loggedInUser) {
@@ -160,14 +187,16 @@ export default function NavbarUserLoggedInCard() {
             {notifications.map((notification) => (
               <div
                 key={notification._id}
-                className='flex flex-col w-full p-2 border-b cursor-pointer hover:bg-gray-200'
+                className={`flex flex-col w-full p-2 border-b cursor-pointer hover:bg-gray-200 ${
+                  !notification.isRead ? 'bg-yellow-50' : ''
+                }`}
                 onClick={() => handleNotificationClick(notification._id, notification.link)}
               >
-                <p className='text-sm font-bold text-black'>{notification.title}</p>
+                <p className={`text-sm font-bold`}>{notification.title}</p>
                 <span>{notification.content}</span>
                 <div className='flex items-center justify-between'>
                   <span>{formatTimeAgo(notification.createdAt)}</span>
-                  <span>{notification.isRead ? 'Đã đọc' : 'Chưa đọc'}</span>
+                  <span className='font-semibold'>{notification.isRead ? 'Đã đọc' : 'Chưa đọc'}</span>
                 </div>
               </div>
             ))}

@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BriefcaseIcon, BuildingLibraryIcon, UserPlusIcon, ChartBarIcon } from '@heroicons/react/24/solid'
 import { Tabs } from 'antd' // Import Tabs từ antd
 import StatisticsCard from '../../../components/Card/StatisticsCard'
-import { useAppSelector } from '../../../hooks/hooks'
+import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 import StatisticsRevenueChart from './StatisticsRevenueChart'
-import StatisticsJobChart from './StatisticsJobChart'
-import StatisticsApplicationChart from './StatisticsApplicationChart'
+import StatisticsApplicationChart from './StatisticsApplicationChart/StatisticsApplicationChart'
+import StatisticsCompanyChart from './StatisticsCompanyChart/StatisticsCompanyChart'
+import { AdminService } from '../../../services/AdminService'
+import StatisticsJobChart from './StatisticsJobChart/StatisticsJobChart'
 
 const { TabPane } = Tabs // Destructuring để lấy TabPane từ Tabs
 
@@ -17,9 +19,12 @@ interface StatisticsCardData {
 }
 
 const AdminDashboard: React.FC = () => {
+  const dispatch = useAppDispatch()
+
   const totalCandidate = useAppSelector((state: any) => state.AdminSlice.totalCandidate)
   const totalRecruiter = useAppSelector((state: any) => state.AdminSlice.totalRecruiter)
   const totalJob = useAppSelector((state: any) => state.AdminSlice.totalJob)
+  const totalBlog = useAppSelector((state: any) => state.AdminSlice.totalBlog)
 
   const statisticsCardsData: StatisticsCardData[] = [
     {
@@ -43,10 +48,17 @@ const AdminDashboard: React.FC = () => {
     {
       color: 'bg-orange-500',
       icon: <ChartBarIcon className='w-6 h-6 text-white' />,
-      title: 'Total candidates pass',
-      value: `14`
+      title: 'Số bài viết',
+      value: `${totalBlog}`
     }
   ]
+
+  useEffect(() => {
+    AdminService.getTotalCandidate(dispatch)
+    AdminService.getTotalRecruiter(dispatch)
+    AdminService.getTotalJob(dispatch)
+    AdminService.getTotalBlogs(dispatch)
+  }, [])
 
   return (
     <div className='mt-1'>
@@ -64,10 +76,16 @@ const AdminDashboard: React.FC = () => {
         <TabPane tab='Doanh thu' key='1'>
           <StatisticsRevenueChart />
         </TabPane>
-        <TabPane tab='Công việc' key='2'>
+
+        <TabPane tab='Công ty' key='2'>
+          <StatisticsCompanyChart />
+        </TabPane>
+
+        <TabPane tab='Công việc' key='3'>
           <StatisticsJobChart />
         </TabPane>
-        <TabPane tab='Ứng tuyển' key='3'>
+
+        <TabPane tab='Ứng tuyển' key='4'>
           <StatisticsApplicationChart />
         </TabPane>
       </Tabs>

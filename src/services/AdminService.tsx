@@ -3,6 +3,7 @@ import {
   setJobDetail,
   setListRec,
   setNewDetail,
+  setTotalBlog,
   setTotalCandidate,
   setTotalJob,
   setTotalRecruiter
@@ -87,18 +88,26 @@ const getNewDetail = async (dispatch: Dispatch, id: string) => {
   dispatch(setNewDetail(data))
 }
 
-const approveJob = async (id: string, acceptanceStatus: string) => {
-  const values = {
+const approveJob = async (id: string, acceptanceStatus: string, reasonDecline: string) => {
+  const values: { acceptanceStatus: string; reasonDecline?: string } = {
     acceptanceStatus: acceptanceStatus
   }
+  if (reasonDecline) {
+    values.reasonDecline = reasonDecline
+  }
+
   return await axiosInstance.patch(`admin/jobs/approve/${id}`, values)
 }
 
-const approveCompany = async (id: string, acceptanceStatus: string) => {
-  const values = {
+const approveCompany = async (id: string, acceptanceStatus: string, reasonDecline: string) => {
+  const values: { acceptanceStatus: string; reasonDecline?: string } = {
     acceptanceStatus: acceptanceStatus
   }
-  return await axiosInstance.patch(`admin/recruiters/${id}/approve`, values)
+
+  if (reasonDecline) {
+    values.reasonDecline = reasonDecline
+  }
+  return await axiosInstance.patch(`/admin/recruiters/approve/${id}`, values)
 }
 
 const createJob = async (values: any) => {
@@ -146,6 +155,12 @@ async function getTotalJob(dispatch: Dispatch) {
   dispatch(setTotalJob(data))
 }
 
+async function getTotalBlogs(dispatch: Dispatch) {
+  const response = await axiosInstance.get('/admin/statistic/total_blog')
+  const data = response.data.metadata.number
+  dispatch(setTotalBlog(data))
+}
+
 const getListNews = async ({ name = '', type = '', status = '', page = 1, limit = 10 } = {}) => {
   // Tạo đối tượng URLSearchParams mới
   const params = new URLSearchParams()
@@ -167,6 +182,14 @@ const getCaculateRevenueByYear = async (year: number) => {
   return await axiosInstance.get(`/admin/statistic/revenue_by_year?year=${year}`)
 }
 
+const getCaculateRevenueByMonth = async (month: number, year: number) => {
+  return await axiosInstance.get(`/admin/statistic/revenue_by_month?month=${month}&year=${year}`)
+}
+
+const getCaculateRevenueByDate = async (startDate: string, endDate: string) => {
+  return await axiosInstance.get(`/admin/statistic/revenue?startDate=${startDate}&endDate=${endDate}`)
+}
+
 export const AdminService = {
   getListRec,
   getListJobs,
@@ -184,7 +207,10 @@ export const AdminService = {
   getTotalCandidate,
   getTotalRecruiter,
   getTotalJob,
+  getTotalBlogs,
   getListNews,
   getNewDetail,
-  getCaculateRevenueByYear
+  getCaculateRevenueByYear,
+  getCaculateRevenueByMonth,
+  getCaculateRevenueByDate
 }

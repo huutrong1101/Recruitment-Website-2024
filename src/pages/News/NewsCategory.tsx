@@ -63,9 +63,9 @@ const NewsCategory: React.FC<NewsCategoryProps> = ({ title, newsList, type }) =>
             <Spin size='large' />
           </div>
         ) : (
-          <div className='flex items-start justify-start gap-5'>
+          <div className='flex flex-wrap gap-5'>
             {categoryNews.map((news) => (
-              <div key={news._id} className='w-full mb-8 sm:w-1/2 lg:w-1/4'>
+              <div key={news._id} className='flex w-full mb-8 sm:w-1/2 lg:w-1/4'>
                 <NewCard news={news} />
               </div>
             ))}

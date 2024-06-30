@@ -23,6 +23,7 @@ export default function ConfirmPassword() {
   } = useForm<FormData>()
 
   const [showing, setShowing] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
 
@@ -48,20 +49,26 @@ export default function ConfirmPassword() {
     }
   }, [])
 
-  const handleSend = (data: any) => {
+  const handleSend = async (data: any) => {
     const newData = new FormData()
     newData.append('confirmNewPassword', data.confirmPassword)
     newData.append('newPassword', data.newPassword)
 
-    toast
-      .promise(AuthService.createNewPassword(token, email, newData), {
-        pending: `Đang cập nhật mật khẩu mới`,
-        success: `Mật khẩu mới đã được cập nhật. Hãy đăng nhập lại nhé.`
-      })
-      .then((response) => {
-        navigate('/auth/login')
-      })
-      .catch((error) => toast.error(error.response.data.message))
+    try {
+      await toast
+        .promise(AuthService.createNewPassword(token, email, newData), {
+          pending: `Đang cập nhật mật khẩu mới`,
+          success: `Mật khẩu mới đã được cập nhật. Hãy đăng nhập lại nhé.`
+        })
+        .then((response) => {
+          navigate('/auth/login')
+        })
+        .catch((error) => toast.error(error.response.data.message))
+    } catch (error: any) {
+      toast.error(error.response.data.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -147,7 +154,7 @@ export default function ConfirmPassword() {
           enterTo='opacity-100'
         >
           <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-            <PrimaryButton text='Cập nhật mật khẩu' type='submit' />
+            <PrimaryButton text={loading ? 'Đang gửi...' : 'Cập nhật mật khẩu'} type='submit' disabled={loading} />
           </div>
         </Transition>
       </Transition>

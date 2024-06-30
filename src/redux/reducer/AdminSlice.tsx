@@ -16,6 +16,7 @@ interface AdminState {
   totalCandidate: number
   totalRecruiter: number
   totalJob: number
+  totalBlog: number
 }
 
 const initialState: AdminState = {
@@ -31,7 +32,8 @@ const initialState: AdminState = {
   newDetailStatus: 'idle',
   totalCandidate: 0,
   totalRecruiter: 0,
-  totalJob: 0
+  totalJob: 0,
+  totalBlog: 0
 }
 
 const AdminSlice = createSlice({
@@ -61,6 +63,9 @@ const AdminSlice = createSlice({
     },
     setTotalJob(state, action) {
       state.totalJob = action.payload
+    },
+    setTotalBlog(state, action) {
+      state.totalBlog = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -94,5 +99,6 @@ export const {
   setNewDetail,
   setTotalCandidate,
   setTotalRecruiter,
-  setTotalJob
+  setTotalJob,
+  setTotalBlog
 } = AdminSlice.actions

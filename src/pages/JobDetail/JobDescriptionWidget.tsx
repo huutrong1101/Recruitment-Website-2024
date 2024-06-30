@@ -1,21 +1,29 @@
 import classNames from 'classnames'
 import { useState } from 'react'
-import FavouriteJob from '../../components/FavouriteJob/FavouriteJob'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import { Link, useNavigate } from 'react-router-dom'
 import { setJobIsApplied, setJobIsFovorited } from '../../redux/reducer/JobDetailSlice'
 import JobInformationApplyModal from './JobInformationApplyModal'
 import { JobInterface } from '../../types/job.type'
 import { CalendarIcon, CurrencyDollarIcon, MapPinIcon } from '@heroicons/react/24/outline'
-import { Modal, Radio } from 'antd'
+import { Checkbox, Input, Modal, Radio } from 'antd'
 import { toast } from 'react-toastify'
 import { AdminService } from '../../services/AdminService'
 import { UserService } from '../../services/UserService'
+import { CheckboxChangeEvent } from 'antd/es/checkbox'
+import { setJobDetail } from '../../redux/reducer/AdminSlice'
 
 interface JobDescriptionWidgetProps {
   job: JobInterface
   role: string
 }
+
+const declineReasons = [
+  { id: '1', reason: 'Không đáp ứng tiêu chuẩn chất lượng' },
+  { id: '2', reason: 'Nội dung không phù hợp' },
+  { id: '3', reason: 'Yêu cầu công việc không hợp lý' },
+  { id: '4', reason: 'Công việc không phù hợp với ngành nghề' }
+]
 
 export default function JobDescriptionWidget({ job, role }: JobDescriptionWidgetProps) {
   const dispatch = useAppDispatch()
@@ -29,6 +37,11 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [approvalStatus, setApprovalStatus] = useState('approve')
 
+  const [checkAll, setCheckAll] = useState(false)
+  const [selectedDeclineReasons, setSelectedDeclineReasons] = useState<string[]>([])
+  const [declineReason, setDeclineReason] = useState('')
+  const [isReasonEmpty, setIsReasonEmpty] = useState(false)
+
   const toggleVisibleApplyModal = () => {
     setVisibleApplyDialog((isVisible) => !isVisible)
   }
@@ -40,7 +53,6 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
   }
 
   const handleNavigateToSignIn = () => {
-    navigate(`/auth/login`)
     navigate(`/auth/login?from=${encodeURIComponent(window.location.pathname)}`)
   }
 
@@ -48,15 +60,50 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
     setIsModalVisible(true)
   }
 
-  const handleConfirmJob = () => {
+  const handleConfirmJob = async () => {
     if (approvalStatus === 'approve') {
-      AdminService.approveJob(job._id, 'accept').then(() => toast.success(`Công việc đã được duyệt thành công`))
+      try {
+        toast
+          .promise(AdminService.approveJob(job._id, 'accept', ''), {
+            pending: `Quá trình xử lí đang diễn ra`,
+            success: `Công việc đã được duyệt thành công`
+          })
+          .then((response) => {
+            const updatedJob = { ...job, acceptanceStatus: 'accept' }
+            dispatch(setJobDetail(updatedJob))
+            setIsModalVisible(false)
+          })
+          .catch((error) => {
+            toast.error(error.response.data.message)
+          })
+      } catch (error) {
+        toast.error('Có lỗi xảy ra khi duyệt công việc')
+        console.error(error)
+      }
     } else if (approvalStatus === 'decline') {
-      AdminService.approveJob(job._id, 'decline').then(() =>
-        toast.success(`Công việc đã được thêm vào danh sách không duyệt`)
-      )
+      if (!declineReason.trim()) {
+        toast.error('Vui lòng nhập lý do khi không duyệt công việc.')
+        return
+      }
+      try {
+        toast
+          .promise(AdminService.approveJob(job._id, 'decline', declineReason), {
+            pending: `Quá trình xử lí đang diễn ra`,
+            success: `Công việc đã được thêm vào danh sách không duyệt`
+          })
+          .then((response) => {
+            const updatedJob = { ...job, acceptanceStatus: 'decline', declineReason: declineReason }
+            dispatch(setJobDetail(updatedJob))
+            setIsModalVisible(false)
+          })
+          .catch((error) => {
+            toast.error(error.response.data.message)
+          })
+      } catch (error) {
+        toast.error('Có lỗi xảy ra khi từ chối công việc')
+        console.error(error)
+      }
     }
-    setIsModalVisible(false)
   }
 
   const handleCancelConfirmJob = () => {
@@ -118,6 +165,26 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
     navigate(`/admin/manage_jobs/editJob/${job?._id}`)
   }
 
+  const handleCheckAllChange = (e: CheckboxChangeEvent) => {
+    const checked = e.target.checked
+    setCheckAll(checked)
+    if (checked) {
+      const allReasons = declineReasons.map((reason) => reason.reason)
+      setSelectedDeclineReasons(allReasons)
+      setDeclineReason(allReasons.join(', '))
+    } else {
+      setSelectedDeclineReasons([])
+      setDeclineReason('')
+    }
+  }
+
+  const handleCheckboxChange = (checkedValues: string[]) => {
+    setSelectedDeclineReasons(checkedValues)
+    const selectedReasonTexts = checkedValues.join(', ') // Tạo chuỗi từ các lý do được chọn
+    setDeclineReason(selectedReasonTexts) // Cập nhật state declineReason
+    setCheckAll(checkedValues.length === declineReasons.length)
+  }
+
   return (
     <>
       {role === 'admin' ? (
@@ -136,6 +203,7 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
               <div className={classNames(`flex flex-col w-full items-center`)}>
                 <div className='flex flex-col text-[15px] font-medium text-gray-600 w-full'>
                   <h2 className='text-lg font-semibold text-center text-gray-700'>{job.name}</h2>
+
                   <div className='flex items-center justify-center w-full mt-3'>
                     <div className='flex items-center justify-center w-full gap-3 px-3 mb-6 sm:w-1/2 lg:w-1/3'>
                       <div className='p-3 text-white bg-green-500 rounded-full'>
@@ -191,6 +259,7 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                     XỬ LÍ
                   </button>
                 </div>
+
                 <Modal
                   title='Xác nhận công việc'
                   visible={isModalVisible}
@@ -199,15 +268,53 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                   okText='Xử lý'
                   cancelText='Hủy'
                   cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
-                  width={450}
                 >
                   <div className='flex flex-col gap-1'>
-                    <p>Chọn trạng thái xử lí công việc</p>
+                    <p className='font-bold'>Chọn trạng thái xử lí công việc</p>
                     <Radio.Group onChange={(e) => setApprovalStatus(e.target.value)} value={approvalStatus}>
                       <Radio value='approve'>Duyệt công việc</Radio>
-
                       <Radio value='decline'>Không duyệt công việc</Radio>
                     </Radio.Group>
+                    {/* Hiển thị ô nhập lý do nếu chọn "Không nhận hồ sơ" */}
+                    {approvalStatus === 'decline' && (
+                      <>
+                        <div className='flex items-center gap-2'>
+                          <div className='font-bold'>Chọn lý do không duyệt công việc:</div>
+                        </div>
+                        <Checkbox onChange={handleCheckAllChange} checked={checkAll}>
+                          Chọn tất cả
+                        </Checkbox>
+                        <Checkbox.Group value={selectedDeclineReasons} onChange={handleCheckboxChange}>
+                          <div className='flex flex-col gap-2'>
+                            {declineReasons.map((reason) => (
+                              <Checkbox key={reason.id} value={reason.reason}>
+                                {reason.reason}
+                              </Checkbox>
+                            ))}
+                          </div>
+                        </Checkbox.Group>
+
+                        <div>
+                          <div className='font-bold'>Lý do không duyệt công việc:</div>
+                          <Input.TextArea
+                            style={{ minHeight: '200px', borderColor: isReasonEmpty ? '#ff4d4f' : '' }}
+                            value={declineReason}
+                            onChange={(e) => {
+                              setDeclineReason(e.target.value)
+                              if (e.target.value.trim()) {
+                                setIsReasonEmpty(false) // Nếu người dùng bắt đầu nhập, ẩn cảnh báo
+                              }
+                            }}
+                            placeholder='Nhập lý do không nhận hồ sơ'
+                          />
+                          {isReasonEmpty && (
+                            <div style={{ color: '#ff4d4f', marginTop: '5px' }}>
+                              Vui lòng nhập lý do khi không duyệt công việc.
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </Modal>
               </div>
@@ -241,7 +348,6 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
               </div>
             </div>
           </div>
-          {/* <FavouriteJob visible={visibleFavoriteModal} onAccept={handleSaveJob} onCancel={closeModal} /> */}
         </div>
       ) : (
         <div className='mb-5 bg-white'>

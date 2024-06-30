@@ -13,9 +13,10 @@ import { JobService } from '../../services/JobService'
 interface JobCardProps {
   job: JobInterface
   isShow: boolean
+  inNews: boolean
 }
 
-export default function JobCard({ job, isShow }: JobCardProps) {
+export default function JobCard({ job, isShow, inNews }: JobCardProps) {
   const now = moment()
   const created = moment(job.createdAt)
   const duration = moment.duration(now.diff(created))
@@ -114,7 +115,7 @@ export default function JobCard({ job, isShow }: JobCardProps) {
           className={classNames(
             'px-4 py-2 bg-white rounded-lg shadow-sm flex flex-col md:flex-col transition-all duration-75 cursor-pointer hover:shadow-md',
             {
-              'border-2 border-yellow-400 bg-yellow-50': job.premiumAccount,
+              'border-2 border-yellow-400': job.premiumAccount,
               'border hover:border-emerald-500': !job.premiumAccount
             }
           )}
@@ -175,26 +176,28 @@ export default function JobCard({ job, isShow }: JobCardProps) {
                   </Link>
 
                   <p className='text-xs font-medium text-gray-600 truncate md:text-sm'>{job.companyName}</p>
-                  <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-2'>
-                      <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
-                        {formatSalary(job.salary)}
-                      </button>
-                      <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
-                        {job.province}
-                      </button>
-                    </div>
-                    <Tooltip title={isFavorite ? 'Hủy thích' : 'Lưu việc'}>
-                      <div className={isFavorite ? 'text-red-500' : 'text-gray-500'}>
-                        <HiHeart
-                          onClick={(e) => {
-                            e.preventDefault()
-                            showModal()
-                          }}
-                        />
+                  {!inNews && (
+                    <div className='flex items-center justify-between'>
+                      <div className='flex items-center gap-2'>
+                        <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
+                          {formatSalary(job.salary)}
+                        </button>
+                        <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
+                          {job.province}
+                        </button>
                       </div>
-                    </Tooltip>
-                  </div>
+                      <Tooltip title={isFavorite ? 'Hủy thích' : 'Lưu việc'}>
+                        <div className={isFavorite ? 'text-red-500' : 'text-gray-500'}>
+                          <HiHeart
+                            onClick={(e) => {
+                              e.preventDefault()
+                              showModal()
+                            }}
+                          />
+                        </div>
+                      </Tooltip>
+                    </div>
+                  )}
                 </>
               )}
             </div>

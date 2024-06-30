@@ -8,14 +8,13 @@ export default function FilterCandidate() {
   useTokenAuthorize()
   const navigate = useNavigate()
 
-  const { isLoggedIn, loading, token, user } = useAppSelector((app) => app.Auth)
+  const { isLoggedIn, loading, user, token } = useAppSelector((app) => app.Auth)
 
   if (!token && loading === 'idle') {
     navigate('/auth/login')
     return <NotFound />
   }
 
-  // Wait for verifying a token
   if (loading === 'idle' || loading === 'pending') {
     return <FilterLoadingLayout />
   }

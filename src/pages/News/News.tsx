@@ -58,9 +58,9 @@ const News: React.FC = () => {
         <>
           <div className='flex flex-col gap-2 mb-8'>
             <p className='text-xl font-bold leading-8'>Bài viết mới nhất</p>
-            <div className='flex items-start justify-center gap-4'>
+            <div className='flex items-start justify-center gap-4' style={{ alignItems: 'stretch' }}>
               <div className='w-1/2'>{firstNews && <NewBigLeftCard news={firstNews} />}</div>
-              <div className='flex flex-col w-1/2 gap-3'>
+              <div className='flex flex-col items-center justify-between w-1/2 gap-3'>
                 {remainingNews.map((news) => (
                   <NewBigRightCard key={news._id} news={news} />
                 ))}

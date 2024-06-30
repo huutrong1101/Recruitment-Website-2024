@@ -147,7 +147,7 @@ const withdrawJobApplication = async (jobId: string) => {
 
 const getCompanyFavorite = async ({ name = '', page = 1, limit = 10 } = {}) => {
   const params = new URLSearchParams()
-  if (name) params.append('name', name)
+  if (name) params.append('searchText', name)
 
   params.append('page', page.toString())
   params.append('limit', limit.toString())

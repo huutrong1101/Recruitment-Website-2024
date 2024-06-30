@@ -24,6 +24,7 @@ interface DataType {
   expirationDate: string
   applicationProfile: number
   status: string
+  reasonDecline: string
 }
 
 interface JobFromApi {
@@ -34,6 +35,7 @@ interface JobFromApi {
   deadline: string
   status: 'active' | 'inactive'
   applicationNumber: number
+  reasonDecline: string
 }
 
 interface ActivityOption {
@@ -56,9 +58,10 @@ function RecListJobRecruitment(): JSX.Element {
   const [pageSize, setPageSize] = useState(5)
   const [isLoading, setIsLoading] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isModalReason, setIsModalReason] = useState(false)
   const [currentJob, setCurrentJob] = useState<DataType | null>(null)
 
-  const columns: TableColumnsType<DataType> = [
+  let columns: TableColumnsType<DataType> = [
     {
       title: 'STT',
       dataIndex: 'stt',
@@ -126,29 +129,35 @@ function RecListJobRecruitment(): JSX.Element {
         </Tooltip>
       )
     }
-    // {
-    //   title: <Cog6ToothIcon className='w-6 h-6' />,
-    //   dataIndex: 'action',
-    //   key: 'action',
-    //   render: (text, record) => (
-    //     <Tooltip title='Xem chi tiết'>
-    //       <Link to={`/recruiter/profile/editJob/${record.key}`}>
-    //         <Button type='primary' icon={<PencilSquareIcon className='w-4 h-4' />} />
-    //       </Link>
-    //     </Tooltip>
-    //   )
-    // }
   ]
+
+  if (activeTabKey === '3') {
+    // Giả sử '3' là key cho tab "Việc làm không duyệt"
+    columns = columns.filter((column) => column.key !== 'applicationProfile') // Loại bỏ cột "Hồ sơ ứng tuyển"
+    columns.push({
+      title: 'HÀNH ĐỘNG',
+      key: 'action',
+      render: (_, record) => (
+        <div
+          className='p-1 text-center text-white cursor-pointer bg-emerald-500'
+          onClick={() => showModalReason(record)}
+        >
+          Xem lý do
+        </div>
+      )
+    })
+  }
   // Function để chuyển đổi dữ liệu từ API
   const mapApiDataToTableData = (apiData: JobFromApi[]): DataType[] => {
     return apiData.map((job, index) => ({
       key: job._id,
       stt: index + 1,
       jobName: job.name,
-      jobPosition: job.field, // Lấy từ trường 'field'
+      jobPosition: job.field,
       expirationDate: job.deadline,
       applicationProfile: job.applicationNumber,
-      status: job.status === 'active' ? 'Kích hoạt' : 'Không kích hoạt'
+      status: job.status === 'active' ? 'Kích hoạt' : 'Không kích hoạt',
+      reasonDecline: job.reasonDecline
     }))
   }
 
@@ -231,12 +240,12 @@ function RecListJobRecruitment(): JSX.Element {
 
   const fetchDataForTab = (key: string) => {
     setActiveTabKey(key)
-    setCurrentPage(1) // Reset lại trang đầu tiên mỗi khi thay đổi tab
+    setCurrentPage(1)
     fetchDataForTab(key)
   }
 
   const handleSearch = async () => {
-    setIsLoading(true) // Bắt đầu quá trình tải dữ liệu
+    setIsLoading(true)
     try {
       let response
       const searchParams = {
@@ -330,6 +339,15 @@ function RecListJobRecruitment(): JSX.Element {
     setCurrentJob(null)
   }
 
+  const showModalReason = (record: DataType) => {
+    setCurrentJob(record)
+    setIsModalReason(true)
+  }
+
+  const handleCancelReason = () => {
+    setIsModalReason(false)
+  }
+
   return (
     <div className='flex flex-col flex-1 gap-4'>
       <div className='w-full p-4 border rounded-xl border-zinc-100'>
@@ -371,6 +389,19 @@ function RecListJobRecruitment(): JSX.Element {
               cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
             >
               <p>{`Bạn có chắc chắn muốn ${currentJob?.status === 'Kích hoạt' ? 'Hủy kích hoạt' : 'Kích hoạt'} công việc này không?`}</p>
+            </Modal>
+
+            <Modal
+              title='Lý do không được duyệt'
+              visible={isModalReason}
+              onCancel={handleCancelReason}
+              footer={[
+                <Button key='ok' type='primary' onClick={handleCancelReason}>
+                  OK
+                </Button>
+              ]}
+            >
+              <p>{currentJob?.reasonDecline}</p>
             </Modal>
           </div>
         </div>

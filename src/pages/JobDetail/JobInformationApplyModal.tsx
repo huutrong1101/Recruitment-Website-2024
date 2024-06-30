@@ -141,6 +141,7 @@ export default function JobInformationApplyModal({
             value={searchTermTemp}
             onChange={handleSearchInputChange}
             className='flex-grow'
+            onPressEnter={handleSearch}
           />
           <Button onClick={handleSearch} className='text-white'>
             Tìm kiếm

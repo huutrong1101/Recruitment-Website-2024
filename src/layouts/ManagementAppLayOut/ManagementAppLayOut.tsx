@@ -42,6 +42,7 @@ function ManagementAppLayout() {
     AdminService.getTotalCandidate(dispatch)
     AdminService.getTotalRecruiter(dispatch)
     AdminService.getTotalJob(dispatch)
+    AdminService.getTotalBlogs(dispatch)
   }, [])
 
   const handleLogout = () => {

@@ -12,22 +12,22 @@ interface NewCardProps {
 function NewBigLeftCard({ news }: NewCardProps) {
   return (
     <Link to={`/news/${news._id}`}>
-      <div className='bg-white border rounded-lg shadow-lg hover:border-emerald-500'>
+      <div className='flex flex-col h-full bg-white border rounded-lg shadow-lg hover:border-emerald-500'>
         <div className={classNames('w-full shadow')}>
           <img
             src={news.thumbnail}
             alt='blog_image'
-            className={classNames('w-full h-full object-cover aspect-video rounded-t-md')}
+            className={classNames('w-full h-[300px] object-cover aspect-video rounded-t-md')}
           />
         </div>
-        <div className={classNames('p-6')}>
-          <div className={classNames('flex flex-col gap-2')}>
+        <div className={classNames('p-6 flex flex-col flex-1')}>
+          <div className={classNames('flex flex-col gap-2 flex-1')}>
             <p className='text-sm text-emerald-500'>{news.type}</p>
             <p className='text-lg font-bold line-clamp-2'>{news.name}</p>
             <p className='text-sm'>Ngày đăng tải: {news.createdAt}</p>
           </div>
 
-          <div className={classNames('mt-2')}>
+          <div className={classNames('mt-2 flex-1')}>
             <p className={classNames(`mt-4 text-sm line-clamp-5 text-gray-400`)}>{parse(news.content)}</p>
           </div>
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Input, Select, Table, Tooltip } from 'antd'
+import { Button, Input, Modal, Select, Table, Tooltip } from 'antd'
 import { SearchOutlined, EyeOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { ColumnsType } from 'antd/es/table'
 import { ArrowPathIcon, Cog6ToothIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
@@ -7,14 +7,19 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AdminService } from '../../../../services/AdminService'
 import FilterNewsComponent from './FilterNewsComponent'
 import NewTableComponent from './NewTableComponent'
+import { toast } from 'react-toastify'
 
 interface News {
   key: string
   stt: number
+  _id: string
   thumbnail: string
-  type: string
   name: string
+  type: string
+  content: string
+  status: string
   createdAt: string
+  updatedAt: string
 }
 
 interface NewFromApi {
@@ -52,6 +57,7 @@ function AdminManageNews() {
   const [searchValue, setSearchValue] = useState('')
   const [selectedType, setSelectedType] = useState<string | undefined>(undefined)
   const [isModalVisible, setIsModalVisible] = React.useState(false)
+  const [chooseNew, setChooseNew] = useState<NewFromApi | null>()
 
   const columns: ColumnsType<News> = [
     {
@@ -65,13 +71,13 @@ function AdminManageNews() {
       dataIndex: 'thumbnail',
       key: 'thumbnail',
       render: (image: string) => <img src={image} alt='Hình ảnh bài viết' className='w-40 h-36' />,
-      width: 200 // Width adjusted to fit the image
+      width: 200
     },
     {
       title: 'Loại bài viết',
       dataIndex: 'type',
       key: 'type',
-      width: 150 // Width adjusted to fit the content
+      width: 150
     },
     {
       title: 'Tiêu đề bài viết',
@@ -88,7 +94,7 @@ function AdminManageNews() {
       title: 'Ngày đăng',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 150 // Width adjusted to fit the content
+      width: 150
     },
     {
       title: 'Hành động',
@@ -103,13 +109,13 @@ function AdminManageNews() {
             </Link>
           </Tooltip>
           <Tooltip title='Đổi trạng thái'>
-            <Button onClick={showModal}>
+            <Button onClick={() => showModal(record)}>
               <ArrowPathIcon className='w-4 h-4' />
             </Button>
           </Tooltip>
         </span>
       ),
-      width: 150 // Width adjusted to fit the actions
+      width: 150
     }
   ]
 
@@ -121,10 +127,14 @@ function AdminManageNews() {
     return apiData.map((data, index) => ({
       key: data._id,
       stt: (currentPage - 1) * pageSize + index + 1,
+      _id: data._id,
       thumbnail: data.thumbnail,
-      type: data.type,
       name: data.name,
-      createdAt: data.createdAt
+      type: data.type,
+      content: data.content,
+      status: data.status,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt
     }))
   }
 
@@ -203,11 +213,33 @@ function AdminManageNews() {
     }
   }
 
-  const showModal = () => {
+  const showModal = (record: NewFromApi) => {
     setIsModalVisible(true)
+    setChooseNew(record) // Lưu record bài viết hiện tại vào state
   }
 
-  const handleOk = () => {}
+  const handleOk = () => {
+    if (chooseNew) {
+      const formDataObj = new FormData()
+      const newStatus = chooseNew.status === 'active' ? 'inactive' : 'active'
+
+      formDataObj.append('status', newStatus)
+
+      toast
+        .promise(AdminService.updateNewInformation(formDataObj, chooseNew._id), {
+          pending: `Trạng thái của tin tức đang được thay đổi`,
+          success: `Thay đổi trạng thái của tin tức thành công`
+        })
+        .then((response) => {
+          setIsModalVisible(false)
+
+          fetchDataByTab(activeTabKey, currentPage, pageSize)
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message)
+        })
+    }
+  }
 
   const handleCancel = () => {
     setIsModalVisible(false)
@@ -251,6 +283,18 @@ function AdminManageNews() {
           />
         </div>
       </div>
+      <Modal
+        title={'Xác nhận đổi trạng thái'}
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText={'Xác nhận'}
+        cancelText='Hủy'
+        cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
+        width={450}
+      >
+        <p>Bạn có muốn đổi trạng thái của bài viết này không ? </p>
+      </Modal>
     </div>
   )
 }

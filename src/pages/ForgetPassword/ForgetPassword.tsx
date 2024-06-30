@@ -20,6 +20,7 @@ export default function ForgetPassword() {
   } = useForm<FormData>()
 
   const [showing, setShowing] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -31,13 +32,20 @@ export default function ForgetPassword() {
     }
   }, [])
 
-  const handleSend = (data: any) => {
-    toast
-      .promise(AuthService.forgetPassword(data), {
-        pending: `Mail xác nhận đang được gửi`,
-        success: `Kiểm tra email để đổi mật khẩu mới`
-      })
-      .catch((error) => toast.error(error.response.data.message))
+  const handleSend = async (data: any) => {
+    setLoading(true)
+    try {
+      await toast
+        .promise(AuthService.forgetPassword(data), {
+          pending: `Mail xác nhận đang được gửi`,
+          success: `Kiểm tra email để đổi mật khẩu mới`
+        })
+        .catch((error) => toast.error(error.response.data.message))
+    } catch (error: any) {
+      toast.error(error.response.data.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -98,7 +106,7 @@ export default function ForgetPassword() {
           enterTo='opacity-100'
         >
           <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-            <PrimaryButton text='Gửi' type='submit' />
+            <PrimaryButton text={loading ? 'Đang gửi...' : 'Gửi'} type='submit' disabled={loading} />
           </div>
         </Transition>
       </Transition>

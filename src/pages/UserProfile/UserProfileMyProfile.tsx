@@ -401,6 +401,7 @@ function UserProfileInformation() {
                   value={searchTermTemp}
                   onChange={handleSearchInputChange}
                   className='flex-grow'
+                  onPressEnter={handleSearch}
                 />
                 <Button onClick={handleSearch} className='text-white'>
                   Tìm kiếm
@@ -508,15 +509,14 @@ function UserProfileInformation() {
 }
 
 function UserProfilePassword() {
-  const { handleSubmit, control, getValues } = useForm()
   const [form] = Form.useForm()
 
   const handleChangePassword = (data: any) => {
     const { email, ...rest } = data
     toast
       .promise(UserService.changePassword(rest), {
-        pending: `Mật khẩu của bạn đang được cập nhật`,
-        success: `Cập nhật mật khẩu thành công`
+        pending: 'Mật khẩu của bạn đang được cập nhật',
+        success: 'Cập nhật mật khẩu thành công'
       })
       .catch((error) => toast.error(error.response.data.message))
   }
@@ -525,10 +525,10 @@ function UserProfilePassword() {
 
   return (
     <div className='p-4 border rounded-xl border-zinc-100'>
-      <h1 className={classNames(`text-2xl font-semibold flex-1 md:mb-4`)}>Mật khẩu</h1>
-      <div className={classNames(`flex flex-col md:flex-row gap-6`)}>
+      <h1 className={classNames('text-2xl font-semibold flex-1 md:mb-4')}>Mật khẩu</h1>
+      <div className={classNames('flex flex-col md:flex-row gap-6')}>
         {/* Avatar edit block */}
-        <div className={classNames(`w-full md:w-3/12 flex flex-col gap-4 px-4`)}></div>
+        <div className={classNames('w-full md:w-3/12 flex flex-col gap-4 px-4')}></div>
         <div className='flex flex-col flex-1 gap-2'>
           <Form layout='vertical' onFinish={handleChangePassword} form={form}>
             <Form.Item label='Email đăng nhập' initialValue={user?.email} name='email'>
@@ -538,7 +538,10 @@ function UserProfilePassword() {
             <Form.Item
               label='Mật khẩu hiện tại'
               name='currentPassword'
-              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại' }]}
+              rules={[
+                { required: true, message: 'Vui lòng nhập mật khẩu hiện tại' },
+                { min: 8, message: 'Mật khẩu mới phải có ít nhất 8 ký tự' }
+              ]}
             >
               <Input.Password prefix={<HiKey />} />
             </Form.Item>
@@ -546,7 +549,10 @@ function UserProfilePassword() {
             <Form.Item
               label='Mật khẩu mới'
               name='newPassword'
-              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu mới' }]}
+              rules={[
+                { required: true, message: 'Vui lòng nhập mật khẩu mới' },
+                { min: 8, message: 'Mật khẩu mới phải có ít nhất 8 ký tự' }
+              ]}
             >
               <Input.Password prefix={<HiKey />} />
             </Form.Item>
@@ -556,7 +562,6 @@ function UserProfilePassword() {
               name='confirmNewPassword'
               rules={[
                 { required: true, message: 'Vui lòng nhập lại mật khẩu mới' },
-                // Thêm quy tắc để kiểm tra xem confirmPassword có trùng với newPassword hay không
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     if (!value || getFieldValue('newPassword') === value) {
@@ -571,7 +576,6 @@ function UserProfilePassword() {
             </Form.Item>
 
             <Form.Item shouldUpdate className='flex flex-row-reverse'>
-              {/* Sử dụng Button của Ant Design, không cần className `md:!w-5/12` như ban đầu nếu không cần thiết */}
               <Button type='primary' htmlType='submit'>
                 Đổi mật khẩu
               </Button>

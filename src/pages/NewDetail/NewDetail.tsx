@@ -10,6 +10,8 @@ import { SearchOutlined } from '@ant-design/icons'
 import { NewService } from '../../services/NewService'
 import parse from 'html-react-parser'
 import NewCard from '../../components/EventCard/NewCard'
+import { JobInterface } from '../../types/job.type'
+import JobCard from '../../components/JobCard/JobCard'
 
 export default function NewDetail() {
   const navigate = useNavigate()
@@ -19,6 +21,8 @@ export default function NewDetail() {
 
   const newDetail = useAppSelector((state) => state.New.newDetail)
 
+  const jobs: JobInterface[] = useAppSelector((state) => state.Job.jobs)
+
   const provinces = useAppSelector((state) => state.Job.province)
   const [search, setSearch] = useState('')
   const [selectedProvince, setSelectedProvince] = useState('')
@@ -26,6 +30,8 @@ export default function NewDetail() {
   const [relatedNews, setRelatedNews] = useState([])
 
   const optionsProvinces = provinces.map((option) => ({ value: option, label: option }))
+
+  console.log(jobs)
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -95,9 +101,9 @@ export default function NewDetail() {
               </div>
             </div>
 
-            <div className={classnames('w-full lg:max-w-xs lg:w-[30%] h-fit sticky top-4')}>
+            <div className={classnames('w-full lg:max-w-xs lg:w-[30%] h-fit sticky top-4 flex flex-col gap-5')}>
               <div className='p-3 bg-white border rounded-lg shadow-lg'>
-                <p className='text-lg font-bold text-emerald-500'>Tìm việc ngay</p>
+                <p className='text-lg font-bold text-center text-emerald-500'>Tìm việc ngay</p>
                 <div className='flex flex-col gap-2 mt-2'>
                   <div>
                     <Input
@@ -123,6 +129,18 @@ export default function NewDetail() {
                     />
                     <Button type='primary' icon={<SearchOutlined />} onClick={handleSubmit} />
                   </div>
+                </div>
+              </div>
+
+              <div className='p-3 bg-white border rounded-lg shadow-lg'>
+                <p className='text-lg font-bold text-center text-emerald-500'>Việc làm mới nhất</p>
+                <div className='flex flex-col gap-2 px-4 -mx-4 mt-[10px]'>
+                  {jobs &&
+                    jobs.slice(0, 4).map((job) => (
+                      <div key={job._id} className='w-full'>
+                        <JobCard job={job} isShow={false} inNews={true} />
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>

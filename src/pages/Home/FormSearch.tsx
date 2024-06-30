@@ -30,6 +30,12 @@ export default function FormSearch() {
     })
   }
 
+  const handleKeyDown = (e: any) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e)
+    }
+  }
+
   return (
     <div
       className={classNames(
@@ -43,6 +49,7 @@ export default function FormSearch() {
           placeholder='Tìm kiếm theo tên, lương khởi điểm, kĩ năng làm việc'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
           className={classNames('w-[85%] h-full text-[10px] md:text-[17px] ml-3 focus:outline-none')}
         />
       </div>

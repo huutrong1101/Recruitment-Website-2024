@@ -17,7 +17,7 @@ export default function LatestJob() {
         {jobs &&
           jobs.slice(0, 6).map((job) => (
             <div key={job._id} className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3'>
-              <JobCard job={job} isShow={false} />
+              <JobCard inNews={false} job={job} isShow={false} />
             </div>
           ))}
       </div>

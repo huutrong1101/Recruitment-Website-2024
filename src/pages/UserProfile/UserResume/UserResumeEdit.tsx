@@ -29,7 +29,6 @@ import '@react-pdf-viewer/page-navigation/lib/styles/index.css'
 import { UploadChangeParam } from 'antd/es/upload'
 import { AuthService } from '../../../services/AuthService'
 import { ResumeResponse } from '../../../types/resume.type'
-import { MdWorkHistory } from 'react-icons/md'
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
 import { useDebounceEffect } from '../AvatarCrop/useDebounceEffect'
 import { canvasPreview } from '../AvatarCrop/canvasPreview'
@@ -137,8 +136,6 @@ function UserResumeEdit() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [imgSrc, setImgSrc] = useState('')
   const imgRef = useRef<HTMLImageElement>(null)
-  const hiddenAnchorRef = useRef<HTMLAnchorElement>(null)
-  const blobUrlRef = useRef('')
   const [crop, setCrop] = useState<Crop>()
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
   const [scale, setScale] = useState(1)
@@ -223,7 +220,6 @@ function UserResumeEdit() {
           })
         }
 
-        // Đảm bảo rằng giá trị của `certifications` cũng được set cho form ở đây
         form.setFieldsValue({
           name: data.name,
           title: data.title,
@@ -477,6 +473,10 @@ function UserResumeEdit() {
     }
   ]
 
+  const handleFormChange = (changedValues: any, allValues: any) => {
+    setFormValues(allValues)
+  }
+
   const handleBack = () => {
     navigate(-1)
   }
@@ -574,13 +574,27 @@ function UserResumeEdit() {
         isUploading: false,
         fileList: []
       }
+      const newDataSource = [...dataSource, newItem]
 
-      setDataSource([...dataSource, newItem])
+      setDataSource(newDataSource)
+
+      setFormValues((currentValues) => ({
+        ...currentValues!,
+        certifications: newDataSource
+      }))
+
+      form.setFieldsValue({ certifications: newDataSource })
     } else if (type === 'educations') {
       const newKey = educations.length > 0 ? educations[educations.length - 1].key + 1 : 1
       const newItem: DataEducationType = { key: newKey, stt: newKey, dateRange: [null, null], major: '' }
       const newEducations = [...educations, newItem]
       setEducations(newEducations)
+
+      setFormValues((currentValues) => ({
+        ...currentValues!,
+        educations: newEducations
+      }))
+
       form.setFieldsValue({ educations: newEducations })
     }
   }
@@ -594,10 +608,14 @@ function UserResumeEdit() {
       }
       setDataSource(updatedDataSource)
       form.setFieldsValue({ certifications: updatedDataSource })
+
+      setFormValues({ ...form.getFieldsValue(), certifications: updatedDataSource })
     } else if (type === 'educations') {
       const updatedEducations = educations.filter((item) => item.key !== key)
       setEducations(updatedEducations)
       form.setFieldsValue({ educations: updatedEducations })
+
+      setFormValues({ ...form.getFieldsValue(), educations: updatedEducations })
     }
   }
 
@@ -605,6 +623,8 @@ function UserResumeEdit() {
     const updatedDataSource = dataSource.map((item) => (item.key === key ? { ...item, name: value } : item))
     setDataSource(updatedDataSource)
     form.setFieldsValue({ certifications: updatedDataSource })
+
+    setFormValues({ ...form.getFieldsValue(), certifications: updatedDataSource })
   }
 
   const handleDateRangeChange = (key: React.Key, dates: [Dayjs | null, Dayjs | null]) => {
@@ -619,19 +639,25 @@ function UserResumeEdit() {
     setEducations(updatedEducations)
     // Cập nhật giá trị trong form
     form.setFieldsValue({ educations: updatedEducations })
+
+    setFormValues({ ...form.getFieldsValue(), educations: updatedEducations })
   }
 
   const handleChangeMajor = (key: React.Key, value: string) => {
     const updatedEducations = educations.map((item) => (item.key === key ? { ...item, major: value } : item))
     setEducations(updatedEducations)
     // Cập nhật giá trị trong form
-    form.setFieldsValue({ workHistories: updatedEducations })
+    form.setFieldsValue({ educations: updatedEducations })
+
+    setFormValues({ ...form.getFieldsValue(), educations: updatedEducations })
   }
 
   const handleDeleteEducation = (key: React.Key) => {
     const updatedEducations = educations.filter((item) => item.key !== key)
     setEducations(updatedEducations)
     form.setFieldsValue({ educations: updatedEducations })
+
+    setFormValues({ ...form.getFieldsValue(), educations: updatedEducations })
   }
 
   const handleAddWorkExperience = () => {
@@ -667,7 +693,9 @@ function UserResumeEdit() {
         : item
     )
     setWorkExperiences(updatedWorkExperiences)
-    form.setFieldsValue({ MdWorkHistory: updatedWorkExperiences })
+    form.setFieldsValue({ workHistories: updatedWorkExperiences })
+
+    setFormValues({ ...form.getFieldsValue(), workHistories: updatedWorkExperiences })
   }
 
   const handleChangeCompany = (key: React.Key, value: string) => {
@@ -675,7 +703,9 @@ function UserResumeEdit() {
       item.key === key ? { ...item, jobDescription: { ...item.jobDescription, company: value } } : item
     )
     setWorkExperiences(updatedWorkExperiences)
-    form.setFieldsValue({ workHistories: updatedWorkExperiences }) // Đảm bảo tên field đúng với Form.Item
+    form.setFieldsValue({ workHistories: updatedWorkExperiences })
+
+    setFormValues({ ...form.getFieldsValue(), workHistories: updatedWorkExperiences })
   }
 
   const handleChangeJobDescription = (key: React.Key, value: string) => {
@@ -683,7 +713,9 @@ function UserResumeEdit() {
       item.key === key ? { ...item, jobDescription: { ...item.jobDescription, jobDescription: value } } : item
     )
     setWorkExperiences(updatedWorkExperiences)
-    form.setFieldsValue({ workHistories: updatedWorkExperiences }) // Đảm bảo tên field đúng với Form.Item
+    form.setFieldsValue({ workHistories: updatedWorkExperiences })
+
+    setFormValues({ ...form.getFieldsValue(), workHistories: updatedWorkExperiences })
   }
 
   const handleDeleteWorkExperience = (key: React.Key) => {
@@ -809,6 +841,7 @@ function UserResumeEdit() {
 
     return new Blob([u8arr], { type: mimeMatch })
   }
+
   function onSelectFile(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
       setCrop(undefined)
@@ -852,7 +885,7 @@ function UserResumeEdit() {
                 <h6 className='flex-1 text-lg font-semibold text-white uppercase'>CV cá nhân</h6>
               </div>
               <div className='flex flex-col gap-2 p-4'>
-                <Form form={form} layout='vertical' onFinish={handleFormSubmit}>
+                <Form form={form} layout='vertical' onFinish={handleFormSubmit} onValuesChange={handleFormChange}>
                   <div className='flex items-start justify-center gap-5'>
                     <div className='w-1/4'>
                       <Form.Item
@@ -1139,6 +1172,7 @@ function UserResumeEdit() {
                           onChange={(_: any, editor: any) => {
                             const data = editor.getData()
                             form.setFieldsValue({ goal: data })
+                            handleFormChange({ goal: data }, { ...form.getFieldsValue(), goal: data })
                           }}
                         />
                       </div>
@@ -1199,6 +1233,7 @@ function UserResumeEdit() {
                           onChange={(_: any, editor: any) => {
                             const data = editor.getData()
                             form.setFieldsValue({ activity: data })
+                            handleFormChange({ activity: data }, { ...form.getFieldsValue(), activity: data })
                           }}
                         />
                       </div>

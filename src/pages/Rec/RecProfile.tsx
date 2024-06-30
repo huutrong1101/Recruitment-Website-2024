@@ -13,7 +13,7 @@ import { UserService } from '../../services/UserService'
 import { setRec, setUser } from '../../redux/reducer/AuthSlice'
 import { RecruiterResponseState } from '../../types/user.type'
 import { Button, Form, Input } from 'antd'
-import { AiOutlineUser } from 'react-icons/ai'
+import { AiOutlineHome, AiOutlineMail, AiOutlinePhone, AiOutlineUser } from 'react-icons/ai'
 import { validateEmail, validatePhone } from '../../utils/validation'
 
 function UserProfileInformation() {
@@ -138,7 +138,7 @@ function UserProfileInformation() {
                 initialValue={recruiter.contactEmail}
                 rules={[{ validator: validateEmail }]}
               >
-                <Input prefix={<AiOutlineUser />} />
+                <Input prefix={<AiOutlineMail />} />
               </Form.Item>
 
               <Form.Item
@@ -147,7 +147,7 @@ function UserProfileInformation() {
                 initialValue={recruiter.position}
                 rules={[{ required: true, message: 'Không được để trống' }]}
               >
-                <Input prefix={<AiOutlineUser />} />
+                <Input prefix={<AiOutlineHome />} />
               </Form.Item>
 
               <Form.Item
@@ -156,7 +156,7 @@ function UserProfileInformation() {
                 initialValue={recruiter.phone}
                 rules={[{ validator: validatePhone }]}
               >
-                <Input prefix={<AiOutlineUser />} />
+                <Input prefix={<AiOutlinePhone />} />
               </Form.Item>
 
               <div className='flex flex-row-reverse'>

@@ -63,20 +63,20 @@ function ResumeTemp3({ values, previewAvatar }: ResumeThemeProps) {
   }
 
   return (
-    <div className='w-full border border-zinc-100 min-h-[600px] py-10 px-8 relative'>
-      <div className='absolute bg-[#163853] top-0 left-0 w-[229px] h-full'></div>
+    <div className='w-full border border-zinc-100 min-h-[600px] py-6 px-8 relative'>
+      <div className='absolute border-r-2 top-0 left-0 w-[229px] h-full'></div>
       <div className='relative flex items-start justify-center'>
         <div className='float-left w-[302px]'>
-          <div className='pl-7'>
+          <div className='pl-4'>
             {previewAvatar ? (
               <img
-                className='object-cover w-[100px] h-[100px] rounded-full border-2 border-white '
+                className='object-cover w-[150px] h-[150px] border-2 border-white '
                 src={previewAvatar}
                 alt={`Preview Avatar`}
               />
             ) : (
               <img
-                className='object-cover w-[100px] h-[100px] rounded-full border-2 border-white'
+                className='object-cover w-[150px] h-[150px] border-2 border-white '
                 src='https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png?ssl=1'
                 alt={`Preview Avatar`}
               />
@@ -84,12 +84,26 @@ function ResumeTemp3({ values, previewAvatar }: ResumeThemeProps) {
           </div>
         </div>
         <div className='float-right w-full pl-5'>
-          <p className='text-lg font-bold'>{values.name ? values.name : 'HỌ VÀ TÊN'}</p>
-          <p>{values.title ? values.title : 'TIÊU ĐỀ HỒ SƠ'}</p>
+          <div className='flex items-center justify-between mb-2'>
+            <p className='text-lg font-bold'>{values.name ? values.name : 'HỌ VÀ TÊN'}</p>
+            <p>{values.title ? values.title : 'TIÊU ĐỀ HỒ SƠ'}</p>
+          </div>
+
+          {values.goal && (
+            <div className='flex flex-col w-full'>
+              <p className='text-sm font-bold'>MỤC TIÊU NGHỀ NGHIỆP</p>
+
+              <div className='w-full my-2 border-b-2'></div>
+
+              <div className='flex flex-col gap-2 text-xs'>
+                <div dangerouslySetInnerHTML={{ __html: values.goal ?? '' }} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className='relative flex items-start justify-center mt-3'>
-        <div className='float-left w-[302px] text-white flex flex-col gap-5'>
+        <div className='float-left w-[302px] flex flex-col gap-5'>
           <div className='flex flex-col w-[90%]'>
             <p className='text-sm font-bold'>LIÊN HỆ</p>
 
@@ -98,21 +112,19 @@ function ResumeTemp3({ values, previewAvatar }: ResumeThemeProps) {
             <div className='flex flex-col gap-2 text-xs'>
               <div className='flex items-center gap-2'>
                 <PhoneIcon className='w-3 h-3' />
-                <p className='text-blue-200'>{values.phone ? values.phone : 'Điền số điện thoại'}</p>
+                <p className=''>{values.phone ? values.phone : 'Điền số điện thoại'}</p>
               </div>
               <div className='flex items-center gap-2'>
                 <EnvelopeIcon className='w-3 h-3' />
-                <p className='text-blue-200'>{values.email ? values.email : 'Điền email'}</p>
+                <p className=''>{values.email ? values.email : 'Điền email'}</p>
               </div>
               <div className='flex items-center gap-2'>
                 <CakeIcon className='w-3 h-3' />
-                <p className='text-blue-200'>
-                  {values.dateOfBirth ? values.dateOfBirth?.format('DD/MM/YYYY') : 'Điền ngày sinh'}
-                </p>
+                <p className=''>{values.dateOfBirth ? values.dateOfBirth?.format('DD/MM/YYYY') : 'Điền ngày sinh'}</p>
               </div>
               <div className='flex items-center gap-2'>
                 <MapPinIcon className='w-3 h-3' />
-                <p className='text-blue-200'>{values.homeTown ? values.homeTown : 'Điền địa chỉ'}</p>
+                <p className=''>{values.homeTown ? values.homeTown : 'Điền địa chỉ'}</p>
               </div>
             </div>
           </div>
@@ -144,26 +156,22 @@ function ResumeTemp3({ values, previewAvatar }: ResumeThemeProps) {
 
               <div className='flex flex-col gap-2 text-xs'>
                 <p className='text-xs font-medium'>
-                  <span className='font-bold'>Học vấn:</span>{' '}
-                  <span className='text-blue-200'>{values.educationLevel}</span>
+                  <span className='font-bold'>Học vấn:</span> <span className=''>{values.educationLevel}</span>
                 </p>
                 <p className='text-xs font-medium'>
-                  <span className='font-bold'>Điểm GPA:</span> <span className='text-blue-200'>{values.GPA} / 4.0</span>
+                  <span className='font-bold'>Điểm GPA:</span> <span className=''>{values.GPA} / 4.0</span>
                 </p>
                 <p className='text-xs font-medium '>
-                  <span className='font-bold'>Ngành:</span> <span className='text-blue-200'>{values.major}</span>
+                  <span className='font-bold'>Ngành:</span> <span className=''>{values.major}</span>
                 </p>
                 <p className='text-xs font-medium '>
-                  <span className='font-bold'>Kinh nghiệm làm việc:</span>{' '}
-                  <span className='text-blue-200'>{values.experience}</span>
+                  <span className='font-bold'>Kinh nghiệm làm việc:</span> <span className=''>{values.experience}</span>
                 </p>
                 <p className='text-xs font-medium '>
-                  <span className='font-bold'>Loại hình công việc:</span>{' '}
-                  <span className='text-blue-200'>{values.jobType}</span>
+                  <span className='font-bold'>Loại hình công việc:</span> <span className=''>{values.jobType}</span>
                 </p>
                 <p className='text-xs font-medium '>
-                  <span className='font-bold'>Trình độ ngoại ngữ:</span>{' '}
-                  <span className='text-blue-200'>{values.english}</span>
+                  <span className='font-bold'>Trình độ ngoại ngữ:</span> <span className=''>{values.english}</span>
                 </p>
               </div>
             </div>
@@ -171,18 +179,6 @@ function ResumeTemp3({ values, previewAvatar }: ResumeThemeProps) {
         </div>
 
         <div className='flex flex-col float-right w-full gap-5 pl-5'>
-          {values.goal && (
-            <div className='flex flex-col w-full'>
-              <p className='text-sm font-bold'>MỤC TIÊU NGHỀ NGHIỆP</p>
-
-              <div className='w-full my-2 border-b-2'></div>
-
-              <div className='flex flex-col gap-2 text-xs'>
-                <div dangerouslySetInnerHTML={{ __html: values.goal ?? '' }} />
-              </div>
-            </div>
-          )}
-
           {values.workHistories && values.workHistories.length > 0 && (
             <div className='flex flex-col w-full'>
               <p className='text-sm font-bold'>KINH NGHIỆM LÀM VIỆC</p>

@@ -14,7 +14,6 @@ import ForgetPassword from './pages/ForgetPassword/ForgetPassword'
 import ConfirmPassword from './pages/ForgetPassword/ConfirmPassword'
 import Jobs from './pages/Jobs/Jobs'
 import JobDetail from './pages/JobDetail/JobDetail'
-import EventDetail from './pages/NewDetail/NewDetail'
 import UserProfileLayout from './pages/UserProfile/UserProfileLayout'
 import UserProfileMyProfile from './pages/UserProfile/UserProfileMyProfile'
 import UserProfileMyInformation from './pages/UserProfile/UserProfileMyInformation'
@@ -54,7 +53,7 @@ import { RecService } from './services/RecService'
 import RecuiterDetail from './pages/RecuiterDetail/RecuiterDetail'
 import Payment from './pages/Recruiter/Payment.tsx/Payment'
 import RecFindCandidate from './pages/Rec/RecMyService/RecFindCandidate'
-import RecStatistical from './pages/Rec/RecMyService/RecStatistical'
+import RecStatistical from './pages/Rec/RecMyService/RecStatistical/RecStatistical'
 import AdminManageNews from './pages/Admin/AdminManageNews/AdminManageNews/AdminManageNews'
 import AdminManageNewDetail from './pages/Admin/AdminManageNews/AdminManageNewDetail'
 import AdminManageAddCompany from './pages/Admin/AdminManageCompanies/AddCompany/AdminManageAddCompany'
@@ -71,6 +70,8 @@ import { NewService } from './services/NewService'
 import FilterCandidate from './components/Routers/FilterCandidate'
 import FilterRecruiter from './components/Routers/FilterRecruiter'
 import NewDetail from './pages/NewDetail/NewDetail'
+import { useTokenAuthorize } from './hooks/useTokenAuthorize'
+import RecruiterAppLayout from './layouts/RecruiterAppLayout'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -127,7 +128,6 @@ function App() {
             <Route path='complete' element={<ConfirmComplete />} />
           </Route>
 
-          {/* This route is accepted when user is not logged in */}
           <Route element={<FilterNonLogin />}>
             <Route path='/email' element={<EmailConfirmationLayout />}>
               <Route path='incomplete' element={<IncompleteConfirmEmail />} />
@@ -160,27 +160,27 @@ function App() {
               <Route index element={<UserResumeEdit />} />
             </Route>
           </Route>
-        </Route>
 
-        {/* RECRUITER  */}
-        <Route element={<FilterRecruiter />}>
-          <Route path='/recruiter' element={<UserAppLayout />}>
-            <Route path='thankyou' element={<Payment />} />
-            <Route path='profile' element={<UserProfileLayout />}>
-              <Route index element={<RecProfile />} />
-              <Route path='service' element={<RecMyService />} />
-              <Route path='service/findCandidate' element={<RecFindCandidate />} />
-              <Route path='service/findCandidate/:resumeId' element={<ResumeDetail />} />
-              <Route path='service/statistical' element={<RecStatistical />} />
-              <Route path='company' element={<RecCompany />} />
-              <Route path='jobsPosted' element={<RecListJobRecruitment />} />
-              <Route path='jobsPosted/listCandidate/:jobid' element={<ListCandidateApply />} />
-              <Route
-                path='jobsPosted/listCandidate/:jobid/candidateDetail/:candidateId'
-                element={<CandidateProfileDetail />}
-              />
-              <Route path='createJob' element={<RecAddJob />} />
-              <Route path='editJob/:jobId' element={<RecEditJob />} />
+          {/* RECRUITER  */}
+          <Route element={<FilterRecruiter />}>
+            <Route path='/recruiter' element={<RecruiterAppLayout />}>
+              <Route path='thankyou' element={<Payment />} />
+              <Route path='profile' element={<UserProfileLayout />}>
+                <Route index element={<RecProfile />} />
+                <Route path='service' element={<RecMyService />} />
+                <Route path='service/findCandidate' element={<RecFindCandidate />} />
+                <Route path='service/findCandidate/:resumeId' element={<ResumeDetail />} />
+                <Route path='service/statistical' element={<RecStatistical />} />
+                <Route path='company' element={<RecCompany />} />
+                <Route path='jobsPosted' element={<RecListJobRecruitment />} />
+                <Route path='jobsPosted/listCandidate/:jobid' element={<ListCandidateApply />} />
+                <Route
+                  path='jobsPosted/listCandidate/:jobid/candidateDetail/:candidateId'
+                  element={<CandidateProfileDetail />}
+                />
+                <Route path='createJob' element={<RecAddJob />} />
+                <Route path='editJob/:jobId' element={<RecEditJob />} />
+              </Route>
             </Route>
           </Route>
         </Route>

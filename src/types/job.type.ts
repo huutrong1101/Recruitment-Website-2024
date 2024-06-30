@@ -25,6 +25,7 @@ export interface JobInterface {
   companyAddress: string
   companySlug: string
   premiumAccount: boolean
+  reasonDecline: string
 }
 
 export interface AdminJobInterface {
@@ -72,6 +73,7 @@ export interface AdminCompanyInterface {
   employeeNumber: number
   role: string
   slug: string
+  reasonDecline: string
 }
 
 export interface NewInterface {

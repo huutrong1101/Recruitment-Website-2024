@@ -5,10 +5,14 @@ import TabPane from 'antd/es/tabs/TabPane'
 interface DataType {
   key: string
   stt: number
+  _id: string
   thumbnail: string
-  type: string
   name: string
+  type: string
+  content: string
+  status: string
   createdAt: string
+  updatedAt: string
 }
 
 interface NewTableProps {

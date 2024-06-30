@@ -119,10 +119,13 @@ function AdminManageEditNew() {
       }
     })
 
-    // Thêm file logo và cover photo vào formDataObj nếu có
+    const uploadFilesArray = Array.isArray(mergedValues.uploadFile)
+      ? mergedValues.uploadFile
+      : [mergedValues.uploadFile]
 
-    if (mergedValues.uploadFile && mergedValues.uploadFile.slice(-1)[0].originFileObj instanceof File) {
-      formDataObj.append('uploadFile', mergedValues.uploadFile.slice(-1)[0].originFileObj)
+    if (uploadFilesArray.length > 0 && uploadFilesArray[0].originFileObj instanceof File) {
+      const latestFile = uploadFilesArray[uploadFilesArray.length - 1].originFileObj
+      formDataObj.append('uploadFile', latestFile)
     }
 
     if (newDetail) {

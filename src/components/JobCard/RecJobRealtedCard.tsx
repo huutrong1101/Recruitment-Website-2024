@@ -4,7 +4,7 @@ import { RecruiterResponseState } from '../../types/user.type'
 import { useAppSelector } from '../../hooks/hooks'
 import { RecService } from '../../services/RecService'
 import { toast } from 'react-toastify'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Modal } from 'antd'
 
 interface RecCardProps {
@@ -69,7 +69,8 @@ function RecJobRealtedCard({ rec }: RecCardProps) {
     }
   }
   return (
-    <div
+    <Link
+      to={`/recruiters/${rec.slug}`}
       className={classNames(
         `px-4 py-4 bg-white rounded-lg shadow-sm border hover:border-emerald-500`,
         `ease-in-out duration-75 hover:shadow-md`,
@@ -115,7 +116,7 @@ function RecJobRealtedCard({ rec }: RecCardProps) {
           {isFavorite ? 'loại công ty này khỏi danh sách yêu thích' : 'lưu công ty này vào danh sách yêu thích'}?
         </p>
       </Modal>
-    </div>
+    </Link>
   )
 }
 
