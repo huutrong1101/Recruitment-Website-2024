@@ -103,7 +103,7 @@ function RecJobRealtedCard({ rec }: RecCardProps) {
 
       <Modal
         title={isFavorite ? 'Xác nhận xóa' : 'Xác nhận theo dõi'}
-        visible={visibleModal}
+        open={visibleModal}
         onOk={handleFavoriteToggle}
         onCancel={handleCancel}
         okText={isFavorite ? 'Xóa' : 'Lưu'}

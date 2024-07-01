@@ -380,7 +380,7 @@ function UserProfileInformation() {
 
       <Modal
         title='Bật tìm việc'
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
         okText='Bật tìm việc ngay'
@@ -457,7 +457,7 @@ function UserProfileInformation() {
 
       <Modal
         title='Cập nhật avatar'
-        visible={isModalUploadImage}
+        open={isModalUploadImage}
         onOk={handleUploadAvatarModal}
         onCancel={handleCancelUploadAvatar}
         okText='Cập nhật avatar'

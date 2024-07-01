@@ -104,7 +104,7 @@ export default function JobInformationApplyModal({
   return (
     <Modal
       title={'NỘP HỒ SƠ ỨNG TUYỂN'}
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       footer={[
         <Button key='back' onClick={onClose} style={{ backgroundColor: 'transparent' }}>

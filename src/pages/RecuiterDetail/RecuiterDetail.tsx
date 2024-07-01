@@ -289,7 +289,7 @@ function RecuiterDetail() {
 
                     <Modal
                       title={isRecFavorite ? 'Xác nhận xóa' : 'Xác nhận theo dõi'}
-                      visible={isModalVisible}
+                      open={isModalVisible}
                       onOk={isRecFavorite ? handleRemoveFavorite : handleSaveFavorite}
                       onCancel={handleCancel}
                       okText={isRecFavorite ? 'Xóa' : 'Lưu'}
@@ -360,9 +360,14 @@ function RecuiterDetail() {
                       prefix={<UserCircleIcon />}
                       className='w-full'
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật giá trị khi thay đổi
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       type='text'
                       style={{ width: '50%' }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSearch()
+                        }
+                      }}
                     />
                     <Select
                       showSearch

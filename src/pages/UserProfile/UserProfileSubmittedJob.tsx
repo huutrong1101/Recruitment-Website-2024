@@ -242,7 +242,7 @@ const UserProfileSubmittedJob = () => {
         </div>
         <Modal
           title='Rút hồ sơ ứng tuyển'
-          visible={isModalVisible}
+          open={isModalVisible}
           onOk={handleModalOk}
           onCancel={handleModalCancel}
           okText='Có'
@@ -257,7 +257,7 @@ const UserProfileSubmittedJob = () => {
 
         <Modal
           title='Lý do không được nhận'
-          visible={isReasonModalVisible}
+          open={isReasonModalVisible}
           onOk={() => setIsReasonModalVisible(false)}
           onCancel={() => setIsReasonModalVisible(false)}
           okText='Đóng'

@@ -381,7 +381,7 @@ function RecListJobRecruitment(): JSX.Element {
             />
             <Modal
               title='Chuyển đổi trạng thái'
-              visible={isModalVisible}
+              open={isModalVisible}
               onOk={handleOk}
               onCancel={handleCancel}
               okText='Xác nhận'
@@ -393,7 +393,7 @@ function RecListJobRecruitment(): JSX.Element {
 
             <Modal
               title='Lý do không được duyệt'
-              visible={isModalReason}
+              open={isModalReason}
               onCancel={handleCancelReason}
               footer={[
                 <Button key='ok' type='primary' onClick={handleCancelReason}>

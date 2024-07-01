@@ -137,7 +137,7 @@ export default function UserProfileMyResume() {
       </div>
       <Modal
         title='Chọn mẫu CV'
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         width='80%'

@@ -262,7 +262,7 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
 
                 <Modal
                   title='Xác nhận công việc'
-                  visible={isModalVisible}
+                  open={isModalVisible}
                   onOk={handleConfirmJob}
                   onCancel={handleCancelConfirmJob}
                   okText='Xử lý'
@@ -447,7 +447,7 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                       </button>
                       <Modal
                         title={isFavorite ? 'Xác nhận xóa' : 'Xác nhận lưu'}
-                        visible={visibleFavoriteModal}
+                        open={visibleFavoriteModal}
                         onOk={isFavorite ? handleRemoveFavorite : handleSaveFavorite}
                         onCancel={handleCancel}
                         okText={isFavorite ? 'Xóa' : 'Lưu'}

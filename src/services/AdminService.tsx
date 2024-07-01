@@ -172,9 +172,6 @@ const getListNews = async ({ name = '', type = '', status = '', page = 1, limit 
   params.append('page', page.toString())
   params.append('limit', limit.toString())
 
-  // Chuyển params thành chuỗi để gắn vào URL
-  const queryParams = params.toString()
-
   return await axiosInstance.get(`/admin/blogs/list_blog?${params}`)
 }
 

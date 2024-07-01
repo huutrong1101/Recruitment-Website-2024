@@ -254,7 +254,7 @@ function AdminManageAddNew() {
               <Modal
                 title='Cập nhật avatar'
                 style={{ top: 20 }}
-                visible={isModalOpen}
+                open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
                 okText='Cập nhật ảnh bài viết'

@@ -276,7 +276,7 @@ function ResumeDetail() {
 
                   <Modal
                     title={isFavorite ? 'Bỏ khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
-                    visible={isFavoriteModalVisible}
+                    open={isFavoriteModalVisible}
                     onOk={toggleFavorite}
                     onCancel={handleCancel}
                     okText={isFavorite ? 'Bỏ yêu thích' : 'Lưu'}

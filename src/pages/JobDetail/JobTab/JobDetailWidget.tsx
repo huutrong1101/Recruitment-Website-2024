@@ -83,7 +83,7 @@ function JobDetailWidget({ job, jobInformation }: JobProps) {
 
       <Modal
         title='Lý do không được duyệt'
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleCancel}
         footer={[
           <Button key='ok' type='primary' onClick={handleCancel}>

@@ -20,7 +20,6 @@ import UserProfileMyInformation from './pages/UserProfile/UserProfileMyInformati
 import UserProfileMyResume from './pages/UserProfile/UserResume/UserProfileMyResume'
 import UserProfileSubmittedJob from './pages/UserProfile/UserProfileSubmittedJob'
 import OneTimePasswordVerify from './pages/OneTimePasswordVerify/OneTimePasswordVerify'
-import PrintResume from './pages/PrintResume/PrintResume'
 import ManagementAppLayOut from './layouts/ManagementAppLayOut/ManagementAppLayOut'
 import AdminDashboard from './pages/Admin/AdminDashboard/AdminDashboard'
 import Logout from './pages/Logout/Logout'
@@ -150,7 +149,6 @@ function App() {
               <Route path='interest-jobs' element={<UserInterestJob />} />
               <Route path='interest-companies' element={<UserInterestCompanies />} />
             </Route>
-            <Route path='/print-resume' element={<PrintResume />} />
 
             <Route path='/profile/resume/add' element={<UserResumeLayout />}>
               <Route index element={<UserResumeAdd />} />

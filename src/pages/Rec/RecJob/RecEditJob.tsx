@@ -64,8 +64,6 @@ function RecEditJob() {
     form.setFieldsValue({ salary: salary })
   }, [salaryType, salary, form])
 
-  console.log(jobDetail)
-
   useEffect(() => {
     if (jobDetail && form) {
       const formattedDeadline = jobDetail.deadline ? dayjs(jobDetail.deadline, 'DD/MM/YYYY') : null
@@ -152,8 +150,6 @@ function RecEditJob() {
     delete formValues.salaryType
     delete formValues.startingSalary
     delete formValues.salaryRange
-
-    console.log(formValues)
 
     if (jobId) {
       toast

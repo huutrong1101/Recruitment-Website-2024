@@ -105,7 +105,7 @@ function CandidateCardCV({ resume }: ResumeCardProps) {
       </div>
       <Modal
         title='Xác nhận thay đổi trạng thái'
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         cancelText='Hủy'

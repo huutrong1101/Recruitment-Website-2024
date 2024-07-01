@@ -4,7 +4,6 @@ import React from 'react'
 import { HiHeart } from 'react-icons/hi2'
 import { Link } from 'react-router-dom'
 import { JobInterface } from '../../types/job.type'
-import { useAppSelector } from '../../hooks/hooks'
 
 interface RecJobCardProps {
   job: JobInterface
@@ -39,15 +38,13 @@ function RecJobCard({ job }: RecJobCardProps) {
     >
       <div className='flex items-center gap-5'>
         <div className='w-1/6'>
-          <img className='object-cover w-[120px] h-[120px]' src={job.companyLogo} alt='' />
+          <img className='object-cover w-[120px] h-[120px]' src={job.companyLogo} alt={`${job.companyName} logo`} />
         </div>
 
         <div className='flex flex-col w-5/6 gap-4'>
           <div className='flex justify-between'>
             <div className='flex flex-col gap-2'>
-              <Link to={``}>
-                <h3 className='text-lg font-semibold leading-6 text-black hover:text-emerald-500'>{job.name}</h3>
-              </Link>
+              <h3 className='text-lg font-semibold leading-6 text-black hover:text-emerald-500'>{job.name}</h3>
 
               <p className='text-base font-normal leading-5 text-gray-700 truncate'>{job.companyName}</p>
             </div>
@@ -66,7 +63,7 @@ function RecJobCard({ job }: RecJobCardProps) {
               </button>
             </div>
             <div className='flex items-center gap-3'>
-              <button className='px-2 py-1 text-sm text-white rounded-md bg-emerald-500'>Ứng tuyển</button>
+              <button className='px-2 py-1 text-sm text-white rounded-md bg-emerald-500'>Ởng tuyển</button>
               <HiHeart className='w-6 h-6 text-emerald-500' />
             </div>
           </div>

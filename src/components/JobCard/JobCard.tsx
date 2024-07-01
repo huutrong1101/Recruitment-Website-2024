@@ -110,29 +110,83 @@ export default function JobCard({ job, isShow, inNews }: JobCardProps) {
 
   return (
     <>
-      <Link to={`/jobs/${job._id}`}>
-        <div
-          className={classNames(
-            'px-4 py-2 bg-white rounded-lg shadow-sm flex flex-col md:flex-col transition-all duration-75 cursor-pointer hover:shadow-md',
-            {
-              'border-2 border-yellow-400': job.premiumAccount,
-              'border hover:border-emerald-500': !job.premiumAccount
-            }
-          )}
-        >
-          <div className='flex items-center gap-3'>
-            <div className='w-1/4'>
+      <div
+        className={classNames(
+          'px-4 py-2 bg-white rounded-lg shadow-sm flex flex-col md:flex-col transition-all duration-75 cursor-pointer hover:shadow-md',
+          {
+            'border-2 border-yellow-400': job.premiumAccount,
+            'border hover:border-emerald-500': !job.premiumAccount
+          }
+        )}
+      >
+        <div className='flex items-center gap-3'>
+          <div className='w-1/4'>
+            <Link to={`/jobs/${job._id}`}>
               <img className='object-cover w-full h-full' src={job.companyLogo} alt='' />
-            </div>
-            <div className='flex flex-col w-3/4 gap-1'>
-              {isShow ? (
-                <div className='flex flex-col text-xs font-medium text-gray-600 md:text-sm'>
+            </Link>
+          </div>
+          <div className='flex flex-col w-3/4 gap-1'>
+            {isShow ? (
+              <div className='flex flex-col text-xs font-medium text-gray-600 md:text-sm'>
+                <div className='flex items-center justify-between'>
+                  <Link to={`/jobs/${job._id}`} className='w-[95%]'>
+                    <h3 className='text-xs font-semibold text-gray-700 truncate md:text-sm hover:text-emerald-500'>
+                      {job.name}
+                    </h3>
+                  </Link>
+                  <Tooltip title={isFavorite ? 'Hủy thích' : 'Lưu việc'}>
+                    <div className={isFavorite ? 'text-red-500' : 'text-gray-500'}>
+                      <HiHeart
+                        onClick={(e) => {
+                          e.preventDefault()
+                          showModal()
+                        }}
+                      />
+                    </div>
+                  </Tooltip>
+                </div>
+                <p className='text-xs font-medium text-gray-600 truncate md:text-sm'>
+                  <span className='font-bold'>Tên công ty:</span>{' '}
+                  <span className='hover:text-emerald-500'>{job.companyName}</span>
+                </p>
+                <p>
+                  <span className='font-bold'>Nơi làm việc: </span>
+                  {job.province}
+                </p>
+                <p>
+                  <span className='font-bold'>Cập nhật: </span>
+                  {moment(job.updatedAt).format('MM/DD/YYYY')} - Bạn còn
+                  <span className='font-semibold'> {calculateDaysToDeadline(job.deadline)} </span>
+                  ngày để ứng tuyển.
+                </p>
+                <p>
+                  <span className='font-bold'>Vị trí: </span>
+                  {job.field} - {job.type}
+                </p>
+                <p>
+                  <span className='font-bold'>Mức lương: </span>
+                  {formatSalary(job.salary)}
+                </p>
+              </div>
+            ) : (
+              <>
+                <Link to={`/jobs/${job._id}`}>
+                  <h3 className='text-xs font-semibold text-gray-700 truncate md:text-sm hover:text-emerald-500'>
+                    {job.name}
+                  </h3>
+                </Link>
+
+                <p className='text-xs font-medium text-gray-600 truncate md:text-sm'>{job.companyName}</p>
+                {!inNews && (
                   <div className='flex items-center justify-between'>
-                    <Link to={`/jobs/${job._id}`} className='w-[95%]'>
-                      <h3 className='text-xs font-semibold text-gray-700 truncate md:text-sm hover:text-emerald-500'>
-                        {job.name}
-                      </h3>
-                    </Link>
+                    <div className='flex items-center gap-2'>
+                      <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
+                        {formatSalary(job.salary)}
+                      </button>
+                      <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
+                        {job.province}
+                      </button>
+                    </div>
                     <Tooltip title={isFavorite ? 'Hủy thích' : 'Lưu việc'}>
                       <div className={isFavorite ? 'text-red-500' : 'text-gray-500'}>
                         <HiHeart
@@ -144,70 +198,16 @@ export default function JobCard({ job, isShow, inNews }: JobCardProps) {
                       </div>
                     </Tooltip>
                   </div>
-                  <p className='text-xs font-medium text-gray-600 truncate md:text-sm'>
-                    <span className='font-bold'>Tên công ty:</span>{' '}
-                    <span className='hover:text-emerald-500'>{job.companyName}</span>
-                  </p>
-                  <p>
-                    <span className='font-bold'>Nơi làm việc: </span>
-                    {job.province}
-                  </p>
-                  <p>
-                    <span className='font-bold'>Cập nhật: </span>
-                    {moment(job.updatedAt).format('MM/DD/YYYY')} - Bạn còn
-                    <span className='font-semibold'> {calculateDaysToDeadline(job.deadline)} </span>
-                    ngày để ứng tuyển.
-                  </p>
-                  <p>
-                    <span className='font-bold'>Vị trí: </span>
-                    {job.field} - {job.type}
-                  </p>
-                  <p>
-                    <span className='font-bold'>Mức lương: </span>
-                    {formatSalary(job.salary)}
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <Link to={`/jobs/${job._id}`}>
-                    <h3 className='text-xs font-semibold text-gray-700 truncate md:text-sm hover:text-emerald-500'>
-                      {job.name}
-                    </h3>
-                  </Link>
-
-                  <p className='text-xs font-medium text-gray-600 truncate md:text-sm'>{job.companyName}</p>
-                  {!inNews && (
-                    <div className='flex items-center justify-between'>
-                      <div className='flex items-center gap-2'>
-                        <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
-                          {formatSalary(job.salary)}
-                        </button>
-                        <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
-                          {job.province}
-                        </button>
-                      </div>
-                      <Tooltip title={isFavorite ? 'Hủy thích' : 'Lưu việc'}>
-                        <div className={isFavorite ? 'text-red-500' : 'text-gray-500'}>
-                          <HiHeart
-                            onClick={(e) => {
-                              e.preventDefault()
-                              showModal()
-                            }}
-                          />
-                        </div>
-                      </Tooltip>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+                )}
+              </>
+            )}
           </div>
         </div>
-      </Link>
+      </div>
 
       <Modal
         title={isFavorite ? 'Hủy thích công việc ' : 'Lưu việc vào yêu thích'}
-        visible={visibleModal}
+        open={visibleModal} // Thay đổi visible thành open
         onOk={handleFavoriteToggle}
         onCancel={handleCancel}
         okText={isFavorite ? 'Hủy thích' : 'Lưu'}

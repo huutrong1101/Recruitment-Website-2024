@@ -248,7 +248,7 @@ function UserInterestCompanies() {
       </div>
       <Modal
         title='Xác nhận xóa'
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         okText='Có'
@@ -264,7 +264,7 @@ function UserInterestCompanies() {
 
       <Modal
         title='Xác nhận xóa'
-        visible={isModalDeleteAllVisible}
+        open={isModalDeleteAllVisible}
         onOk={handleDelete}
         onCancel={handleCancelDelete}
         okText='Có'

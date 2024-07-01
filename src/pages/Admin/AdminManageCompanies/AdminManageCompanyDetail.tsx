@@ -247,28 +247,10 @@ function AdminManageCompanyDetail() {
                     >
                       XỬ LÍ
                     </button>
-                    {/* <Modal
-                      title='Xác nhận công ty'
-                      visible={isModalVisible}
-                      onOk={handleOk}
-                      onCancel={handleCancel}
-                      okText='Xử lý'
-                      cancelText='Hủy'
-                      cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
-                      width={450}
-                    >
-                      <div className='flex flex-col gap-1'>
-                        <p>Chọn trạng thái xử lí công ty</p>
-                        <Radio.Group onChange={(e) => setApprovalStatus(e.target.value)} value={approvalStatus}>
-                          <Radio value='approve'>Duyệt công ty</Radio>
 
-                          <Radio value='decline'>Không duyệt công ty</Radio>
-                        </Radio.Group>
-                      </div>
-                    </Modal> */}
                     <Modal
                       title='Xác nhận công ty'
-                      visible={isModalVisible}
+                      open={isModalVisible}
                       onOk={handleOk}
                       onCancel={handleCancel}
                       okText='Xử lý'
@@ -355,7 +337,7 @@ function AdminManageCompanyDetail() {
                   )}
                   <Modal
                     title='Lý do không được duyệt'
-                    visible={isModalReason}
+                    open={isModalReason}
                     onCancel={handleCancelReason}
                     footer={[
                       <Button key='ok' type='primary' onClick={handleCancelReason}>

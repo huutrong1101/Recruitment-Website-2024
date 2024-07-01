@@ -224,7 +224,7 @@ function FilterListResume({
 
         <Modal
           title='Xác nhận xóa'
-          visible={isModalDeleteAllVisible}
+          open={isModalDeleteAllVisible}
           onOk={deleteAllFavorite}
           onCancel={handleCancelDelete}
           okText='Có'
@@ -240,7 +240,7 @@ function FilterListResume({
 
         <Modal
           title='Tìm kiếm nâng cao'
-          visible={isAdvancedSearchModalVisible}
+          open={isAdvancedSearchModalVisible}
           onOk={handleSearch}
           onCancel={toggleAdvancedSearchModal}
           okText='Tìm kiếm'

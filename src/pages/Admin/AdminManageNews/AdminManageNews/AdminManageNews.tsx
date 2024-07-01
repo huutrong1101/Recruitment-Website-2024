@@ -285,7 +285,7 @@ function AdminManageNews() {
       </div>
       <Modal
         title={'Xác nhận đổi trạng thái'}
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         okText={'Xác nhận'}

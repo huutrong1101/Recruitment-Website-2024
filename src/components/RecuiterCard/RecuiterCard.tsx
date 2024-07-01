@@ -8,6 +8,11 @@ interface RecuiterCardProps {
   recruiter: RecruiterResponseState
 }
 
+function cleanHtml(html: string) {
+  // Sử dụng regex hoặc thư viện để làm sạch HTML, loại bỏ thẻ <p> lồng nhau
+  return html.replace(/<\/?p[^>]*>/g, '') // Loại bỏ tất cả các thẻ <p>
+}
+
 function RecuiterCard({ recruiter }: RecuiterCardProps) {
   return (
     <Link
@@ -46,7 +51,7 @@ function RecuiterCard({ recruiter }: RecuiterCardProps) {
           </h3>
         </div>
         <div className='text-[#555] text-sm pt-4 flex-grow'>
-          <p className='line-clamp-5'>{parse(recruiter.about)}</p>
+          <div className='line-clamp-5'>{parse(cleanHtml(recruiter.about))}</div>
         </div>
       </div>
     </Link>

@@ -276,7 +276,7 @@ function UserResumeEdit() {
   const modalBody = () => (
     <Modal
       title='PDF Viewer'
-      visible={shown}
+      open={shown}
       onCancel={() => setShown(false)}
       footer={null}
       width='80%'
@@ -921,7 +921,7 @@ function UserResumeEdit() {
                         )}
                         <Modal
                           title='Cập nhật avatar'
-                          visible={isModalOpen}
+                          open={isModalOpen}
                           onOk={handleOk}
                           onCancel={handleCancel}
                           okText='Cập nhật avatar'

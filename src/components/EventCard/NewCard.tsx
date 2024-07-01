@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { NewInterface } from '../../types/job.type'
 import parse from 'html-react-parser'
 
@@ -8,10 +8,16 @@ interface NewCardProps {
 }
 
 export default function NewCard({ news }: NewCardProps) {
+  const navigate = useNavigate()
+
+  const handleClick = () => {
+    navigate(`/news/${news._id}`)
+  }
+
   return (
     <>
       {news && (
-        <Link to={`/news/${news._id}`}>
+        <div onClick={handleClick} className='cursor-pointer'>
           <div className='flex flex-col h-full bg-white border rounded-lg shadow-lg hover:border-emerald-500'>
             <div className={classNames('w-full shadow')}>
               <img
@@ -24,17 +30,17 @@ export default function NewCard({ news }: NewCardProps) {
               {/* Description */}
               <div className={classNames('mt-2 flex-1')}>
                 <div className={classNames('flex flex-col gap-1')}>
-                  <p className='text-sm text-emerald-500'>{news.type}</p>
-                  <p className='text-base font-bold line-clamp-2'>{news.name}</p>
-                  <p className='text-sm'>Ngày đăng tải: {news.createdAt}</p>
+                  <span className='text-sm text-emerald-500'>{news.type}</span>
+                  <span className='text-base font-bold line-clamp-2'>{news.name}</span>
+                  <span className='text-sm'>Ngày đăng tải: {news.createdAt}</span>
                 </div>
                 <div className={classNames('mt-1')}>
-                  <p className={classNames('text-sm line-clamp-4 text-gray-400')}>{parse(news.content)}</p>
+                  <div className={classNames('text-sm line-clamp-4 text-gray-400')}>{parse(news.content)}</div>
                 </div>
               </div>
             </div>
           </div>
-        </Link>
+        </div>
       )}
     </>
   )

@@ -7,7 +7,6 @@ import { Navigation, Autoplay } from 'swiper/modules'
 
 import 'swiper/css'
 import 'swiper/css/pagination'
-import { Link } from 'react-router-dom'
 import RecCard from '../../components/JobCard/RecCard'
 
 export default function FeaturedRecruiter() {
@@ -33,15 +32,13 @@ export default function FeaturedRecruiter() {
             delay: 2500,
             disableOnInteraction: false
           }}
-          loop={true} // Thêm dòng này
+          loop={true}
           modules={[Autoplay, Navigation]}
         >
           {listRec.map((item) => (
-            <>
-              <SwiperSlide key={item._id}>
-                <RecCard rec={item} />
-              </SwiperSlide>
-            </>
+            <SwiperSlide key={item._id}>
+              <RecCard rec={item} />
+            </SwiperSlide>
           ))}
         </Swiper>
       </div>

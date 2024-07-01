@@ -238,7 +238,7 @@ function CandidateProfileDetail() {
           </div>
           <Modal
             title='Xử lý hồ sơ'
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleOk}
             onCancel={handleCancel}
             okText='Lưu'

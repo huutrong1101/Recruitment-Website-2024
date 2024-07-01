@@ -152,7 +152,7 @@ const Step2Form: React.FC<Step2FormProps> = ({
 
         <Modal
           title='Cập nhật avatar'
-          visible={isModalOpen}
+          open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
           okText='Cập nhật avatar'

@@ -225,7 +225,7 @@ function RecMyService() {
               </div>
               <Modal
                 title='Xác nhận hủy gói dịch vụ'
-                visible={isCancelModalVisible}
+                open={isCancelModalVisible}
                 onOk={handleCancelOk}
                 onCancel={handleCancelCancel}
                 okText='Xác nhận'
@@ -271,7 +271,7 @@ function RecMyService() {
 
               <Modal
                 title='Chi tiết gói dịch vụ'
-                visible={isDetailModalVisible}
+                open={isDetailModalVisible}
                 onCancel={handleDetailClose}
                 footer={null}
                 width={700}
@@ -386,7 +386,7 @@ function RecMyService() {
 
       <Modal
         title='Nâng cấp tài khoản'
-        visible={isModalVisible}
+        open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         okText='Thanh toán'
