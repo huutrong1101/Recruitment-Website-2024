@@ -211,6 +211,7 @@ function AdminManageJobs() {
 
       if (response) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
+        setTotalElement(response.data.metadata.totalElement)
       }
     } catch (error) {
       console.error('Error searching jobs:', error)
@@ -234,6 +235,7 @@ function AdminManageJobs() {
       const response = await AdminService.getListJobs({ acceptanceStatus: acceptanceStatus })
       if (response) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
+        setTotalElement(response.data.metadata.totalElement)
       }
     } catch (error) {
       // Xử lý lỗi nếu có

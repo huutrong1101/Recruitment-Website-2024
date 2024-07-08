@@ -29,6 +29,12 @@ function FilterPanelCompany({
     setSearchValue(e.target.value)
   }
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
   return (
     <div className='flex items-center justify-between w-full'>
       <div className='flex w-full gap-3'>
@@ -53,7 +59,13 @@ function FilterPanelCompany({
           ))}
         </Select>
 
-        <Input placeholder='Nhập tên công ty' className='w-1/2' value={searchValue} onChange={handleInputChange} />
+        <Input
+          placeholder='Nhập tên công ty'
+          className='w-1/2'
+          value={searchValue}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+        />
       </div>
       <div className='flex items-center gap-3'>
         <Button type='primary' icon={<SearchOutlined />} onClick={handleSearch}>

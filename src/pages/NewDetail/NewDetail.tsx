@@ -153,7 +153,7 @@ export default function NewDetail() {
             <div className='flex flex-wrap -mx-4 mt-[10px]'>
               {relatedNews && relatedNews.length > 0 ? (
                 relatedNews.slice(0, 3).map((relatedNew, index) => (
-                  <div className='w-full px-3 mb-6 sm:w-1/2 lg:w-1/3' key={index}>
+                  <div key={index} className='flex w-full px-4 mb-8 sm:w-1/2 lg:w-1/3'>
                     <NewCard news={relatedNew} />
                   </div>
                 ))

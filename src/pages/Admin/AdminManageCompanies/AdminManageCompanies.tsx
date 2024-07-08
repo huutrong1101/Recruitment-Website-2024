@@ -153,6 +153,7 @@ function AdminManageCompanies() {
 
       if (response) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listRecruiter))
+        setTotalElement(response.data.metadata.totalElement)
       }
     } catch (error) {
       console.error('Error searching jobs:', error)
@@ -173,6 +174,7 @@ function AdminManageCompanies() {
       const response = await AdminService.getListCompany({ acceptanceStatus: acceptanceStatus })
       if (response) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listRecruiter))
+        setTotalElement(response.data.metadata.totalElement)
       }
     } catch (error) {
       console.error('Error searching jobs:', error)

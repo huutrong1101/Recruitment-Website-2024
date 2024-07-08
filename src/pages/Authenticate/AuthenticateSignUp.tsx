@@ -92,7 +92,7 @@ export default function AuthenticateSignUp() {
       .unwrap()
       .then(() => {
         // toast.success(`Successfully register the`)
-        navigate('/email/incomplete')
+        navigate('/email/incomplete?type=candidate')
       })
       .catch((errorData) => {
         toast.error(errorData.message)

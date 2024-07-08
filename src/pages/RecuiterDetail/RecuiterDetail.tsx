@@ -300,8 +300,8 @@ function RecuiterDetail() {
                       <p>
                         Bạn có muốn
                         {isRecFavorite
-                          ? 'loại công ty này khỏi danh sách yêu thích'
-                          : 'lưu công ty này vào danh sách yêu thích'}
+                          ? ' loại công ty này khỏi danh sách yêu thích'
+                          : ' lưu công ty này vào danh sách yêu thích'}
                         ?
                       </p>
                     </Modal>

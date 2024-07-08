@@ -11,13 +11,17 @@ import '../../index.css'
 import { Pagination, Autoplay } from 'swiper/modules'
 import FormSearch from './FormSearch'
 import Container from '../../components/Container/Container'
+import banner_1 from '../../../images/banner_1.png'
+import banner_2 from '../../../images/banner_2.png'
+import banner_3 from '../../../images/banner_3.png'
+import banner_4 from '../../../images/banner_4.png'
 
 export default function Banner() {
   const listBanner = [
-    { id: 1, img: 'https://vieclam.thegioididong.com/img/mobile/searchv2/detail_banner/common.jpg' },
-    { id: 2, img: 'https://fptjobs.com/Media/Images/BannerImages/9222023120000AM744207061920x503.png' },
-    { id: 3, img: 'https://fptjobs.com/Media/Images/BannerImages/872023120000AM15651189banner%201920x503.png' },
-    { id: 4, img: 'https://fptjobs.com/Media/Images/BannerImages/352024120000AM1350293051920x503@100x.png' }
+    { id: 1, img: banner_3 },
+    { id: 2, img: banner_2 },
+    { id: 3, img: banner_1 },
+    { id: 4, img: banner_4 }
   ]
   return (
     <Swiper

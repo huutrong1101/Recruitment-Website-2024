@@ -43,6 +43,8 @@ const getListJobs = async ({
   // Chuyển params thành chuỗi để gắn vào URL
   const queryParams = params.toString()
 
+  console.log(queryParams)
+
   return await axiosInstance.get(`/admin/jobs/list_job?${queryParams}`)
 }
 

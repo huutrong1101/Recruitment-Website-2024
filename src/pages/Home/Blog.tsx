@@ -14,7 +14,7 @@ function Blog() {
 
       <div className='flex flex-wrap mt-5 -mx-4'>
         {listNews.slice(0, 4).map((news) => (
-          <div key={news._id} className='w-full px-4 mb-8 sm:w-1/2 lg:w-1/4'>
+          <div key={news._id} className='flex w-full px-4 mb-8 sm:w-1/2 lg:w-1/4'>
             <NewCard news={news} />
           </div>
         ))}

@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import {
   prepareCandidateProvider,
   prepareOtherProvider,
+  prepareRecruiterProvider,
   prepareRecruiterProviderConfirm
 } from '../../utils/NavigateMenu'
 import DummyAvatar from '../DummyAvatar/DummyAvatar'
@@ -19,7 +20,6 @@ import { useNavigate } from 'react-router-dom'
 
 import io from 'socket.io-client'
 import { getLocalToken } from '../../utils/localToken'
-import { useTokenAuthorize } from '../../hooks/useTokenAuthorize'
 
 const SOCKET_SERVER_URL = 'http://localhost:8080'
 
@@ -73,7 +73,7 @@ export default function NavbarUserLoggedInCard() {
         : recruiter
           ? recruiter.acceptanceStatus !== 'waiting'
             ? prepareRecruiterProviderConfirm()
-            : prepareRecruiterProviderConfirm()
+            : prepareRecruiterProvider()
           : prepareOtherProvider()
       setDropdownItemList(supplierDropdownItem)
     }

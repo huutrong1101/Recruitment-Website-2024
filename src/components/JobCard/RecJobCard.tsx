@@ -63,7 +63,7 @@ function RecJobCard({ job }: RecJobCardProps) {
               </button>
             </div>
             <div className='flex items-center gap-3'>
-              <button className='px-2 py-1 text-sm text-white rounded-md bg-emerald-500'>Ởng tuyển</button>
+              <button className='px-2 py-1 text-sm text-white rounded-md bg-emerald-500'>Ứng tuyển</button>
               <HiHeart className='w-6 h-6 text-emerald-500' />
             </div>
           </div>

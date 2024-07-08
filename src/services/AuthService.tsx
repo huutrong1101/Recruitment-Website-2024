@@ -88,7 +88,7 @@ const resendEmail = async (data: any) => {
   const params = {
     email: data
   }
-  return await axiosInstance.post(`/recruiter/signup/resend_mail`, params)
+  return await axiosInstance.post(`/candidate/signup/resend_mail`, params)
 }
 
 const getWorkStatus = async (dispatch: Dispatch) => {
