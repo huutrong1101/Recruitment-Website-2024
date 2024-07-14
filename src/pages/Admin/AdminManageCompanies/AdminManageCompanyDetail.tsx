@@ -65,6 +65,8 @@ function AdminManageCompanyDetail() {
   const [isReasonEmpty, setIsReasonEmpty] = useState(false)
   const [isModalReason, setIsModalReason] = useState(false)
 
+  console.log(companyDetail)
+
   const getCoordinatesFromAddress = async (address: string) => {
     try {
       // Sử dụng ví dụ API URL dưới đây và thay thế YOUR_API_KEY với key thực tế của bạn
@@ -261,12 +263,14 @@ function AdminManageCompanyDetail() {
                     </div>
                   </div>
                   <div className='flex items-center gap-2'>
-                    <button
-                      className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
-                      onClick={handleNavigateEdit}
-                    >
-                      CHỈNH SỬA
-                    </button>
+                    {companyDetail.acceptanceStatus === 'accept' || companyDetail.acceptanceStatus === 'decline' ? (
+                      <button
+                        className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
+                        onClick={handleNavigateEdit}
+                      >
+                        CHỈNH SỬA
+                      </button>
+                    ) : null}
                     <button
                       className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
                       onClick={showModal}

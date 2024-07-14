@@ -40,7 +40,7 @@ function FilterPanelCompany({
       <div className='flex w-full gap-3'>
         <Select
           showSearch
-          style={{ width: 200 }}
+          style={{ width: 300 }}
           placeholder='Chọn lĩnh vực'
           optionFilterProp='children'
           filterOption={

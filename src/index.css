@@ -113,3 +113,7 @@ img {
   background-color: #007ea7;
   top: -25px;
 }
+
+:where(.css-kghr11).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select {
+  width: 100%;
+}

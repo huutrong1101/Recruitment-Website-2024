@@ -54,6 +54,7 @@ export interface RecruiterResponseState {
   likeNumber: string
   premiumAccount: boolean
   activeJobCount: number
+  firstApproval: boolean
 }
 
 export interface AdminResponseState {

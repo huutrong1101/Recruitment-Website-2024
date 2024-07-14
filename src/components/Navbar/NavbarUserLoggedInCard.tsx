@@ -71,7 +71,7 @@ export default function NavbarUserLoggedInCard() {
       const supplierDropdownItem = user
         ? prepareCandidateProvider()
         : recruiter
-          ? recruiter.acceptanceStatus !== 'waiting'
+          ? recruiter.firstApproval !== true
             ? prepareRecruiterProviderConfirm()
             : prepareRecruiterProvider()
           : prepareOtherProvider()
