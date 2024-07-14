@@ -156,13 +156,23 @@ function CandidateProfileDetail() {
 
   const handleOk = () => {
     if (approvalStatus === 'approve' && resumeDetail) {
-      RecService.handleResume(resumeDetail._id, 'Đã nhận', '').then(() => {
-        toast.success(`Hồ sơ đã được duyệt thành công`)
-      })
+      toast
+        .promise(RecService.handleResume(resumeDetail._id, 'Đã nhận', ''), {
+          pending: `Hồ sơ đang được xử lí`,
+          success: `Hồ sơ đã được duyệt thành công`
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message)
+        })
     } else if (approvalStatus === 'decline' && resumeDetail) {
-      RecService.handleResume(resumeDetail._id, 'Không nhận', declineReason).then(() =>
-        toast.success(`Hồ sơ đã được duyệt thành công`)
-      )
+      toast
+        .promise(RecService.handleResume(resumeDetail._id, 'Không nhận', declineReason), {
+          pending: `Hồ sơ đang được xử lí`,
+          success: `Hồ sơ đã được duyệt thành công`
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message)
+        })
     }
     setIsModalVisible(false)
   }
@@ -256,10 +266,10 @@ function CandidateProfileDetail() {
                 <>
                   <div className='flex items-center gap-2'>
                     <div className='font-bold'>Chọn lý do không nhận hồ sơ:</div>
-                    <Checkbox onChange={handleCheckAllChange} checked={checkAll}>
-                      Chọn tất cả
-                    </Checkbox>
                   </div>
+                  <Checkbox onChange={handleCheckAllChange} checked={checkAll}>
+                    Chọn tất cả
+                  </Checkbox>
                   <Checkbox.Group value={selectedDeclineReasons} onChange={handleCheckboxChange}>
                     <div className='flex flex-col gap-2'>
                       {declineReasons.map((reason) => (

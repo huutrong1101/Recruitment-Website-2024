@@ -136,13 +136,17 @@ export default function NavbarUserLoggedInCard() {
     const then = moment(dateString, 'DD/MM/YYYY HH:mm:ss')
     const minutesDiff = now.diff(then, 'minutes')
     const hoursDiff = now.diff(then, 'hours')
+    const daysDiff = now.diff(then, 'days')
+    const monthsDiff = now.diff(then, 'months')
 
     if (minutesDiff < 60) {
       return `${minutesDiff} phút trước`
     } else if (hoursDiff < 24) {
       return `${hoursDiff} giờ trước`
+    } else if (daysDiff < 30) {
+      return `${daysDiff} ngày trước`
     } else {
-      return then.fromNow()
+      return `${monthsDiff} tháng trước`
     }
   }
 

@@ -179,11 +179,11 @@ export default function JobCard({ job, isShow, inNews }: JobCardProps) {
                 <p className='text-xs font-medium text-gray-600 truncate md:text-sm'>{job.companyName}</p>
                 {!inNews && (
                   <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-2'>
-                      <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
+                    <div className='flex items-center flex-grow gap-2'>
+                      <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap'>
                         {formatSalary(job.salary)}
                       </button>
-                      <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md'>
+                      <button className='inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap'>
                         {job.province}
                       </button>
                     </div>
@@ -207,7 +207,7 @@ export default function JobCard({ job, isShow, inNews }: JobCardProps) {
 
       <Modal
         title={isFavorite ? 'Hủy thích công việc ' : 'Lưu việc vào yêu thích'}
-        open={visibleModal} // Thay đổi visible thành open
+        open={visibleModal}
         onOk={handleFavoriteToggle}
         onCancel={handleCancel}
         okText={isFavorite ? 'Hủy thích' : 'Lưu'}

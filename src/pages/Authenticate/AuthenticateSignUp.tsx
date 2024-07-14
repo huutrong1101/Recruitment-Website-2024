@@ -84,6 +84,8 @@ export default function AuthenticateSignUp() {
   const dispatch = useAppDispatch()
   const { registerLoadingState, loading } = useAppSelector((app) => app.Auth)
 
+  console.log(registerLoadingState)
+
   const navigate = useNavigate()
 
   const onSubmit = (data: any) => {
@@ -92,7 +94,7 @@ export default function AuthenticateSignUp() {
       .unwrap()
       .then(() => {
         // toast.success(`Successfully register the`)
-        navigate('/email/incomplete?type=candidate')
+        navigate(`/email/incomplete?type=candidate&email=${data.email}`)
       })
       .catch((errorData) => {
         toast.error(errorData.message)

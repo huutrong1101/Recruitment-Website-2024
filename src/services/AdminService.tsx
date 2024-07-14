@@ -13,7 +13,7 @@ import axiosInstance from '../utils/AxiosInstance'
 
 const getListRec = async (dispatch: Dispatch) => {
   // No Content-Type header is manually set here
-  const response = await axiosInstance.get(`/admin/recruiters/list_recruiter`)
+  const response = await axiosInstance.get(`/admin/recruiters/list_all_recruiter`)
   const data = response.data.metadata.listRecruiter
   dispatch(setListRec(data))
 }

@@ -69,7 +69,6 @@ import { NewService } from './services/NewService'
 import FilterCandidate from './components/Routers/FilterCandidate'
 import FilterRecruiter from './components/Routers/FilterRecruiter'
 import NewDetail from './pages/NewDetail/NewDetail'
-import { useTokenAuthorize } from './hooks/useTokenAuthorize'
 import RecruiterAppLayout from './layouts/RecruiterAppLayout'
 
 function ScrollToTop() {

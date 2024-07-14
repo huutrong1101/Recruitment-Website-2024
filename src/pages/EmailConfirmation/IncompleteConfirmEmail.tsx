@@ -5,22 +5,36 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import PrimaryButton from '../../components/PrimaryButton/PrimaryButton'
 import { AuthService } from '../../services/AuthService'
+import { RecService } from '../../services/RecService'
 
 export default function IncompleteConfirmEmail() {
   const navigate = useNavigate()
 
   const query = new URLSearchParams(useLocation().search)
   const email = query.get('email')
+  const type = query.get('type')
 
   const handleResendEmail = () => {
-    toast
-      .promise(AuthService.resendEmail(email), {
-        pending: `Email xác minh tài khoản đang được gửi đến cho bạn`,
-        success: `Email đã được gửi đến rồi. Hãy kiểm tra nhé`
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message)
-      })
+    if (type === 'candidate') {
+      toast
+        .promise(AuthService.resendEmail(email), {
+          pending: `Email xác minh tài khoản đang được gửi đến cho bạn`,
+          success: `Email đã được gửi đến rồi. Hãy kiểm tra nhé`
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message)
+        })
+    } else if (type === 'recruiter') {
+      console.log('check')
+      toast
+        .promise(RecService.resendEmail(email), {
+          pending: `Email xác minh tài khoản đang được gửi đến cho bạn`,
+          success: `Email đã được gửi đến rồi. Hãy kiểm tra nhé`
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message)
+        })
+    }
   }
 
   return (

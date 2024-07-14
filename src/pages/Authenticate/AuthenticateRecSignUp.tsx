@@ -93,6 +93,7 @@ const signUpSchema = yup.object().shape({
 
 function AuthenticateRecSignUp() {
   const [visibleTermAndCondition, setVisibleTermAndCondition] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
 
   const dispatch = useAppDispatch()
 
@@ -116,15 +117,19 @@ function AuthenticateRecSignUp() {
   })
 
   const onSubmit = (data: any) => {
+    setLoading(true)
     const { agreeTerms, ...formData } = data
 
     dispatch(authRecRegister(formData))
       .unwrap()
       .then(() => {
-        navigate(`/email/incomplete?email=${encodeURIComponent(data.email)}`)
+        navigate(`/email/incomplete?type=recruiter&email=${encodeURIComponent(data.email)}`)
       })
       .catch((errorData) => {
         toast.error(errorData.message)
+      })
+      .finally(() => {
+        setLoading(false)
       })
   }
 
@@ -286,7 +291,7 @@ function AuthenticateRecSignUp() {
           onOkay={handleCloseDialog}
         />
 
-        <PrimaryButton type={'submit'} text='Đăng Ký' />
+        <PrimaryButton type={'submit'} text='Đăng Ký' isLoading={loading} disabled={loading} />
       </div>
     </form>
   )

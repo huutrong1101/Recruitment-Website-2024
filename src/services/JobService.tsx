@@ -76,7 +76,7 @@ async function getHighlightedJobs(
     field = '',
     genderRequirement = '',
     page = 1,
-    limit = 10
+    limit = 6
   } = {}
 ) {
   dispatch(setJobsStatus(STATUS.LOADING))

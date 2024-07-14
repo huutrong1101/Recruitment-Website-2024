@@ -14,8 +14,6 @@ import { Button, Input, Modal, Pagination, Select, Spin } from 'antd'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import RecJobCard from '../../components/JobCard/RecJobCard'
 import RecJobRealtedCard from '../../components/JobCard/RecJobRealtedCard'
-import GoogleMapReact from 'google-map-react'
-import GooglePlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-google-places-autocomplete'
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import { RecService } from '../../services/RecService'
 import parse from 'html-react-parser'
@@ -23,15 +21,29 @@ import { JobInterface } from '../../types/job.type'
 import { checkFavoriteRec, setIsRecFavorite } from '../../redux/reducer/RecSlice'
 import { toast } from 'react-toastify'
 import axiosInstance from '../../utils/AxiosInstance'
+import MapGL, { GeolocateControl, Marker } from '@goongmaps/goong-map-react'
+import Pin from './pin'
+import axios from 'axios'
 
-const AnyReactComponent = (props: { lat: number; lng: number; text: React.ReactNode }) => <div>{props.text}</div>
+const TOKEN = 'rarYDFFHJzYbDhUAsXRkXIeZnLOhZuclekcdKMEE'
 
 function RecuiterDetail() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { recruiterSlug } = useParams()
 
-  const [coords, setCoords] = useState({ lat: 0, lng: 0 })
+  const [viewport, setViewport] = useState({
+    latitude: 21.02727,
+    longitude: 105.85119,
+    zoom: 12,
+    bearing: 0,
+    pitch: 0
+  })
+  const [marker, setMarker] = useState({
+    latitude: 21.02727,
+    longitude: 105.85119
+  })
+
   const { user } = useAppSelector((state) => state.Auth)
   const recDetail = useAppSelector((state) => state.RecJobs.companyDetail)
   const { isRecFavorite } = useAppSelector((state) => state.RecJobs)
@@ -56,27 +68,38 @@ function RecuiterDetail() {
     setShowFullDescription(!showFullDescription)
   }
 
-  useEffect(() => {
-    const fetchCoords = async () => {
-      if (recDetail && recDetail.companyAddress) {
-        try {
-          const result = await geocodeByAddress(recDetail.companyAddress)
-          const lnglat = await getLatLng(result[0])
-          setCoords(lnglat)
-        } catch (error) {
-          console.error('Error fetching coordinates for address:', recDetail.companyAddress, error)
-        }
-      }
-    }
+  const getCoordinatesFromAddress = async (address: string) => {
+    try {
+      // Sử dụng ví dụ API URL dưới đây và thay thế YOUR_API_KEY với key thực tế của bạn
+      const response = await axios.get(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=pk.eyJ1IjoiaHV1dHJvbmcxMTAxIiwiYSI6ImNseWpsNXp0ZDBvcmQyanF5dG9sbGtkNTIifQ.Sal2ev4j4pzsHAHim2xeKA`
+      )
 
-    if (recDetail && recDetail.about) {
+      const coordinates = response.data.features[0].center
+      return {
+        longitude: coordinates[0],
+        latitude: coordinates[1]
+      }
+    } catch (error) {
+      console.error('Error during geocoding:', error)
+      return null
+    }
+  }
+
+  useEffect(() => {
+    if (recDetail) {
       const fullDescription = recDetail.about
       const shortened = truncate(fullDescription, 155)
       setShortenedDescription(shortened)
       setShowMoreButton(fullDescription.length > 155)
-    }
 
-    if (recDetail) {
+      getCoordinatesFromAddress(recDetail.companyAddress).then((coords) => {
+        if (coords) {
+          setViewport((prev) => ({ ...prev, latitude: coords.latitude, longitude: coords.longitude }))
+          setMarker(coords)
+        }
+      })
+
       const fetchRelatedRecs = async () => {
         try {
           const response = await axiosInstance.get(`/recruiters/${recDetail._id}/related_recruiter`)
@@ -91,8 +114,6 @@ function RecuiterDetail() {
 
       fetchRelatedRecs()
     }
-
-    fetchCoords()
   }, [recDetail])
 
   useEffect(() => {
@@ -101,7 +122,6 @@ function RecuiterDetail() {
       try {
         if (recruiterSlug) {
           await RecService.getRecFromSlug(dispatch, recruiterSlug)
-          setActiveData([])
         }
         if (user) {
           await Promise.all([dispatch(checkFavoriteRec({ slug: recruiterSlug })).unwrap()])
@@ -434,18 +454,24 @@ function RecuiterDetail() {
                     </div>
                     <div>
                       <div style={{ height: '250px', width: '100%' }}>
-                        <GoogleMapReact
-                          bootstrapURLKeys={{ key: 'AIzaSyDiTFSvK7eZQoKZkBVSmzybVvuG4aY0m6A' }}
-                          defaultCenter={coords}
-                          center={coords}
-                          defaultZoom={11}
+                        <MapGL
+                          {...viewport}
+                          width='100%'
+                          height='100%'
+                          mapStyle='https://tiles.goong.io/assets/goong_map_web.json'
+                          onViewportChange={setViewport}
+                          goongApiAccessToken={TOKEN}
                         >
-                          <AnyReactComponent
-                            lat={coords.lat}
-                            lng={coords.lng}
-                            text={<MapPinIcon className='w-6 h-6 text-red-500' />}
-                          />
-                        </GoogleMapReact>
+                          <Marker
+                            longitude={marker.longitude}
+                            latitude={marker.latitude}
+                            offsetTop={-20}
+                            offsetLeft={-10}
+                            draggable
+                          >
+                            <Pin size={20} />
+                          </Marker>
+                        </MapGL>
                       </div>
                     </div>
                   </div>

@@ -28,8 +28,6 @@ function JobDetailWidget({ job, jobInformation }: JobProps) {
     setIsModalVisible(false)
   }
 
-  console.log(admin)
-
   return (
     <div className={classNames(`flex flex-col md:flex-row gap-12`)}>
       {/* Left side description */}

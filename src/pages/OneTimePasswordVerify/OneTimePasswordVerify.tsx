@@ -10,6 +10,8 @@ import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
 import OneTimePasswordInputArray from './OneTimePasswordInputArray'
 import { UserVerifySendParamsInterface } from '../../types/user.type'
 import { sendVerify } from '../../redux/reducer/OneTimePasswordSlice'
+import { Button, Form } from 'antd'
+import { InputOTP } from 'antd-input-otp'
 
 export default function OneTimePasswordVerify() {
   const [showing, setShowing] = useState(true)
@@ -20,6 +22,29 @@ export default function OneTimePasswordVerify() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+
+  const [form] = Form.useForm()
+
+  const handleFinish = (values: any) => {
+    const otpArray = values.otp
+    const otp = otpArray.join('')
+
+    console.log(`OTP: ${otp}`)
+
+    const code = searchParams.get('code') || ''
+    const email = getValues('email')
+    const dataWithCode = { email, otp, code }
+
+    dispatch(sendVerify(dataWithCode))
+      .unwrap()
+      .then(() => {
+        toast.success(`Xác minh thành công. Bạn đã có thể đăng nhập vào hệ thống.`)
+        navigate('/email/complete')
+      })
+      .catch((response) => {
+        toast.error(response.message)
+      })
+  }
 
   useEffect(() => {
     setValue('otp', '')
@@ -40,8 +65,8 @@ export default function OneTimePasswordVerify() {
   }, [searchParams])
 
   const handleVerifyOneTimePassword = (data: UserVerifySendParamsInterface) => {
-    const code = searchParams.get('code') || '' // Lấy giá trị code từ searchParams, nếu không tồn tại sẽ dùng chuỗi rỗng.
-    const dataWithCode = { ...data, code: code } // Tạo một object mới có bao gồm cả code.
+    const code = searchParams.get('code') || ''
+    const dataWithCode = { ...data, code: code }
 
     dispatch(sendVerify(dataWithCode)) // Gọi action với dữ liệu mới có bao gồm code.
       .unwrap()
@@ -55,9 +80,9 @@ export default function OneTimePasswordVerify() {
   }
 
   return (
-    <form
+    <div
       className='flex flex-col items-center justify-center w-full h-auto py-8'
-      onSubmit={handleSubmit(handleVerifyOneTimePassword)}
+      // onSubmit={handleSubmit(handleVerifyOneTimePassword)}
     >
       <Transition
         show={showing}
@@ -95,17 +120,6 @@ export default function OneTimePasswordVerify() {
         </Transition>
         <input type='hidden' {...register('email')} value={''} />
 
-        {/* Pass code input */}
-        <OneTimePasswordInputArray
-          onFilled={(value: string) => {
-            setValue('otp', value)
-            setFilled(true)
-          }}
-          onUnfilled={() => {
-            setFilled(false)
-          }}
-        />
-
         <Transition
           show={showing}
           appear={true}
@@ -114,11 +128,23 @@ export default function OneTimePasswordVerify() {
           enterFrom=' opacity-0 '
           enterTo='opacity-100'
         >
-          <div className={classNames(`mt-8 flex flex-row-reverse`)}>
-            <PrimaryButton text='Xác nhận' type='submit' isLoading={loadingState === 'pending'} disabled={!isFilled} />
-          </div>
+          <Form form={form} onFinish={handleFinish}>
+            <Form.Item
+              name='otp'
+              className='center-error-message'
+              rules={[{ validator: async () => Promise.resolve() }]}
+            >
+              <InputOTP autoFocus inputType='numeric' length={6} />
+            </Form.Item>
+
+            <Form.Item noStyle>
+              <Button block htmlType='submit' type='primary'>
+                Xác nhận
+              </Button>
+            </Form.Item>
+          </Form>
         </Transition>
       </Transition>
-    </form>
+    </div>
   )
 }

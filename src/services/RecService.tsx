@@ -353,6 +353,13 @@ const getApplicationStatisticByYear = async (year: string) => {
   return await axiosInstance.get(`/recruiter/statistic/application_statistic_by_year?year=${year}`)
 }
 
+const resendEmail = async (data: any) => {
+  const params = {
+    email: data
+  }
+  return await axiosInstance.post(`/recruiter/signup/resend_mail`, params)
+}
+
 export const RecService = {
   createJob,
   getListWaitingJob,
@@ -391,5 +398,6 @@ export const RecService = {
   getEnglish,
   getApplicationStatisticByRange,
   getApplicationStatisticByMonth,
-  getApplicationStatisticByYear
+  getApplicationStatisticByYear,
+  resendEmail
 }

@@ -20,8 +20,11 @@ import { toast } from 'react-toastify'
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 import { setCompanyDetail } from '../../../redux/reducer/AdminSlice'
+import axios from 'axios'
+import MapGL, { GeolocateControl, Marker } from '@goongmaps/goong-map-react'
+import Pin from '../../RecuiterDetail/pin'
 
-const AnyReactComponent = (props: { lat: number; lng: number; text: React.ReactNode }) => <div>{props.text}</div>
+const TOKEN = 'rarYDFFHJzYbDhUAsXRkXIeZnLOhZuclekcdKMEE'
 
 const declineReasons = [
   { id: '1', reason: 'Không đáp ứng tiêu chuẩn chất lượng' },
@@ -36,7 +39,19 @@ function AdminManageCompanyDetail() {
   const { companyId } = useParams()
 
   const { companyDetail } = useAppSelector((state) => state.AdminSlice)
-  const [coords, setCoords] = useState({ lat: 0, lng: 0 })
+
+  const [viewport, setViewport] = useState({
+    latitude: 21.02727,
+    longitude: 105.85119,
+    zoom: 12,
+    bearing: 0,
+    pitch: 0
+  })
+  const [marker, setMarker] = useState({
+    latitude: 21.02727,
+    longitude: 105.85119
+  })
+
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [approvalStatus, setApprovalStatus] = useState('approve')
   const [showFullDescription, setShowFullDescription] = useState(false)
@@ -50,27 +65,38 @@ function AdminManageCompanyDetail() {
   const [isReasonEmpty, setIsReasonEmpty] = useState(false)
   const [isModalReason, setIsModalReason] = useState(false)
 
-  useEffect(() => {
-    const fetchCoords = async () => {
-      if (companyDetail && companyDetail.companyAddress) {
-        try {
-          const result = await geocodeByAddress(companyDetail.companyAddress)
-          const lnglat = await getLatLng(result[0])
-          setCoords(lnglat)
-        } catch (error) {
-          console.error('Error fetching coordinates for address:', companyDetail.companyAddress, error)
-        }
-      }
-    }
+  const getCoordinatesFromAddress = async (address: string) => {
+    try {
+      // Sử dụng ví dụ API URL dưới đây và thay thế YOUR_API_KEY với key thực tế của bạn
+      const response = await axios.get(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=pk.eyJ1IjoiaHV1dHJvbmcxMTAxIiwiYSI6ImNseWpsNXp0ZDBvcmQyanF5dG9sbGtkNTIifQ.Sal2ev4j4pzsHAHim2xeKA`
+      )
 
+      const coordinates = response.data.features[0].center
+      return {
+        longitude: coordinates[0],
+        latitude: coordinates[1]
+      }
+    } catch (error) {
+      console.error('Error during geocoding:', error)
+      return null
+    }
+  }
+
+  useEffect(() => {
     if (companyDetail && companyDetail.about) {
       const fullDescription = companyDetail.about
       const shortened = truncate(fullDescription, 167)
       setShortenedDescription(shortened)
       setShowMoreButton(fullDescription.length > 167)
-    }
 
-    fetchCoords()
+      getCoordinatesFromAddress(companyDetail.companyAddress).then((coords) => {
+        if (coords) {
+          setViewport((prev) => ({ ...prev, latitude: coords.latitude, longitude: coords.longitude }))
+          setMarker(coords)
+        }
+      })
+    }
   }, [companyDetail])
 
   useEffect(() => {
@@ -417,18 +443,24 @@ function AdminManageCompanyDetail() {
                     </div>
                     <div>
                       <div style={{ height: '250px', width: '100%' }}>
-                        <GoogleMapReact
-                          bootstrapURLKeys={{ key: 'AIzaSyDiTFSvK7eZQoKZkBVSmzybVvuG4aY0m6A' }}
-                          defaultCenter={coords}
-                          center={coords}
-                          defaultZoom={11}
+                        <MapGL
+                          {...viewport}
+                          width='100%'
+                          height='100%'
+                          mapStyle='https://tiles.goong.io/assets/goong_map_web.json'
+                          onViewportChange={setViewport}
+                          goongApiAccessToken={TOKEN}
                         >
-                          <AnyReactComponent
-                            lat={coords.lat}
-                            lng={coords.lng}
-                            text={<MapPinIcon className='w-6 h-6 text-red-500' />}
-                          />
-                        </GoogleMapReact>
+                          <Marker
+                            longitude={marker.longitude}
+                            latitude={marker.latitude}
+                            offsetTop={-20}
+                            offsetLeft={-10}
+                            draggable
+                          >
+                            <Pin size={20} />
+                          </Marker>
+                        </MapGL>
                       </div>
                     </div>
                   </div>

@@ -151,7 +151,7 @@ function RecListJobRecruitment(): JSX.Element {
   const mapApiDataToTableData = (apiData: JobFromApi[]): DataType[] => {
     return apiData.map((job, index) => ({
       key: job._id,
-      stt: index + 1,
+      stt: (currentPage - 1) * pageSize + index + 1,
       jobName: job.name,
       jobPosition: job.field,
       expirationDate: job.deadline,

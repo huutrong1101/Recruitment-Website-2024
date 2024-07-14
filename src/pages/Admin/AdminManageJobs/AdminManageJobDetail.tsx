@@ -11,7 +11,8 @@ import {
   ComputerDesktopIcon,
   CurrencyDollarIcon,
   MapPinIcon,
-  UserIcon
+  UserIcon,
+  UsersIcon
 } from '@heroicons/react/24/outline'
 import { Spin } from 'antd'
 
@@ -79,9 +80,9 @@ function AdminManageJobDetail() {
           value: jobDetail.levelRequirement
         },
         {
-          icon: <CurrencyDollarIcon />,
-          name: 'Mức lương',
-          value: formatSalary(jobDetail.salary)
+          icon: <UsersIcon />,
+          name: 'Số lượng',
+          value: jobDetail.quantity.toString()
         },
         {
           icon: <ClockIcon />,
@@ -91,6 +92,8 @@ function AdminManageJobDetail() {
       ])
     }
   }, [jobDetail])
+
+  console.log(jobDetail)
 
   const formatNumber = (number: number): string => {
     return (number / 1000000).toLocaleString('vi-VN')

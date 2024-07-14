@@ -116,7 +116,7 @@ function AdminManageEditJob() {
         description: jobDetail.description,
         requirement: jobDetail.requirement,
         benefit: jobDetail.benefit,
-        quantity: jobDetail.quantity.toString(), // Đảm bảo nó là một chuỗi
+        quantity: jobDetail.quantity !== 'Không giới hạn' ? jobDetail.quantity.toString() : 'o', // Đảm bảo nó là một chuỗi
         deadline: formattedDeadline,
         genderRequirement: jobDetail.genderRequirement
       })

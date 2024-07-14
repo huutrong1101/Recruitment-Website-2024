@@ -11,7 +11,7 @@ export interface JobInterface {
   description: string
   requirement: string
   benefit: string
-  quantity: number
+  quantity: string
   deadline: string
   status: string
   acceptanceStatus: string

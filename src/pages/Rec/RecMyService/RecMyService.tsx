@@ -83,8 +83,6 @@ function RecMyService() {
         return
       }
 
-      setLoading(true)
-
       try {
         await dispatch(checkRecUpgrade()).unwrap()
 
@@ -92,11 +90,9 @@ function RecMyService() {
           const response = await RecService.viewOrder()
           setServiceInfo(response.data.metadata)
         }
+
+        setLoading(false)
       } catch (error) {
-        toast.error('Loading failed')
-        console.error('Error loading data:', error)
-      } finally {
-        // Đảm bảo setLoading false ở đây để ngăn chặn hiện tượng loading quay vô tận
         setLoading(false)
       }
     }

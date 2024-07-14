@@ -5,6 +5,7 @@ import { Slide, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import App from './App'
 import './index.css'
+import '@goongmaps/goong-js/dist/goong-js.css'
 import { ApplicationStore } from './redux/Store'
 
 const appElement = document.getElementById('app')
