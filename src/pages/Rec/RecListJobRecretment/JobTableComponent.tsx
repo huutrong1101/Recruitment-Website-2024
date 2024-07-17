@@ -69,7 +69,8 @@ function JobTableComponent({
           }}
         />
       </TabPane>
-      <TabPane tab='Việc làm chưa duyệt' key='2'>
+
+      <TabPane tab='Việc làm bị khóa' key='2'>
         <Table
           loading={isLoading}
           columns={columns}
@@ -87,7 +88,7 @@ function JobTableComponent({
           }}
         />
       </TabPane>
-      <TabPane tab='Việc làm không duyệt' key='3'>
+      <TabPane tab='Việc làm sắp hết hạn' key='3'>
         <Table
           loading={isLoading}
           columns={columns}
@@ -105,25 +106,7 @@ function JobTableComponent({
           }}
         />
       </TabPane>
-      <TabPane tab='Việc làm sắp hết hạn' key='4'>
-        <Table
-          loading={isLoading}
-          columns={columns}
-          dataSource={activeData}
-          size='middle'
-          pagination={{
-            current: currentPage,
-            pageSize: pageSize,
-            onChange: handlePageChange,
-            total: totalElement,
-            showSizeChanger: true,
-            onShowSizeChange: handlePageChange,
-            pageSizeOptions: ['5', '10', '20', '30', '50'],
-            locale: { items_per_page: ' / trang' }
-          }}
-        />
-      </TabPane>
-      <TabPane tab='Việc làm đã hết hạn' key='5'>
+      <TabPane tab='Việc làm đã hết hạn' key='4'>
         <Table
           loading={isLoading}
           columns={columns}

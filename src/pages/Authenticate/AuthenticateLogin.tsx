@@ -54,8 +54,12 @@ export default function AuthenticateLogin() {
           }
         })
     } catch (err: any) {
-      toast.error(`${err.message}`)
-      throw err
+      if (err.statusCode === 403) {
+        navigate('/block')
+      } else {
+        toast.error(`${err.message}`)
+        throw err
+      }
     }
   }
 

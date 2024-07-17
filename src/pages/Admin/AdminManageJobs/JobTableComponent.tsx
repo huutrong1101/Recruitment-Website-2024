@@ -13,6 +13,7 @@ interface DataType {
   levelRequirement: string
   deadline: string
   premiumAccount: boolean
+  reportNumber: number
 }
 
 interface JobTableProps {
@@ -63,7 +64,7 @@ function JobTableComponent({
           pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
         />
       </TabPane>
-      <TabPane tab='Việc làm chưa duyệt' key='2'>
+      <TabPane tab='Việc làm bị báo cáo' key='2'>
         <Table
           loading={isLoading}
           columns={columns}
@@ -73,7 +74,8 @@ function JobTableComponent({
           pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
         />
       </TabPane>
-      <TabPane tab='Việc làm không duyệt' key='3'>
+
+      <TabPane tab='Việc làm bị khóa' key='3'>
         <Table
           loading={isLoading}
           columns={columns}

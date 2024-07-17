@@ -64,12 +64,12 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
     if (approvalStatus === 'approve') {
       try {
         toast
-          .promise(AdminService.approveJob(job._id, 'accept', ''), {
+          .promise(AdminService.handleBlockJob(job._id, 'false', ''), {
             pending: `Quá trình xử lí đang diễn ra`,
-            success: `Công việc đã được duyệt thành công`
+            success: `Công việc đã được mở khóa`
           })
           .then((response) => {
-            const updatedJob = { ...job, acceptanceStatus: 'accept' }
+            const updatedJob = { ...job, isBan: false }
             dispatch(setJobDetail(updatedJob))
             setIsModalVisible(false)
           })
@@ -77,22 +77,22 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
             toast.error(error.response.data.message)
           })
       } catch (error) {
-        toast.error('Có lỗi xảy ra khi duyệt công việc')
+        toast.error('Có lỗi xảy ra khóa công việc')
         console.error(error)
       }
     } else if (approvalStatus === 'decline') {
       if (!declineReason.trim()) {
-        toast.error('Vui lòng nhập lý do khi không duyệt công việc.')
+        toast.error('Vui lòng nhập lý do khóa công việc.')
         return
       }
       try {
         toast
-          .promise(AdminService.approveJob(job._id, 'decline', declineReason), {
+          .promise(AdminService.handleBlockJob(job._id, 'true', declineReason), {
             pending: `Quá trình xử lí đang diễn ra`,
-            success: `Công việc đã được thêm vào danh sách không duyệt`
+            success: `Công việc đã được khóa`
           })
           .then((response) => {
-            const updatedJob = { ...job, acceptanceStatus: 'decline', declineReason: declineReason }
+            const updatedJob = { ...job, isBan: true, banReason: declineReason }
             dispatch(setJobDetail(updatedJob))
             setIsModalVisible(false)
           })
@@ -238,7 +238,7 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                   <button
                     className={classNames(
                       `px-3 py-2 w-1/4`,
-                      `border-emerald-500 border text-emerald-500 text-center`,
+                      `border-emerald-500 border text-emerald-500 text-center uppercase`,
                       `font-semibold`,
                       `rounded-xl`
                     )}
@@ -250,13 +250,13 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                   <button
                     className={classNames(
                       `px-3 py-2 w-1/4`,
-                      `border-emerald-500 border text-emerald-500 text-center`,
+                      `border-emerald-500 border text-emerald-500 text-center uppercase`,
                       `font-semibold`,
                       `rounded-xl`
                     )}
-                    onClick={showModal} // Gọi hàm này để hiển thị modal
+                    onClick={showModal}
                   >
-                    XỬ LÍ
+                    {job.isBan ? 'Xử lý mở khóa' : 'Xử lý khóa'}
                   </button>
                 </div>
 
@@ -272,14 +272,13 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                   <div className='flex flex-col gap-1'>
                     <p className='font-bold'>Chọn trạng thái xử lí công việc</p>
                     <Radio.Group onChange={(e) => setApprovalStatus(e.target.value)} value={approvalStatus}>
-                      <Radio value='approve'>Duyệt công việc</Radio>
-                      <Radio value='decline'>Không duyệt công việc</Radio>
+                      <Radio value='approve'>Mở khóa công việc</Radio>
+                      <Radio value='decline'>Khóa công việc</Radio>
                     </Radio.Group>
-                    {/* Hiển thị ô nhập lý do nếu chọn "Không nhận hồ sơ" */}
                     {approvalStatus === 'decline' && (
                       <>
                         <div className='flex items-center gap-2'>
-                          <div className='font-bold'>Chọn lý do không duyệt công việc:</div>
+                          <div className='font-bold'>Chọn lý do khóa công việc:</div>
                         </div>
                         <Checkbox onChange={handleCheckAllChange} checked={checkAll}>
                           Chọn tất cả
@@ -295,7 +294,7 @@ export default function JobDescriptionWidget({ job, role }: JobDescriptionWidget
                         </Checkbox.Group>
 
                         <div>
-                          <div className='font-bold'>Lý do không duyệt công việc:</div>
+                          <div className='font-bold'>Lý do khóa công việc:</div>
                           <Input.TextArea
                             style={{ minHeight: '200px', borderColor: isReasonEmpty ? '#ff4d4f' : '' }}
                             value={declineReason}

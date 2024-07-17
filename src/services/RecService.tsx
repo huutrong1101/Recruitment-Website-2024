@@ -56,7 +56,7 @@ const getListWaitingJob = async ({ name = '', field = '', type = '', page = 1, l
   return await axiosInstance.get(`/recruiter/jobs/waiting_jobs?${queryParams}`)
 }
 
-const getAcceptedJobs = async ({ name = '', field = '', levelRequirement = '', page = 1, limit = 10 } = {}) => {
+const getShowListJobs = async ({ name = '', field = '', levelRequirement = '', page = 1, limit = 10 } = {}) => {
   const params = new URLSearchParams()
 
   // Thêm các param vào nếu chúng không rỗng
@@ -70,7 +70,7 @@ const getAcceptedJobs = async ({ name = '', field = '', levelRequirement = '', p
   // Chuyển params thành chuỗi để gắn vào URL
   const queryParams = params.toString()
   // No Content-Type header is manually set here
-  return await axiosInstance.get(`/recruiter/jobs/accepted_jobs?${queryParams}`)
+  return await axiosInstance.get(`/recruiter/jobs/list_job?${queryParams}`)
 }
 
 const getDeclinedJobs = async ({ name = '', field = '', type = '', page = 1, limit = 10 } = {}) => {
@@ -363,7 +363,7 @@ const resendEmail = async (data: any) => {
 export const RecService = {
   createJob,
   getListWaitingJob,
-  getAcceptedJobs,
+  getShowListJobs,
   getDeclinedJobs,
   getListRec,
   getRecFromSlug,

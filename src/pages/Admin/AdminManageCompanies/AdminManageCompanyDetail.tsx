@@ -64,8 +64,7 @@ function AdminManageCompanyDetail() {
   const [declineReason, setDeclineReason] = useState('')
   const [isReasonEmpty, setIsReasonEmpty] = useState(false)
   const [isModalReason, setIsModalReason] = useState(false)
-
-  console.log(companyDetail)
+  const [isUnlockModalVisible, setIsUnlockModalVisible] = useState(false)
 
   const getCoordinatesFromAddress = async (address: string) => {
     try {
@@ -216,6 +215,37 @@ function AdminManageCompanyDetail() {
     setIsModalReason(false)
   }
 
+  const showUnlockModal = () => {
+    setIsUnlockModalVisible(true)
+  }
+
+  const handleUnlockCompany = async () => {
+    try {
+      if (companyDetail) {
+        toast
+          .promise(AdminService.unlockCompany(companyDetail._id), {
+            pending: `Quá trình xử lí đang diễn ra`,
+            success: `Công ty đã được mở khóa thành công`
+          })
+          .then((response) => {
+            const updatedJob = { ...companyDetail, isBan: false }
+            dispatch(setCompanyDetail(updatedJob))
+            setIsUnlockModalVisible(false)
+          })
+          .catch((error) => {
+            toast.error(error.response.data.message)
+          })
+      }
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi từ chối công ty')
+      console.error(error)
+    }
+  }
+
+  const handleCancelUnlock = () => {
+    setIsUnlockModalVisible(false)
+  }
+
   return (
     <>
       {isLoading ? (
@@ -263,20 +293,43 @@ function AdminManageCompanyDetail() {
                     </div>
                   </div>
                   <div className='flex items-center gap-2'>
-                    {companyDetail.acceptanceStatus === 'accept' || companyDetail.acceptanceStatus === 'decline' ? (
-                      <button
-                        className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
-                        onClick={handleNavigateEdit}
-                      >
-                        CHỈNH SỬA
-                      </button>
-                    ) : null}
-                    <button
-                      className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
-                      onClick={showModal}
-                    >
-                      XỬ LÍ
-                    </button>
+                    {companyDetail.isBan ? (
+                      <>
+                        <button
+                          className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
+                          onClick={showUnlockModal}
+                        >
+                          MỞ KHÓA
+                        </button>
+                        <Modal
+                          title='Xác nhận mở khóa công ty'
+                          open={isUnlockModalVisible}
+                          onOk={handleUnlockCompany}
+                          onCancel={handleCancelUnlock}
+                          okText='Xác nhận'
+                          cancelText='Hủy'
+                        >
+                          <p>Bạn có chắc chắn muốn mở khóa công ty này không?</p>
+                        </Modal>
+                      </>
+                    ) : (
+                      <>
+                        {companyDetail.acceptanceStatus === 'accept' || companyDetail.acceptanceStatus === 'decline' ? (
+                          <button
+                            className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
+                            onClick={handleNavigateEdit}
+                          >
+                            CHỈNH SỬA
+                          </button>
+                        ) : null}
+                        <button
+                          className={classNames('bg-white text-emerald-500 font-bold p-3 rounded-md flex')}
+                          onClick={showModal}
+                        >
+                          XỬ LÍ
+                        </button>
+                      </>
+                    )}
 
                     <Modal
                       title='Xác nhận công ty'
@@ -347,7 +400,11 @@ function AdminManageCompanyDetail() {
                   <h2 className='text-lg font-semibold text-white'>Thông tin công ty</h2>
                 </div>
                 <div className='flex flex-col gap-8 p-6'>
-                  {companyDetail.acceptanceStatus === 'decline' ? (
+                  {companyDetail.isBan ? (
+                    <Tag color={'error'} className='w-1/5 py-1 font-medium text-center uppercase cursor-pointer'>
+                      Đã bị khóa
+                    </Tag>
+                  ) : companyDetail.acceptanceStatus === 'decline' ? (
                     <Tooltip placement='top' title={'Xem lí do'} arrow={true}>
                       <Tag
                         color={'error'}

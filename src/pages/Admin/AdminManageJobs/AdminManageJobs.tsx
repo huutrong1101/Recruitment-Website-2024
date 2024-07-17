@@ -10,8 +10,8 @@ import JobTableComponent from './JobTableComponent'
 import { AdminService } from '../../../services/AdminService'
 import { Link, useNavigate } from 'react-router-dom'
 import { ColumnType } from 'antd/es/table'
-import { useTokenAuthorize } from '../../../hooks/useTokenAuthorize'
 import { PlusCircleOutlined } from '@ant-design/icons'
+import { WarningOutlined } from '@ant-design/icons'
 
 // Định nghĩa các interface
 interface DataType {
@@ -23,6 +23,7 @@ interface DataType {
   levelRequirement: string
   deadline: string
   premiumAccount: boolean
+  reportNumber: number
 }
 
 interface JobFromApi {
@@ -35,6 +36,7 @@ interface JobFromApi {
   companyName: string
   companyLogo: string
   premiumAccount: boolean
+  reportNumber: number
 }
 
 interface ActivityOption {
@@ -56,7 +58,17 @@ const getColumns = (activeTabKey: string): Array<ColumnType<DataType>> => [
   {
     title: 'TÊN VIỆC LÀM',
     dataIndex: 'jobName',
-    key: 'jobName'
+    key: 'jobName',
+    render: (text, record) => (
+      <>
+        {record.jobName}{' '}
+        {record.reportNumber > 0 && (
+          <Tooltip placement='topRight' title='Việc làm đang bị báo cáo'>
+            <WarningOutlined style={{ color: 'red' }} />
+          </Tooltip>
+        )}
+      </>
+    )
   },
   {
     title: 'LĨNH VỰC',
@@ -135,7 +147,8 @@ function AdminManageJobs() {
       field: job.field,
       levelRequirement: job.levelRequirement,
       deadline: job.deadline,
-      premiumAccount: job.premiumAccount // Thêm thuộc tính này
+      premiumAccount: job.premiumAccount,
+      reportNumber: job.reportNumber
     }))
   }
 
@@ -165,8 +178,17 @@ function AdminManageJobs() {
   const fetchDataByTab = async (key: string, page: number, size: number) => {
     setIsLoading(true)
     try {
-      const params = {
-        acceptanceStatus: mapTabKeyToStatus[key as keyof typeof mapTabKeyToStatus],
+      let response
+      // Mở rộng khai báo của params để bao gồm isBan
+      const params: {
+        name: string
+        field: string | undefined
+        levelRequirement: string | undefined
+        companyName: string | undefined
+        page: number
+        limit: number
+        isBan?: string
+      } = {
         name: searchValue,
         field: selectedActivity,
         levelRequirement: selectedType,
@@ -175,7 +197,20 @@ function AdminManageJobs() {
         limit: size
       }
 
-      const response = await AdminService.getListJobs(params)
+      if (key === '1') {
+        params.isBan = 'false'
+        response = await AdminService.getListJobs(params)
+      } else if (key === '2') {
+        response = await AdminService.getListReportedJobs(params)
+      } else if (key === '3') {
+        params.isBan = 'true'
+        response = await AdminService.getListJobs(params)
+      } else {
+        setActiveData([])
+        setIsLoading(false)
+        return
+      }
+
       if (response && response.data) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
         setTotalElement(response.data.metadata.totalElement)
@@ -197,19 +232,36 @@ function AdminManageJobs() {
   const handleSearch = async () => {
     setIsLoading(true)
     try {
-      const acceptanceStatus = mapTabKeyToStatus[activeTabKey as keyof typeof mapTabKeyToStatus]
-
-      const params = {
+      const params: {
+        name: string
+        field: string | undefined
+        levelRequirement: string | undefined
+        companyName: string | undefined
+        page?: number
+        limit?: number
+        isBan?: string
+      } = {
         name: searchValue,
         field: selectedActivity,
         levelRequirement: selectedType,
         companyName: selectedCompany,
-        acceptanceStatus
+        page: currentPage,
+        limit: pageSize
       }
 
-      const response = await AdminService.getListJobs(params)
+      let response
+      if (activeTabKey === '1') {
+        params.isBan = 'false'
+        response = await AdminService.getListJobs(params)
+      } else if (activeTabKey === '2') {
+        // Gọi API getListReportedJobs cho việc làm bị báo cáo
+        response = await AdminService.getListReportedJobs(params)
+      } else if (activeTabKey === '3') {
+        params.isBan = 'true'
+        response = await AdminService.getListJobs(params)
+      }
 
-      if (response) {
+      if (response && response.data) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
         setTotalElement(response.data.metadata.totalElement)
       }
@@ -224,30 +276,47 @@ function AdminManageJobs() {
     setIsLoading(true)
 
     try {
-      // Reset tất cả các state filter về giá trị ban đầu
       setSelectedActivity(undefined)
       setSelectedType(undefined)
       setSelectedCompany(undefined)
       setSearchValue('')
 
-      const acceptanceStatus = mapTabKeyToStatus[activeTabKey as keyof typeof mapTabKeyToStatus]
-      // Gọi API với acceptanceStatus sau khi reset và các tham số khác ở giá trị ban đầu
-      const response = await AdminService.getListJobs({ acceptanceStatus: acceptanceStatus })
+      const params: {
+        isBan?: string
+        page?: number
+        limit?: number
+      } = {
+        page: 1,
+        limit: pageSize
+      }
+
+      let response
+      if (activeTabKey === '1') {
+        params.isBan = 'false'
+        response = await AdminService.getListJobs(params)
+      } else if (activeTabKey === '2') {
+        response = await AdminService.getListReportedJobs(params)
+      } else if (activeTabKey === '3') {
+        params.isBan = 'true'
+        response = await AdminService.getListJobs(params)
+      }
+
       if (response) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listJob))
         setTotalElement(response.data.metadata.totalElement)
       }
     } catch (error) {
-      // Xử lý lỗi nếu có
       console.error('Error fetching jobs:', error)
     } finally {
-      setIsLoading(false) // Kết thúc loading
+      setIsLoading(false)
     }
   }
 
   const handleNavigate = () => {
     navigate('/admin/manage_jobs/addJob')
   }
+
+  console.log(activeData)
 
   return (
     <div className='flex flex-col flex-1 gap-4'>

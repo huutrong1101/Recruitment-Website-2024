@@ -22,8 +22,8 @@ const getListJobs = async ({
   name = '',
   field = '',
   levelRequirement = '',
-  acceptanceStatus = '',
   companyName = '',
+  isBan = '',
   page = 1,
   limit = 10
 } = {}) => {
@@ -34,8 +34,8 @@ const getListJobs = async ({
   if (name) params.append('name', name)
   if (field) params.append('field', field)
   if (levelRequirement) params.append('levelRequirement', levelRequirement)
-  if (acceptanceStatus) params.append('acceptanceStatus', acceptanceStatus)
   if (companyName) params.append('companyName', companyName)
+  if (isBan) params.append('isBan', isBan)
 
   params.append('page', page.toString())
   params.append('limit', limit.toString())
@@ -43,9 +43,35 @@ const getListJobs = async ({
   // Chuyển params thành chuỗi để gắn vào URL
   const queryParams = params.toString()
 
-  console.log(queryParams)
-
   return await axiosInstance.get(`/admin/jobs/list_job?${queryParams}`)
+}
+
+const getListReportedJobs = async ({
+  name = '',
+  field = '',
+  levelRequirement = '',
+  companyName = '',
+  isBan = '',
+  page = 1,
+  limit = 10
+} = {}) => {
+  // Tạo đối tượng URLSearchParams mới
+  const params = new URLSearchParams()
+
+  // Thêm các param vào nếu chúng không rỗng
+  if (name) params.append('name', name)
+  if (field) params.append('field', field)
+  if (levelRequirement) params.append('levelRequirement', levelRequirement)
+  if (companyName) params.append('companyName', companyName)
+  if (isBan) params.append('isBan', isBan)
+
+  params.append('page', page.toString())
+  params.append('limit', limit.toString())
+
+  // Chuyển params thành chuỗi để gắn vào URL
+  const queryParams = params.toString()
+
+  return await axiosInstance.get(`/admin/jobs/list_reported_job?${queryParams}`)
 }
 
 const getJobDetail = async (dispatch: Dispatch, id: string) => {
@@ -78,6 +104,30 @@ const getListCompany = async ({
   return await axiosInstance.get(`/admin/recruiters/list_recruiter?${queryParams}`)
 }
 
+const getListBannedCompany = async ({
+  searchText = '',
+  field = '',
+  acceptanceStatus = '',
+  page = 1, // mặc định là trang đầu tiên nếu không được cung cấp
+  limit = 10
+} = {}) => {
+  // Tạo đối tượng URLSearchParams mới
+  const params = new URLSearchParams()
+
+  // Thêm các param vào nếu chúng không rỗng
+  if (searchText) params.append('searchText', searchText)
+  if (field) params.append('field', field)
+  if (acceptanceStatus) params.append('acceptanceStatus', acceptanceStatus)
+
+  params.append('page', page.toString())
+  params.append('limit', limit.toString())
+
+  // Chuyển params thành chuỗi để gắn vào URL
+  const queryParams = params.toString()
+
+  return await axiosInstance.get(`/admin/recruiters/list_banned_recruiter?${queryParams}`)
+}
+
 const getCompanyDetail = async (dispatch: Dispatch, id: string) => {
   const response = await axiosInstance.get(`/admin/recruiters/information/${id}`)
   const data = response.data.metadata
@@ -99,6 +149,17 @@ const approveJob = async (id: string, acceptanceStatus: string, reasonDecline: s
   }
 
   return await axiosInstance.patch(`admin/jobs/approve/${id}`, values)
+}
+
+const handleBlockJob = async (id: string, isBan: string, reasonBan: string) => {
+  const values: { isBan: string; reasonBan?: string } = {
+    isBan: isBan
+  }
+  if (reasonBan) {
+    values.reasonBan = reasonBan
+  }
+
+  return await axiosInstance.patch(`admin/jobs/${id}/ban`, values)
 }
 
 const approveCompany = async (id: string, acceptanceStatus: string, reasonDecline: string) => {
@@ -189,7 +250,24 @@ const getCaculateRevenueByDate = async (startDate: string, endDate: string) => {
   return await axiosInstance.get(`/admin/statistic/revenue?startDate=${startDate}&endDate=${endDate}`)
 }
 
+const getListReports = async (jobId: string, { page = 1, limit = 10 } = {}) => {
+  const params = new URLSearchParams()
+
+  params.append('page', page.toString())
+  params.append('limit', limit.toString())
+  return await axiosInstance.get(`/admin/jobs/${jobId}/reports?${params}`)
+}
+
+const unlockCompany = async (recId: string) => {
+  return await axiosInstance.patch(`/admin/recruiters/unban/${recId}`)
+}
+
 export const AdminService = {
+  unlockCompany,
+  getListBannedCompany,
+  handleBlockJob,
+  getListReportedJobs,
+  getListReports,
   getListRec,
   getListJobs,
   getJobDetail,

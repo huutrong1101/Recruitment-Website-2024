@@ -2,7 +2,13 @@ import classNames from 'classnames'
 
 export default function JobInformationCard({ cardData, jobId }: any) {
   return (
-    <div className={classNames(`w-full bg-white shadow-sm px-4 py-6 rounded-xl border`, `flex flex-col gap-4`)}>
+    <div
+      className={classNames(
+        `w-full bg-white shadow-sm px-4 py-6 rounded-xl border`,
+        `flex flex-col gap-4`,
+        `sticky top-3`
+      )}
+    >
       <h1 className={classNames(`font-semibold text-xl`)}>Thông tin bổ sung</h1>
       <div className={classNames(`flex flex-col gap-3`)}>
         {cardData &&

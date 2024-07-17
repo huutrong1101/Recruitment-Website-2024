@@ -164,7 +164,12 @@ const changeResumeStatus = async (resumeId: string, status: string) => {
   return await axiosInstance.patch(`/candidate/resumes/change_status/${resumeId}`, requestBody)
 }
 
+const createReport = async (jobId: string, values: any) => {
+  return await axiosInstance.post(`/jobs/${jobId}/create_report`, values)
+}
+
 export const UserService = {
+  createReport,
   getRecFromToken,
   getAdminFromToken,
   changeUserAvatar,

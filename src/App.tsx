@@ -70,6 +70,9 @@ import FilterCandidate from './components/Routers/FilterCandidate'
 import FilterRecruiter from './components/Routers/FilterRecruiter'
 import NewDetail from './pages/NewDetail/NewDetail'
 import RecruiterAppLayout from './layouts/RecruiterAppLayout'
+import SuggestCandidate from './pages/Rec/RecListJobRecretment/SuggestCandidate/SuggestCandidate'
+import SuggestCandidateProfile from './pages/Rec/RecListJobRecretment/SuggestCandidate/SuggestCandidateProfile/SuggestCandidateProfile'
+import Block from './pages/Block/Block'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -120,6 +123,8 @@ function App() {
             <Route path='rec-signup' element={<AuthenticateRecSignUp />} />
             <Route element={<AuthenticateLogin />} />
           </Route>
+
+          <Route path='block' element={<Block />} />
 
           <Route path='/confirm-rec' element={<ConfirmRecLayout />}>
             <Route index element={<ConfirmRec />} />
@@ -175,6 +180,13 @@ function App() {
                   path='jobsPosted/listCandidate/:jobid/candidateDetail/:candidateId'
                   element={<CandidateProfileDetail />}
                 />
+
+                <Route path='jobsPosted/suggestCandidate/:jobid' element={<SuggestCandidate />} />
+                <Route
+                  path='jobsPosted/suggestCandidate/:jobid/candidateDetail/:candidateId'
+                  element={<SuggestCandidateProfile />}
+                />
+
                 <Route path='createJob' element={<RecAddJob />} />
                 <Route path='editJob/:jobId' element={<RecEditJob />} />
               </Route>

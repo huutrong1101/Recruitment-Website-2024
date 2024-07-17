@@ -8,7 +8,7 @@ import { JobService } from '../../../services/JobService'
 import moment from 'moment'
 import { toast } from 'react-toastify'
 import { RecService } from '../../../services/RecService'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import SelectFormItem from './SelectFormItem'
 
 const { Option } = Select
@@ -33,6 +33,8 @@ interface FormData {
 function RecAddJob() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+
+  const { recruiter } = useAppSelector((app) => app.Auth)
 
   const [formData, setFormData] = useState<FormData>({})
   const [form] = Form.useForm()
@@ -171,8 +173,20 @@ function RecAddJob() {
         <div className='mb-2'>
           <h1 className='flex-1 text-2xl font-semibold md:mb-4'>Đăng tin tuyển dụng</h1>
           <p className='flex items-center gap-2'>
-            <ExclamationCircleIcon className='w-4 h-4' /> Lưu ý: Sau khi thêm mới việc làm thành công, việc làm sẽ
-            chuyển sang trạng thái chờ duyệt
+            <ExclamationCircleIcon className='w-4 h-4' />
+            {recruiter && (
+              <p>
+                Lưu ý: Bạn đã đăng tuyển{' '}
+                <span className='font-semibold text-emerald-500'>
+                  {recruiter.postCount}/{recruiter.limitPost}
+                </span>{' '}
+                số lượng công việc cho phép trong tháng này. Hãy{' '}
+                <Link to='/recruiter/profile/service' className='font-semibold text-emerald-500'>
+                  nâng cấp tài khoản
+                </Link>{' '}
+                để có thể tăng số lượng công việc có thể đăng tuyển nhé!
+              </p>
+            )}
           </p>
         </div>
         <div className='flex-col gap-6 marker:flex md:flex-row'>

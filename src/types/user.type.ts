@@ -55,6 +55,8 @@ export interface RecruiterResponseState {
   premiumAccount: boolean
   activeJobCount: number
   firstApproval: boolean
+  postCount: number
+  limitPost: number
 }
 
 export interface AdminResponseState {

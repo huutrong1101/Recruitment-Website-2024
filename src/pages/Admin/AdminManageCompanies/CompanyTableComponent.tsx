@@ -81,6 +81,16 @@ function CompanyTableComponent({
           pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
         />
       </TabPane>
+      <TabPane tab='Công ty bị khóa' key='4'>
+        <Table
+          loading={isLoading}
+          columns={columns}
+          dataSource={activeData}
+          size='middle'
+          rowClassName={rowClassName}
+          pagination={{ current: currentPage, pageSize: pageSize, onChange: handlePageChange, total: totalElement }}
+        />
+      </TabPane>
     </Tabs>
   )
 }

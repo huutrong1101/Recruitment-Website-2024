@@ -69,7 +69,7 @@ const UserProfileSubmittedJob = () => {
   const convertJobsToTableData = (jobs: any[]): DataType[] => {
     return jobs.map((job, index) => ({
       key: job.jobId,
-      index: index + 1,
+      index: (currentPage - 1) * pageSize + index + 1,
       jobName: job.name,
       jobPosition: job.levelRequirement,
       companyName: job.companyName,

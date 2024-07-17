@@ -110,8 +110,6 @@ function AdminManageCompanies() {
   const [totalElement, setTotalElement] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
 
-  console.log(activeData)
-
   useEffect(() => {
     JobService.getActivity(dispatch)
     JobService.getProvince(dispatch)
@@ -149,7 +147,12 @@ function AdminManageCompanies() {
         acceptanceStatus
       }
 
-      const response = await AdminService.getListCompany(params)
+      let response
+      if (activeTabKey === '4') {
+        response = await AdminService.getListBannedCompany(params)
+      } else {
+        response = await AdminService.getListCompany(params)
+      }
 
       if (response) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listRecruiter))
@@ -170,8 +173,12 @@ function AdminManageCompanies() {
 
     setIsLoading(true)
     try {
-      // Gọi API với acceptanceStatus sau khi reset và các tham số khác ở giá trị ban đầu
-      const response = await AdminService.getListCompany({ acceptanceStatus: acceptanceStatus })
+      let response
+      if (activeTabKey === '4') {
+        response = await AdminService.getListBannedCompany()
+      } else {
+        response = await AdminService.getListCompany({ acceptanceStatus: acceptanceStatus })
+      }
       if (response) {
         setActiveData(mapApiDataToTableData(response.data.metadata.listRecruiter))
         setTotalElement(response.data.metadata.totalElement)
@@ -209,6 +216,13 @@ function AdminManageCompanies() {
             setTotalElement(response.data.metadata.totalElement)
           }
           break
+        case '4':
+          response = await AdminService.getListBannedCompany({ page: page, limit: size })
+          if (response && response.data) {
+            setActiveData(mapApiDataToTableData(response.data.metadata.listRecruiter))
+            setTotalElement(response.data.metadata.totalElement)
+          }
+          break
         default:
           setActiveData([])
           setIsLoading(false)
@@ -224,15 +238,13 @@ function AdminManageCompanies() {
 
   const fetchDataForTab = (key: string) => {
     setActiveTabKey(key)
-    setCurrentPage(1) // Reset lại trang đầu tiên mỗi khi thay đổi tab
+    setCurrentPage(1)
     fetchDataForTab(key)
   }
 
   const handleNavigate = () => {
     navigate('/admin/manage_companies/addCompany')
   }
-
-  console.log(activeData)
 
   return (
     <div className='flex flex-col flex-1 gap-4'>

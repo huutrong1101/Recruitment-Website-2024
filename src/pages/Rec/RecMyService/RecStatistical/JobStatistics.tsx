@@ -32,7 +32,7 @@ interface DailyDetail {
 interface DualAxesData {
   time: string
   value: number
-  type: 'Tổng' | 'Chờ duyệt' | 'Đã duyệt' | 'Không duyệt'
+  type: 'Tổng' | 'Đã tạo' | 'Bị khóa'
 }
 
 const JobStatistics: React.FC = () => {
@@ -56,7 +56,7 @@ const JobStatistics: React.FC = () => {
       .map((detail) => ({
         time: `${detail.month}`,
         value: detail.accepted,
-        type: 'Đã duyệt' as 'Đã duyệt'
+        type: 'Đã tạo' as 'Đã tạo'
       }))
 
     const rejected = dailyDetails
@@ -64,18 +64,10 @@ const JobStatistics: React.FC = () => {
       .map((detail) => ({
         time: `${detail.month}`,
         value: detail.rejected,
-        type: 'Không duyệt' as 'Không duyệt'
+        type: 'Bị khóa' as 'Bị khóa'
       }))
 
-    const waiting = dailyDetails
-      .filter((detail) => detail.waiting > 0)
-      .map((detail) => ({
-        time: `${detail.month}`,
-        value: detail.waiting,
-        type: 'Chờ duyệt' as 'Chờ duyệt'
-      }))
-
-    const combinedData = [...accepted, ...rejected, ...waiting]
+    const combinedData = [...accepted, ...rejected]
     return combinedData.sort((a, b) => dayjs(a.time).diff(dayjs(b.time)))
   }
 
@@ -123,15 +115,13 @@ const JobStatistics: React.FC = () => {
             leftChartData: response.data.metadata.yearlyDetails.map((item: any) => ({
               month: `Tháng ${item.month}`,
               totalApplications: item.totalJobs,
-              waiting: item.waiting,
               accepted: item.accepted,
               rejected: item.rejected
             })),
             rightChartData: [
               { type: 'Tổng', value: response.data.metadata.totalJobs },
-              { type: 'Đã duyệt', value: response.data.metadata.totalAccepted },
-              { type: 'Không duyệt', value: response.data.metadata.totalRejected },
-              { type: 'Chờ duyệt', value: response.data.metadata.totalWaiting }
+              { type: 'Đã tạo', value: response.data.metadata.totalAccepted },
+              { type: 'Bị khóa', value: response.data.metadata.totalRejected }
             ]
           }
         } else {
@@ -140,15 +130,13 @@ const JobStatistics: React.FC = () => {
             leftChartData: response.data.metadata[detailsKey].map((item: any) => ({
               month: filterType === 'month' ? `Ngày ${item.day}` : item.day,
               totalApplications: item.totalJobs || 0,
-              waiting: item.waiting,
               accepted: item.accepted,
               rejected: item.rejected
             })),
             rightChartData: [
               { type: 'Tổng', value: response.data.metadata.totalJobs },
-              { type: 'Đã duyệt', value: response.data.metadata.totalAccepted },
-              { type: 'Không duyệt', value: response.data.metadata.totalRejected },
-              { type: 'Chờ duyệt', value: response.data.metadata.totalWaiting }
+              { type: 'Đã tạo', value: response.data.metadata.totalAccepted },
+              { type: 'Bị khóa', value: response.data.metadata.totalRejected }
             ]
           }
         }
@@ -192,7 +180,7 @@ const JobStatistics: React.FC = () => {
         }
       }
     ],
-    theme: { category10: ['#63B3ED', '#FC8181', '#68D391'] }
+    theme: { category10: ['#63B3ED', '#FC8181'] }
   }
 
   const renderDateFilters = () => {
@@ -249,15 +237,12 @@ const JobStatistics: React.FC = () => {
         <div className='flex flex-col gap-3'>
           <Row gutter={16}>
             {statisticsData.rightChartData.map((data, index) => (
-              <Col key={index} span={6}>
+              <Col key={index} span={8}>
                 <Card
                   style={
-                    [
-                      { backgroundColor: '#F6AD55' },
-                      { backgroundColor: '#63B3ED' },
-                      { backgroundColor: '#FC8181' },
-                      { backgroundColor: '#68D391' }
-                    ][index]
+                    [{ backgroundColor: '#F6AD55' }, { backgroundColor: '#63B3ED' }, { backgroundColor: '#FC8181' }][
+                      index
+                    ]
                   }
                 >
                   <Statistic title={<span className='font-bold'>{data.type}</span>} value={data.value} />

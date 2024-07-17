@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Input, Modal, Select, Table, Tabs, Tooltip } from 'antd'
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks'
 import type { TableColumnsType } from 'antd'
-import { Cog6ToothIcon, EyeIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
+import { Cog6ToothIcon, EyeIcon, PencilSquareIcon, StarIcon } from '@heroicons/react/24/outline'
 import { fetchListWatingJobs } from '../../../redux/reducer/RecSlice'
 import moment from 'moment'
 import { JobService } from '../../../services/JobService'
@@ -11,6 +11,7 @@ import { RecService } from '../../../services/RecService'
 import FilterPanelComponent from './FilterPanelComponent'
 import JobTableComponent from './JobTableComponent'
 import { Link } from 'react-router-dom'
+import { MdOutlineSettingsSuggest, MdSettings } from 'react-icons/md'
 
 const { Option } = Select
 const { TabPane } = Tabs
@@ -128,12 +129,27 @@ function RecListJobRecruitment(): JSX.Element {
           </div>
         </Tooltip>
       )
+    },
+    {
+      title: 'HOẠT ĐỘNG',
+      dataIndex: 'status',
+      key: 'status',
+      align: 'center',
+      render: (text, record) => (
+        <Tooltip title='Gợi ý ứng viên'>
+          <Link
+            className='flex items-center justify-center'
+            to={`/recruiter/profile/jobsPosted/suggestCandidate/${record.key}`}
+          >
+            <MdOutlineSettingsSuggest className='w-6 h-6' />
+          </Link>
+        </Tooltip>
+      )
     }
   ]
 
-  if (activeTabKey === '3') {
-    // Giả sử '3' là key cho tab "Việc làm không duyệt"
-    columns = columns.filter((column) => column.key !== 'applicationProfile') // Loại bỏ cột "Hồ sơ ứng tuyển"
+  if (activeTabKey === '2') {
+    columns = columns.filter((column) => column.key !== 'applicationProfile' && column.key !== 'status')
     columns.push({
       title: 'HÀNH ĐỘNG',
       key: 'action',
@@ -146,6 +162,10 @@ function RecListJobRecruitment(): JSX.Element {
         </div>
       )
     })
+  }
+
+  if (activeTabKey === '4') {
+    columns = columns.filter((column) => column.key !== 'applicationProfile' && column.key !== 'status')
   }
   // Function để chuyển đổi dữ liệu từ API
   const mapApiDataToTableData = (apiData: JobFromApi[]): DataType[] => {
@@ -191,34 +211,28 @@ function RecListJobRecruitment(): JSX.Element {
       let response
       switch (key) {
         case '1':
-          response = await RecService.getAcceptedJobs({ page: page, limit: size })
+          response = await RecService.getShowListJobs({ page: page, limit: size })
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listAcceptedJob))
             setTotalElement(response.data.metadata.totalElement)
           }
           break
+
         case '2':
-          response = await RecService.getListWaitingJob({ page: page, limit: size })
-          if (response && response.data) {
-            setActiveData(mapApiDataToTableData(response.data.metadata.listWaitingJob))
-            setTotalElement(response.data.metadata.totalElement)
-          }
-          break
-        case '3':
           response = await RecService.getDeclinedJobs({ page: page, limit: size })
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listDeclinedJob))
             setTotalElement(response.data.metadata.totalElement)
           }
           break
-        case '4':
+        case '3':
           response = await RecService.getNearingExpirationJob({ page: page, limit: size })
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listNearingExpirationJob))
             setTotalElement(response.data.metadata.totalElement)
           }
           break
-        case '5':
+        case '4':
           response = await RecService.getExpiredJob({ page: page, limit: size })
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listExpiredJob))
@@ -256,34 +270,27 @@ function RecListJobRecruitment(): JSX.Element {
 
       switch (activeTabKey) {
         case '1':
-          response = await RecService.getAcceptedJobs(searchParams)
+          response = await RecService.getShowListJobs(searchParams)
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listAcceptedJob))
             setTotalElement(response.data.metadata.totalElement)
           }
           break
         case '2':
-          response = await RecService.getListWaitingJob(searchParams)
-          if (response && response.data) {
-            setActiveData(mapApiDataToTableData(response.data.metadata.listWaitingJob))
-            setTotalElement(response.data.metadata.totalElement)
-          }
-          break
-        case '3':
           response = await RecService.getDeclinedJobs(searchParams)
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listDeclinedJob))
             setTotalElement(response.data.metadata.totalElement)
           }
           break
-        case '4':
+        case '3':
           response = await RecService.getNearingExpirationJob(searchParams)
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listNearingExpirationJob))
             setTotalElement(response.data.metadata.totalElement)
           }
           break
-        case '5':
+        case '4':
           response = await RecService.getExpiredJob(searchParams)
           if (response && response.data) {
             setActiveData(mapApiDataToTableData(response.data.metadata.listExpiredJob))

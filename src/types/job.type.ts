@@ -26,6 +26,8 @@ export interface JobInterface {
   companySlug: string
   premiumAccount: boolean
   reasonDecline: string
+  isBan: boolean
+  banReason: string
 }
 
 export interface AdminJobInterface {
@@ -74,6 +76,7 @@ export interface AdminCompanyInterface {
   role: string
   slug: string
   reasonDecline: string
+  isBan: boolean
 }
 
 export interface NewInterface {

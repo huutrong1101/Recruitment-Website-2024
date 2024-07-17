@@ -93,8 +93,6 @@ function AdminManageJobDetail() {
     }
   }, [jobDetail])
 
-  console.log(jobDetail)
-
   const formatNumber = (number: number): string => {
     return (number / 1000000).toLocaleString('vi-VN')
   }
