@@ -155,7 +155,7 @@ function RecEditJob() {
       toast
         .promise(RecService.updateJob(formValues, jobId), {
           pending: `Công việc của bạn đang được chỉnh sửa`,
-          success: `Công việc đã được chỉnh sửa thành công. Hãy chờ đợi để admin xét duyệt`
+          success: `Công việc đã được chỉnh sửa thành công.`
         })
         .then((response) => {
           navigate('/recruiter/profile/jobsPosted')

@@ -180,10 +180,9 @@ function App() {
                   path='jobsPosted/listCandidate/:jobid/candidateDetail/:candidateId'
                   element={<CandidateProfileDetail />}
                 />
-
                 <Route path='jobsPosted/suggestCandidate/:jobid' element={<SuggestCandidate />} />
                 <Route
-                  path='jobsPosted/suggestCandidate/:jobid/candidateDetail/:candidateId'
+                  path='jobsPosted/suggestCandidate/:jobid/candidateDetail/:resumeId'
                   element={<SuggestCandidateProfile />}
                 />
 

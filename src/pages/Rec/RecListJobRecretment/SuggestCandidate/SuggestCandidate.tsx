@@ -69,7 +69,7 @@ function SuggestCandidate() {
     setLoading(true)
     try {
       if (jobid) {
-        const response = await RecService.getListResumeOfRec(
+        const response = await RecService.getListSuggestRec(
           {
             ...searchParams,
             page,
@@ -78,14 +78,11 @@ function SuggestCandidate() {
           jobid
         )
         if (response && response.data) {
-          const data = response.data.metadata.listApplication
+          const data = response.data.metadata.listSuggestedCandidate
           const total = response.data.metadata.totalElement
-          const name = response.data.metadata.name
-          const levelRequirement = response.data.metadata.levelRequirement
+
           setListResume(data)
           setTotalElement(total)
-          setName(name)
-          setLevelRequirement(levelRequirement)
         }
       }
     } catch (error) {

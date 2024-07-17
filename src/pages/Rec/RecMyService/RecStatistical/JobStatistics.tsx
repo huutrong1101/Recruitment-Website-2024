@@ -115,8 +115,8 @@ const JobStatistics: React.FC = () => {
             leftChartData: response.data.metadata.yearlyDetails.map((item: any) => ({
               month: `Tháng ${item.month}`,
               totalApplications: item.totalJobs,
-              accepted: item.accepted,
-              rejected: item.rejected
+              accepted: item.activeJobs,
+              rejected: item.bannedJobs
             })),
             rightChartData: [
               { type: 'Tổng', value: response.data.metadata.totalJobs },
@@ -130,8 +130,8 @@ const JobStatistics: React.FC = () => {
             leftChartData: response.data.metadata[detailsKey].map((item: any) => ({
               month: filterType === 'month' ? `Ngày ${item.day}` : item.day,
               totalApplications: item.totalJobs || 0,
-              accepted: item.accepted,
-              rejected: item.rejected
+              accepted: item.activeJobs,
+              rejected: item.bannedJobs
             })),
             rightChartData: [
               { type: 'Tổng', value: response.data.metadata.totalJobs },

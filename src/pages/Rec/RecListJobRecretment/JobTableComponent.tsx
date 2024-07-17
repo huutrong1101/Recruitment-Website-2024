@@ -12,7 +12,7 @@ interface DataType {
   expirationDate: string
   applicationProfile: number
   status: string
-  reasonDecline: string
+  banReason: string
 }
 
 interface JobTableProps {

@@ -73,7 +73,7 @@ const getShowListJobs = async ({ name = '', field = '', levelRequirement = '', p
   return await axiosInstance.get(`/recruiter/jobs/list_job?${queryParams}`)
 }
 
-const getDeclinedJobs = async ({ name = '', field = '', type = '', page = 1, limit = 10 } = {}) => {
+const getBannedJobs = async ({ name = '', field = '', type = '', page = 1, limit = 10 } = {}) => {
   const params = new URLSearchParams()
 
   // Thêm các param vào nếu chúng không rỗng
@@ -87,7 +87,7 @@ const getDeclinedJobs = async ({ name = '', field = '', type = '', page = 1, lim
   // Chuyển params thành chuỗi để gắn vào URL
   const queryParams = params.toString()
   // No Content-Type header is manually set here
-  return await axiosInstance.get(`/recruiter/jobs/declined_jobs?${queryParams}`)
+  return await axiosInstance.get(`/recruiter/jobs/banned_jobs?${queryParams}`)
 }
 
 const getExpiredJob = async ({ name = '', field = '', type = '', page = 1, limit = 10 } = {}) => {
@@ -169,6 +169,26 @@ const getListResumeOfRec = async (
   const queryParams = params.toString()
 
   return await axiosInstance.get(`recruiter/jobs/applications/${jobId}?${queryParams}`)
+}
+
+const getListSuggestRec = async (
+  { page = 1, limit = 10, candidateName = '', experience = '', status = '', major = '', timeSubmit = '' } = {},
+  jobId: string
+) => {
+  const params = new URLSearchParams()
+
+  if (candidateName) params.append('candidateName', candidateName)
+  if (experience) params.append('experience', experience)
+  if (status) params.append('status', status)
+  if (major) params.append('major', major)
+  if (timeSubmit) params.append('timeSubmit', timeSubmit)
+
+  params.append('page', page.toString())
+  params.append('limit', limit.toString())
+
+  const queryParams = params.toString()
+
+  return await axiosInstance.get(`/recruiter/jobs/${jobId}/suggested_resumes?${queryParams}`)
 }
 
 const getListAdvancedResume = async ({
@@ -361,10 +381,11 @@ const resendEmail = async (data: any) => {
 }
 
 export const RecService = {
+  getListSuggestRec,
   createJob,
   getListWaitingJob,
   getShowListJobs,
-  getDeclinedJobs,
+  getBannedJobs,
   getListRec,
   getRecFromSlug,
   getLsitJobOfRec,

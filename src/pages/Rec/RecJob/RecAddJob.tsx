@@ -113,7 +113,7 @@ function RecAddJob() {
     toast
       .promise(RecService.createJob(formValues), {
         pending: `Công việc của bạn đang được khởi tạo`,
-        success: `Công việc đã được khởi tạo thành công. Hãy chờ đợi để admin xét duyệt`
+        success: `Công việc đã được khởi tạo thành công.`
       })
       .then((response) => {
         navigate('/recruiter/profile/jobsPosted')

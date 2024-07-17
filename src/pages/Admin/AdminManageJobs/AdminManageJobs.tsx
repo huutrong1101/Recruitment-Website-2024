@@ -103,12 +103,6 @@ const getColumns = (activeTabKey: string): Array<ColumnType<DataType>> => [
   }
 ]
 
-const mapTabKeyToStatus = {
-  '1': 'accept',
-  '2': 'waiting',
-  '3': 'decline'
-}
-
 function AdminManageJobs() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()

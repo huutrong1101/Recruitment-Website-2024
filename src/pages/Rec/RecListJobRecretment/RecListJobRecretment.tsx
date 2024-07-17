@@ -25,7 +25,7 @@ interface DataType {
   expirationDate: string
   applicationProfile: number
   status: string
-  reasonDecline: string
+  banReason: string
 }
 
 interface JobFromApi {
@@ -36,7 +36,7 @@ interface JobFromApi {
   deadline: string
   status: 'active' | 'inactive'
   applicationNumber: number
-  reasonDecline: string
+  banReason: string
 }
 
 interface ActivityOption {
@@ -61,6 +61,8 @@ function RecListJobRecruitment(): JSX.Element {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [isModalReason, setIsModalReason] = useState(false)
   const [currentJob, setCurrentJob] = useState<DataType | null>(null)
+
+  console.log(currentJob)
 
   let columns: TableColumnsType<DataType> = [
     {
@@ -177,7 +179,7 @@ function RecListJobRecruitment(): JSX.Element {
       expirationDate: job.deadline,
       applicationProfile: job.applicationNumber,
       status: job.status === 'active' ? 'Kích hoạt' : 'Không kích hoạt',
-      reasonDecline: job.reasonDecline
+      banReason: job.banReason
     }))
   }
 
@@ -219,9 +221,9 @@ function RecListJobRecruitment(): JSX.Element {
           break
 
         case '2':
-          response = await RecService.getDeclinedJobs({ page: page, limit: size })
+          response = await RecService.getBannedJobs({ page: page, limit: size })
           if (response && response.data) {
-            setActiveData(mapApiDataToTableData(response.data.metadata.listDeclinedJob))
+            setActiveData(mapApiDataToTableData(response.data.metadata.listBannedJob))
             setTotalElement(response.data.metadata.totalElement)
           }
           break
@@ -277,9 +279,9 @@ function RecListJobRecruitment(): JSX.Element {
           }
           break
         case '2':
-          response = await RecService.getDeclinedJobs(searchParams)
+          response = await RecService.getBannedJobs(searchParams)
           if (response && response.data) {
-            setActiveData(mapApiDataToTableData(response.data.metadata.listDeclinedJob))
+            setActiveData(mapApiDataToTableData(response.data.metadata.listBannedJob))
             setTotalElement(response.data.metadata.totalElement)
           }
           break
@@ -399,7 +401,7 @@ function RecListJobRecruitment(): JSX.Element {
             </Modal>
 
             <Modal
-              title='Lý do không được duyệt'
+              title='Lý do bị khóa'
               open={isModalReason}
               onCancel={handleCancelReason}
               footer={[
@@ -408,7 +410,7 @@ function RecListJobRecruitment(): JSX.Element {
                 </Button>
               ]}
             >
-              <p>{currentJob?.reasonDecline}</p>
+              <p>{currentJob?.banReason}</p>
             </Modal>
           </div>
         </div>

@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import { ArrowLeftOutlined } from '@ant-design/icons'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Checkbox, Input, Modal, Radio, Spin, UploadFile } from 'antd'
-import { RecService } from '../../../../../services/RecService'
-import { useAppDispatch, useAppSelector } from '../../../../../hooks/hooks'
+import { Button, Modal, Spin } from 'antd'
 import moment, { Moment } from 'moment'
-import { toast } from 'react-toastify'
-import { CheckboxChangeEvent } from 'antd/es/checkbox'
-import { ResumeResponse } from '../../../../../types/resume.type'
+import { UploadFile } from 'antd/lib'
 import dayjs from 'dayjs'
+import { FilePdfOutlined, HeartOutlined, ArrowLeftOutlined } from '@ant-design/icons'
+import { toast } from 'react-toastify'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
+import { useAppSelector } from '../../../../../hooks/hooks'
+import { ResumeResponse } from '../../../../../types/resume.type'
+import { RecService } from '../../../../../services/RecService'
 import PreviewResume from '../../../../UserProfile/UserResume/UserResumeAdd/PreviewResume/PreviewResume'
 
 interface DataType {
@@ -62,26 +64,42 @@ interface FormValues {
 
 function SuggestCandidateProfile() {
   const navigate = useNavigate()
-  const dispatch = useAppDispatch()
 
+  const { resumeId } = useParams()
+
+  const { recruiter } = useAppSelector((state) => state.Auth)
   const { isUpgrade } = useAppSelector((state) => state.RecJobs)
 
-  const { candidateId } = useParams()
-
-  const [isLoading, setIsLoading] = useState(false)
   const [formValues, setFormValues] = useState<FormValues | undefined>(undefined)
   const [resumeDetail, setResumeDetail] = useState<ResumeResponse | null>(null)
+  const [isFavorite, setIsFavorite] = useState(false)
+  const [isFavoriteModalVisible, setIsFavoriteModalVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  console.log(isUpgrade)
 
   useEffect(() => {
-    if (candidateId) {
-      fetchResumeDetail(candidateId)
+    if (resumeId) {
+      fetchResumeDetail(resumeId)
     }
-  }, [dispatch, candidateId])
+  }, [resumeId])
 
-  const fetchResumeDetail = async (candidateId: string) => {
+  useEffect(() => {
+    if (recruiter && resumeDetail) {
+      RecService.getIfRecFavoriteTheResume(resumeDetail._id)
+        .then((response) => {
+          setIsFavorite(response.data.metadata.exist)
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+    }
+  }, [recruiter, resumeDetail])
+
+  const fetchResumeDetail = async (resumeId: string) => {
     setIsLoading(true)
     try {
-      const response = await RecService.getResumeDetail(candidateId)
+      const response = await RecService.getResumeDetailFromResumeId(resumeId)
       if (response && response.data) {
         const data = response.data.metadata
         setResumeDetail(data)
@@ -116,7 +134,7 @@ function SuggestCandidateProfile() {
           name: data.name,
           title: data.title,
           GPA: data.GPA,
-          phone: data.phone,
+          phone: isUpgrade ? data.phone : 'Thông tin đã bị ẩn',
           dateOfBirth: data.dateOfBirth ? moment(dayjs(data.dateOfBirth).toISOString()) : undefined,
           homeTown: data.homeTown || '',
           experience: data.experience || '',
@@ -125,7 +143,7 @@ function SuggestCandidateProfile() {
           english: data.english || '',
           goal: data.goal || '',
           activity: data.activity || '',
-          email: data.email || '',
+          email: isUpgrade ? data.email : 'Thông tin đã bị ẩn',
           major: data.major || '',
           certifications: formattedCertifications,
           educations: formattedEducations,
@@ -144,6 +162,80 @@ function SuggestCandidateProfile() {
     navigate(-1)
   }
 
+  const showFavoriteModal = () => {
+    setIsFavoriteModalVisible(true)
+  }
+
+  // Xử lý khi nhấn vào nút cancel trên Modal
+  const handleCancel = () => {
+    setIsFavoriteModalVisible(false)
+  }
+
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      handleRemoveFavorite()
+    } else {
+      handleAddFavorite()
+    }
+  }
+
+  const handleAddFavorite = async () => {
+    toast
+      .promise(RecService.saveFavoriteResume(resumeId), {
+        pending: `Hồ sơ đang được lưu vào danh sách`,
+        success: `Lưu hồ sơ vào mục yêu thích`
+      })
+      .then(() => {
+        setIsFavorite(true)
+        setIsFavoriteModalVisible(false)
+      })
+      .catch((error) => toast.error(error.response.data.message))
+  }
+
+  const handleRemoveFavorite = async () => {
+    toast
+      .promise(RecService.removeFavoriteResume(resumeId), {
+        pending: `Hồ sơ đang được xóa khỏi danh sách`,
+        success: `Xóa hồ sơ khỏi mục yêu thích`
+      })
+      .then(() => {
+        setIsFavorite(false)
+        setIsFavoriteModalVisible(false)
+      })
+      .catch((error) => toast.error(error.response.data.message))
+  }
+
+  const exportPDF = () => {
+    const resumeContentElement = document.getElementById('resumeContent')
+
+    if (resumeContentElement) {
+      html2canvas(resumeContentElement as HTMLElement, {
+        useCORS: true,
+        logging: true
+      })
+        .then((canvas) => {
+          const doc = new jsPDF({
+            orientation: 'p',
+            unit: 'mm',
+            format: 'a4'
+          })
+
+          const imgData = canvas.toDataURL('image/png', 1.0)
+
+          const imgWidth = doc.internal.pageSize.getWidth()
+          const imgHeight = (canvas.height * imgWidth) / canvas.width
+
+          doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
+          doc.save('resume.pdf')
+        })
+        .catch((error) => {
+          console.error('Lỗi khi tạo PDF:', error)
+        })
+    } else {
+      console.error('Element #resumeContent không tồn tại.')
+    }
+  }
+
   return (
     <>
       {isLoading ? (
@@ -155,20 +247,37 @@ function SuggestCandidateProfile() {
           <div className='flex flex-col flex-1 gap-4'>
             <div className='w-full border rounded-xl border-zinc-100'>
               <div className='flex items-center justify-between p-2 rounded-tl-lg bg-slate-200 rounded-tr-xl'>
-                <div className='flex items-center justify-center gap-5'>
+                <div className='flex items-center justify-center gap-3'>
                   <ArrowLeftOutlined onClick={handleBack} style={{ cursor: 'pointer' }} className='font-bold' />
-                  <h6 className='flex-1 text-lg font-semibold uppercase'>Thông tin ứng viên</h6>
+                  <h6 className='flex-1 text-lg font-semibold uppercase'>Thông tin hồ sơ</h6>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <Button type='primary' className='flex items-center justify-center gap-2' onClick={exportPDF}>
+                    <FilePdfOutlined />
+                    <p>Tải file</p>
+                  </Button>
+
+                  <Modal
+                    title={isFavorite ? 'Bỏ khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+                    open={isFavoriteModalVisible}
+                    onOk={toggleFavorite}
+                    onCancel={handleCancel}
+                    okText={isFavorite ? 'Bỏ yêu thích' : 'Lưu'}
+                    cancelText='Hủy'
+                    cancelButtonProps={{ style: { backgroundColor: 'transparent' } }}
+                    width={450}
+                  >
+                    <p>
+                      Bạn có muốn {isFavorite ? 'bỏ hồ sơ này khỏi' : 'thêm hồ sơ này vào'} danh sách yêu thích không?
+                    </p>
+                  </Modal>
                 </div>
               </div>
 
               <div className='mt-1'>
                 {formValues && resumeDetail && (
                   <PreviewResume
-                    values={{
-                      ...formValues,
-                      email: isUpgrade ? formValues.email : 'Thông tin đã ẩn',
-                      phone: isUpgrade ? formValues.phone : 'Thông tin đã ẩn'
-                    }}
+                    values={formValues}
                     previewAvatar={resumeDetail.avatar}
                     templateId={resumeDetail?.themeId}
                     type='watch'

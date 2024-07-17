@@ -34,10 +34,7 @@ function SuggestCandidateCard({ candidate, jobid }: CandidateCardProps) {
   const candidateStatusClass = statusClasses[candidate.status] || 'bg-gray-300 text-emerald-700'
 
   return (
-    <div
-      // to={``}
-      className='flex items-start justify-start p-4 border rounded-xl'
-    >
+    <div className='flex items-start justify-start p-4 border rounded-xl'>
       <div className='flex w-3/4 gap-3'>
         <div className='w-1/4'>
           <img className='object-cover w-full h-full' src={candidate.avatar} alt='' />
