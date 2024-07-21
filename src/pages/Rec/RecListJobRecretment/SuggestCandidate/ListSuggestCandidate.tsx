@@ -6,6 +6,7 @@ interface ListCandidateProps {
 }
 
 function ListSuggestCandidate({ listResume, jobid }: ListCandidateProps) {
+  console.log({ listResume })
   return (
     <div className='flex flex-col gap-3 p-2'>
       {listResume.map((candidate, index) => (

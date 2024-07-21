@@ -36,6 +36,8 @@ function RecAddJob() {
 
   const { recruiter } = useAppSelector((app) => app.Auth)
 
+  console.log(recruiter)
+
   const [formData, setFormData] = useState<FormData>({})
   const [form] = Form.useForm()
   const [salaryType, setSalaryType] = useState('')

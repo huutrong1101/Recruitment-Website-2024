@@ -64,9 +64,11 @@ function RecEditJob() {
     form.setFieldsValue({ salary: salary })
   }, [salaryType, salary, form])
 
+  console.log(jobDetail)
+
   useEffect(() => {
     if (jobDetail && form) {
-      const formattedDeadline = jobDetail.deadline ? dayjs(jobDetail.deadline, 'DD/MM/YYYY') : null
+      const formattedDeadline = jobDetail.deadline ? dayjs(jobDetail.deadline).format('DD-MM-YYYY') : null
 
       form.setFieldsValue({
         name: jobDetail.name,
@@ -81,7 +83,7 @@ function RecEditJob() {
         requirement: jobDetail.requirement,
         benefit: jobDetail.benefit,
         quantity: jobDetail.quantity !== 'Không giới hạn' ? jobDetail.quantity.toString() : 'o', // Đảm bảo nó là một chuỗi
-        deadline: formattedDeadline,
+        deadline: formattedDeadline ? dayjs(formattedDeadline, 'DD-MM-YYYY') : null,
         genderRequirement: jobDetail.genderRequirement
       })
 

@@ -15,7 +15,8 @@ function RightChart(props: RightChartProps) {
     label: {
       text: 'value',
       style: {
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        width: '100%'
       }
     },
     theme: { category10: ['#63B3ED', '#FC8181', '#68D391'] },

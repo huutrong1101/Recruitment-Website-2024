@@ -15,6 +15,7 @@ interface CandidateCardProps {
     status: string
     updatedAt: string
     _id: string
+    jobType: string
   }
 }
 
@@ -53,7 +54,7 @@ function CandidateCard({ candidate, jobid }: CandidateCardProps) {
           </p>
           <p className='text-xs font-medium text-gray-600 md:text-sm '>
             <span className='font-bold'>Loại hình công việc:</span>{' '}
-            <span className='hover:text-emerald-500'>{candidate.major}</span>
+            <span className='hover:text-emerald-500'>{candidate.jobType}</span>
           </p>
           <p className='text-xs font-medium text-gray-600 md:text-sm '>
             <span className='font-bold'>Kinh nghiệm làm việc:</span>{' '}
